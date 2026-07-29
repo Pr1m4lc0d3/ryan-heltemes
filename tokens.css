@@ -1,0 +1,79 @@
+/* ============================================================================
+   tokens.css — THE ONLY FILE PERMITTED TO STATE A RAW VISUAL LITERAL.
+   Every other file uses var(--token). The coherence audit fails the build on a
+   hex code, a numeric font-size, or a numeric border-radius anywhere else.
+
+   Why that rule is worth the friction: a token layer nothing references is
+   worse than none. It reads as a design system while every value is really
+   answered in N hardcoded places, so the site can never be retuned from one
+   file and every screen gets hand-fixed forever.
+
+   Retune the whole site from here. Nothing else needs to change.
+   ========================================================================= */
+
+:root {
+  /* --- Colour ------------------------------------------------------------
+     Cool zinc, not cream. The ground is galvanised sheet — greener and colder
+     than paper stock — which keeps this away from the warm-cream-and-serif
+     look every other personal site currently wears, and away from Madame
+     Whisper's ink-on-cream, which belongs to that brand and not to this one. */
+  --ground:       #e4e5e1;   /* page ground — cool zinc */
+  --ground-deep:  #d7d9d4;   /* plates, panel fills */
+  --ground-edge:  #c3c6c0;   /* hairlines, plate borders */
+  --ink:          #17191a;   /* all body type — cold near-black, never #000 */
+  --ink-soft:     #5c6260;   /* utility data, captions, secondary */
+  --accent:       #2f5d50;   /* deep verdigris — material codes and rules ONLY */
+  --accent-lift:  #3d7565;   /* accent on hover */
+
+  /* --- Type --------------------------------------------------------------
+     No webfont. This site's owner's stated position is that it collects
+     nothing, ever, so hot-linking a font CDN would be a third-party request
+     working against the brand. Self-hosted woff2 is the planned upgrade; see
+     design.md section 4. Until then the character comes from TREATMENT —
+     scale, tracking, tight leading — and from the monospace utility face,
+     which is genuinely distinctive and ships everywhere. */
+  --font-display: "Helvetica Neue", "Arial Narrow", Inter, system-ui, sans-serif;
+  --font-body:    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-util:    ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+
+  /* Type scale. Fluid where it earns it; fixed where predictability matters. */
+  --step--1: 0.78rem;
+  --step-0:  1rem;
+  --step-1:  1.25rem;
+  --step-2:  1.6rem;
+  --step-3:  2.4rem;
+  --step-display: clamp(2.75rem, 11vw, 8.5rem);
+
+  --leading-tight: 0.92;
+  --leading-body:  1.55;
+  --track-display: -0.03em;
+  --track-util:    0.14em;
+
+  --weight-normal: 400;
+  --weight-mid:    500;
+  --weight-bold:   700;
+
+  /* --- Space -------------------------------------------------------------- */
+  --space-1: 0.375rem;
+  --space-2: 0.75rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: 7rem;
+
+  /* --- Geometry ----------------------------------------------------------- */
+  --radius:     0px;         /* squared throughout — this is a catalogue, not a card UI */
+  --rule:       1px;
+  --rule-heavy: 2px;
+  --measure:    64ch;        /* readable line length for prose */
+  --page-max:   78rem;
+  --rail:       6.5rem;      /* width of the material-code rail */
+  --figure-col: 21rem;       /* width of the plate column beside each entry */
+
+  /* --- Motion -------------------------------------------------------------
+     One deliberate moment on load, nothing on scroll. Overridden entirely by
+     prefers-reduced-motion in style.css. */
+  --ease:      cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur:       620ms;
+  --dur-quick: 160ms;
+}

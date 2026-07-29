@@ -42,7 +42,9 @@
   --step-1:  1.25rem;
   --step-2:  1.6rem;
   --step-3:  2.4rem;
-  --step-display: clamp(2.75rem, 11vw, 8.5rem);
+  /* Capped at 6.5rem, not larger: the headline shares its row with the
+     portrait, and a bigger cap pushed it to five lines and a 1200px-tall hero. */
+  --step-display: clamp(2.5rem, 7vw, 6.5rem);
 
   --leading-tight: 0.92;
   --leading-body:  1.55;
@@ -68,7 +70,8 @@
   --measure:    64ch;        /* readable line length for prose */
   --page-max:   78rem;
   --rail:       6.5rem;      /* width of the material-code rail */
-  --figure-col: 21rem;       /* width of the plate column beside each entry */
+  --figure-col:   21rem;     /* width of the plate column beside each entry */
+  --portrait-col: 23rem;     /* width of the portrait plate beside the headline */
 
   /* --- Motion -------------------------------------------------------------
      One deliberate moment on load, nothing on scroll. Overridden entirely by

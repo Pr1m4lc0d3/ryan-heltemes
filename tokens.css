@@ -42,9 +42,11 @@
   --step-1:  1.25rem;
   --step-2:  1.6rem;
   --step-3:  2.4rem;
-  /* Capped at 6.5rem, not larger: the headline shares its row with the
-     portrait, and a bigger cap pushed it to five lines and a 1200px-tall hero. */
-  --step-display: clamp(2.5rem, 7vw, 6.5rem);
+  /* Raised to 9rem once the headline became two short words. The earlier 6.5rem
+     cap existed because "I make things out of different materials" ran to five
+     lines beside the portrait; "I build sh!t." does not, so the type can hit
+     harder. Re-check this if the headline ever gets longer again. */
+  --step-display: clamp(2.75rem, 10vw, 9rem);
 
   --leading-tight: 0.92;
   --leading-body:  1.55;

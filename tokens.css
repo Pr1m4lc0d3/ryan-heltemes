@@ -72,6 +72,7 @@
   --rail:       6.5rem;      /* width of the material-code rail */
   --figure-col:   24rem;     /* width of the plate column beside each entry */
   --portrait-col: 23rem;     /* width of the portrait plate beside the headline */
+  --cover-col:    13rem;     /* width of a book cover on the bookshelf page */
 
   /* --- Motion -------------------------------------------------------------
      One deliberate moment on load, nothing on scroll. Overridden entirely by

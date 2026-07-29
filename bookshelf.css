@@ -1,0 +1,81 @@
+/* bookshelf.css — page-specific only. The bookshelf reuses the index's grammar
+   (.wrap, .entry, .plate, .util, .go) because it IS the same thing: an index of
+   works with a rail, a body and a figure. Only what differs lives here.
+
+   It is a separate file rather than an addition to style.css because style.css
+   is at 296 of its 300-line budget — and because these rules serve one page.
+   Nothing in here is needed by index.html. */
+
+/* --- Page head ----------------------------------------------------------- */
+.page-head { padding-block: var(--space-5) var(--space-4); }
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: var(--step-display);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.page-sub {
+  margin: var(--space-3) 0 0;
+  max-width: var(--measure);
+  font-size: var(--step-1);
+}
+
+/* --- A series and its introduction ---------------------------------------
+   Each collection gets a header and a summary before its volumes, so a reader
+   meets the shape of the thing before the individual books. */
+.series { padding-top: var(--space-5); }
+
+.series-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-heavy) solid var(--ink);
+}
+
+.series-name {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.series-intro {
+  margin: var(--space-3) 0 0;
+  max-width: var(--measure);
+  font-size: var(--step-1);
+}
+
+/* --- A cover plate --------------------------------------------------------
+   2:3, because that is the shape of a book. Same rule as the portrait and the
+   OG cards: the frame follows the artwork. Modifier sits AFTER .plate in load
+   order (style.css then bookshelf.css) so its aspect-ratio wins. */
+.plate--cover { aspect-ratio: 2 / 3; }
+
+.book-entry { grid-template-columns: var(--rail) minmax(0, 1fr) minmax(0, var(--cover-col)); }
+
+.vol { color: var(--accent); }
+
+/* An unwritten volume is not a failure state — it is a slot. It reads as a
+   reserved space in a catalogue, which is exactly what it is. */
+.book-entry--soon .entry-title,
+.book-entry--soon .entry-what { color: var(--ink-soft); }
+
+@media (max-width: 64rem) {
+  .book-entry { grid-template-columns: var(--rail) minmax(0, 1fr); }
+  .book-entry .entry-figure { grid-column: 2; max-width: var(--cover-col); }
+}
+
+@media (max-width: 46rem) {
+  .book-entry { grid-template-columns: 1fr; }
+  .book-entry .entry-figure { grid-column: 1; max-width: var(--cover-col); }
+}

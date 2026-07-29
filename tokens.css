@@ -70,7 +70,7 @@
   --measure:    64ch;        /* readable line length for prose */
   --page-max:   78rem;
   --rail:       6.5rem;      /* width of the material-code rail */
-  --figure-col:   21rem;     /* width of the plate column beside each entry */
+  --figure-col:   24rem;     /* width of the plate column beside each entry */
   --portrait-col: 23rem;     /* width of the portrait plate beside the headline */
 
   /* --- Motion -------------------------------------------------------------

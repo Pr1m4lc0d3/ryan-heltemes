@@ -100,13 +100,23 @@ a { color: inherit; }
   background-repeat: no-repeat;
   border: var(--rule) solid var(--ground-edge);
   border-radius: var(--radius);
-  aspect-ratio: 4 / 3;
+  /* 1.91:1 — the Open Graph card ratio. Every work plate holds the same share
+     card the project's own site serves, and those carry a wordmark and a line
+     of type. A squarer frame would crop the words off, so the frame follows
+     the artwork rather than the artwork getting cut to fit the frame. */
+  aspect-ratio: 1200 / 630;
 }
 
 /* Modifiers MUST come after .plate — an aspect-ratio declared before it loses
    the source-order tie and the plate silently reverts to 4:3. This bit once
    already and rendered the portrait as a landscape crop. */
 .plate--portrait { aspect-ratio: 3 / 4; }
+
+/* The stamp earns its place on an EMPTY plate — it is what makes a blank read
+   as a labelled catalogue figure rather than a hole. On a filled plate it does
+   the opposite: it repeats the code already on the rail two columns to the left
+   and sits on top of the artwork. So it appears only where it is doing work. */
+.plate:not([data-stamp])::after { content: none; }
 
 .plate::after {
   content: attr(data-stamp);

@@ -42,9 +42,22 @@ important sits at the very edge.
 
 ## Swapping the portrait
 
-Three alternates are already sitting in `portrait/`: `alt-mountain.webp`,
+Alternates already sit in `portrait/`: `alt-fence-v1.webp`, `alt-mountain.webp`,
 `alt-cowboy.webp`, `alt-illustration.webp`. To use one, change the single
 filename in the hero `<div class="plate plate--portrait">` in `index.html`.
+
+### Generating a better likeness
+
+Two things every generated portrait so far has got wrong: **the beard comes out
+longer than it is, and the beard bead comes out far too big.**
+
+Write the correction as a **positive description**, never as a negation. Image
+models have no negative channel, so "no large beard bead" reliably *draws* a
+large beard bead. Say what IS there:
+
+> *a short, close-trimmed beard; hair loose, with a small plain cord*
+
+rather than "not a long beard, no big bead."
 
 ## Full-size originals
 

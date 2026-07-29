@@ -72,6 +72,13 @@
 
        Material codes are NOT a sequence. The prefix says what the thing is
        made of: SW software · ST steel · CH chemistry · BO botany · PR prose.
+
+       ⚠ THE STATUS WORD IS ABOUT THE PRODUCT, NEVER ABOUT THE WEBSITE.
+       "Live" means a stranger can get the thing today. A project whose own site
+       says "not yet open" or "in development" is NOT Live here, however finished
+       its landing page looks. Only `status--live` gets the accent colour, so the
+       page cannot quietly imply availability it does not have. Check the
+       project's own site before changing one of these words.
   -->
   <section class="wrap" id="works">
 
@@ -116,9 +123,12 @@
           Every guest is a reconstruction built from what they actually wrote
           and said — an echo, not a resurrection.
         </p>
+        <!-- ⚠ NOT SHIPPING. madamewhisper.com says "The parlour is not yet open"
+             and its own design doc insists the page must never imply an app
+             exists. This row must not say Live. -->
         <ul class="entry-facts util">
           <li>Software</li>
-          <li class="status status--live">Live</li>
+          <li class="status">Coming soon</li>
           <li><a class="go" href="https://madamewhisper.com">madamewhisper.com →</a></li>
         </ul>
       </div>
@@ -159,13 +169,21 @@
       <p class="entry-code">CH·01</p>
       <div class="entry-body">
         <h3 class="entry-title">Glowmark Path</h3>
+        <!-- ⚠ It is a POWDER YOU SCATTER, not a compound you paint on. An earlier
+             draft said "brush onto a trail marker" and was simply wrong. Wording
+             here follows glowmarkpath.com's own copy — check it before rewriting. -->
         <p class="entry-what">
-          A compound you brush onto a trail marker. Five minutes of sun charges
-          it; it gives the light back all night.
+          A biodegradable powder you scatter behind you to mark the way back. Five
+          minutes of sun charges it; a coin-sized pile every few feet stays lit all
+          night, then biodegrades.
+        </p>
+        <p class="entry-note">
+          Stir it into water and it sets into a gel that holds the glow where you
+          put it — or fills a lamp that recharges itself every morning.
         </p>
         <ul class="entry-facts util">
           <li>Chemistry</li>
-          <li class="status status--live">Live</li>
+          <li class="status">In development</li>
           <li><a class="go" href="https://glowmarkpath.com">glowmarkpath.com →</a></li>
         </ul>
       </div>
@@ -263,13 +281,57 @@
       <p class="entry-code">PR·01</p>
       <div class="entry-body">
         <h3 class="entry-title">Books</h3>
-        <p class="entry-what">Prose.</p>
+        <p class="entry-what">
+          Two series and a comedy. Six titles are out; one of the series is a
+          seventh of the way through.
+        </p>
+
+        <!-- Genres are Amazon's own categories, not guesses. Worth keeping:
+             "How I Met My Monkey" READS like a memoir and is filed under Comedy —
+             it is fiction. Do not relabel it from the title alone. -->
+        <div class="books">
+
+          <p class="book-head util">The Hole · complete in four · Science fiction</p>
+          <ul class="book-list">
+            <li><a class="go" href="https://www.amazon.com/dp/B0H6NGRJKC">I — The Believer →</a></li>
+            <li><a class="go" href="https://www.amazon.com/dp/B0H6PL7CZ7">II — The Witness →</a></li>
+            <li><a class="go" href="https://www.amazon.com/dp/B0H6NXGW37">III — The Operator →</a></li>
+            <li><a class="go" href="https://www.amazon.com/dp/B0H6NRT32D">IV — The End →</a></li>
+          </ul>
+
+          <!-- ⚠ Seven volumes are drafted on disk under the Aletheia project, but
+               only Book I is published and several working titles still overlap
+               (3 and 4 currently share a name). So the count is stated and the
+               unpublished TITLES are not — announcing six titles that may still
+               change is the kind of thing this page exists not to do. -->
+          <p class="book-head util">The Garden of Revolution · one of seven · Political thriller</p>
+          <p class="entry-note">
+            It begins from a feeling most people already have: that the language
+            got smoother, the stories started agreeing with each other, and the
+            answers began arriving ahead of the questions. Book one is the
+            confession of someone who helped shape narratives and stopped. The
+            six that follow turn from naming the thing to building what can't be
+            turned against you.
+          </p>
+          <ul class="book-list">
+            <li><a class="go" href="https://www.amazon.com/dp/B0GMRRVHSY">I — Confessions of a Conspirator →</a></li>
+            <li><span class="util book-soon">II–VII — in progress</span></li>
+          </ul>
+
+          <p class="book-head util">Standalone</p>
+          <ul class="book-list">
+            <li><a class="go" href="https://www.amazon.com/dp/B0H6P5HSKJ">How I Met My Monkey →</a>
+                <span class="util">Comedy</span></li>
+          </ul>
+        </div>
+
         <ul class="entry-facts util">
           <li>Prose</li>
-          <li class="status">Draft — which are published?</li>
+          <li class="status status--live">Published</li>
+          <li>Amazon</li>
         </ul>
       </div>
-      <div class="entry-figure plate" data-stamp="PR·01"
+      <div class="entry-figure plate"
              style="background-image: url('assets/works/books.webp');"></div>
     </article>
 

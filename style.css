@@ -30,14 +30,17 @@ a { color: inherit; }
   padding-inline: var(--space-3);
 }
 
-/* --- Utility face: the voice of all data on this page --------------------- */
-.util {
+/* --- Utility face: the voice of all data on this page ---------------------
+   Four rules were each restating these same four properties. Stated once here;
+   below, each only says how it DIFFERS (colour, rules, position). */
+.util, .go, .entry-code, .plate::after {
   font-family: var(--font-util);
   font-size: var(--step--1);
   letter-spacing: var(--track-util);
   text-transform: uppercase;
-  color: var(--ink-soft);
 }
+
+.util { color: var(--ink-soft); }
 
 /* --- Masthead ------------------------------------------------------------ */
 .masthead {
@@ -127,10 +130,11 @@ a { color: inherit; }
   background: var(--ground);
   border-top: var(--rule) solid var(--ground-edge);
   border-right: var(--rule) solid var(--ground-edge);
-  font-family: var(--font-util);
-  font-size: var(--step--1);
-  letter-spacing: var(--track-util);
   color: var(--accent);
+  /* Explicit: this one is NOT uppercased. Joining the shared utility-face rule
+     above would have silently turned "Fig. A" into "FIG. A" — a plate caption
+     is a figure label, and reads as one in mixed case. */
+  text-transform: none;
 }
 
 /* --- Index of works ------------------------------------------------------ */
@@ -159,9 +163,6 @@ a { color: inherit; }
    says what the thing is MADE OF, which is the one fact this page exists to
    show. SW software · ST steel · CH chemistry · BO botany · PR prose. */
 .entry-code {
-  font-family: var(--font-util);
-  font-size: var(--step--1);
-  letter-spacing: var(--track-util);
   color: var(--accent);
   border-top: var(--rule-heavy) solid var(--accent);
   padding-top: var(--space-2);
@@ -191,7 +192,11 @@ a { color: inherit; }
   color: var(--ink-soft);
 }
 
-.entry-facts {
+/* One inline-list rule, used by the fact row AND by each book line. Both are
+   "a row of short items that wraps"; they were written twice and drifted on
+   gap alone. The size budget is what surfaced it — the guard caught real
+   duplication, not just length. */
+.entry-facts, .book-list li {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
@@ -203,12 +208,29 @@ a { color: inherit; }
 
 .entry-figure { margin: 0; }
 
+/* --- Book list -----------------------------------------------------------
+   The only entry with sub-items, because it is the only work that IS several
+   things. Each series stays grouped; standalones sit apart. */
+.books { display: grid; gap: var(--space-3); }
+
+.book-head {
+  margin: 0;
+  padding-bottom: var(--space-1);
+  border-bottom: var(--rule) solid var(--ground-edge);
+}
+
+.book-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.book-soon { color: var(--ink-soft); }
+
 /* Links read as destinations, not decoration. */
 .go {
-  font-family: var(--font-util);
-  font-size: var(--step--1);
-  letter-spacing: var(--track-util);
-  text-transform: uppercase;
   color: var(--accent);
   text-decoration-thickness: var(--rule);
   text-underline-offset: var(--space-1);

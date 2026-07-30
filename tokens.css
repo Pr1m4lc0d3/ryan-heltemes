@@ -81,6 +81,9 @@
      stops doing that job. */
   --cover-mini:    6.5rem;
   --shelf-tile:   15rem;     /* min column width of a shelf tile before it wraps */
+  --work-thumb:    7rem;     /* OG-card thumbnail on a compact index row */
+  --anchor-offset: 2rem;     /* keeps a jumped-to heading clear of the viewport edge */
+  --doc-rail:      5rem;     /* volume-numeral rail on the papers index */
 
   /* --- Motion -------------------------------------------------------------
      One deliberate moment on load, nothing on scroll. Overridden entirely by

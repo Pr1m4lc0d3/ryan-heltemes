@@ -1,0 +1,108 @@
+/* index.css — the INDEX GRAMMAR: top nav, group headings, and the compact
+   one-row-per-thing list. Used by the front page and by aletheia-papers.html,
+   which is the same job one level down. Separate from style.css because
+   style.css sits at 275 of its 300-line budget.
+
+   What this file exists to do: keep the landing page SMALL. The old index gave
+   every work a full plate and two paragraphs, which is why nine works ran to
+   357 lines. The cost was never the number of works — it was the verbosity per
+   work. So a work is now one row, and the page stays scannable as the list
+   grows. Anything that wants a paragraph belongs on the project's own site. */
+
+/* --- Top navigation ------------------------------------------------------
+   A sorting mechanism, not a site map: four groups, each jumping to its own
+   section further down. It links to sections of THIS page rather than to
+   category pages, because a visitor should meet the range immediately — the
+   range is the whole thesis, and hiding it behind four doors would cost the
+   first impression to save a scroll. */
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+/* --- A group of works ---------------------------------------------------- */
+.group-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule-heavy) solid var(--ink);
+  /* Jumping to an anchor must not weld the heading to the top of the window. */
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.group-name {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* --- One work, one row ---------------------------------------------------
+   Columns: thumbnail · what it is · where it lives. The middle column is the
+   only flexible one, so the rail and the status stay aligned down the page and
+   the eye can run the column instead of hunting. */
+.work-list { list-style: none; margin: 0; padding: 0; }
+
+.work-row {
+  display: grid;
+  grid-template-columns: var(--work-thumb) minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: var(--rule) solid var(--ground-edge);
+}
+
+/* The plate is the project's own OG card, so the thumbnail keeps the 1.91:1 it
+   was made at rather than being cropped square. */
+.plate--thumb { width: var(--work-thumb); }
+
+.work-body { display: grid; gap: var(--space-1); min-width: 0; }
+
+.work-name {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+}
+
+/* The material code still earns its place next to the group name: "Gear" does
+   not tell you steel from chemistry from botany, and that distinction is the
+   interesting part. It stays keyed to the hero legend. */
+.work-code { color: var(--accent); margin-right: var(--space-2); }
+
+.work-what { max-width: var(--measure); }
+
+.work-facts {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: end;
+  text-align: right;
+}
+
+@media (max-width: 60rem) {
+  .work-row {
+    grid-template-columns: var(--work-thumb) minmax(0, 1fr);
+    align-items: start;
+  }
+  /* The status column drops under the text rather than under the thumbnail,
+     so the row still reads as one unit instead of an L. */
+  .work-facts {
+    grid-column: 2;
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 34rem) {
+  .work-row { grid-template-columns: minmax(0, 1fr); }
+  .work-facts { grid-column: 1; }
+}

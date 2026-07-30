@@ -22,29 +22,31 @@
 
 <!-- His own Celtic-cross belt buckle — the one he is wearing in the portrait below.
      favicon.ico carries 16/32/48. The 16 is a separate, contrast-boosted render:
-     the relief detail collapses to a grey blob at that size, and a silhouette is
-     worse still, because this mark's identity lives in its interior knotwork
-     rather than its outline. Most browsers take the 32. -->
+     the relief detail collapses to a grey blob at that size. Most browsers take the 32. -->
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
 
 <header class="masthead wrap">
   <span class="util">Ryan Heltemes</span>
-  <span class="util">Bozeman, Montana</span>
+  <nav class="topnav util">
+    <a class="go" href="#software">Software</a>
+    <a class="go" href="#gear">Gear</a>
+    <a class="go" href="#books">Books</a>
+    <a class="go" href="#research">Research</a>
+  </nav>
 </header>
 
 <main>
 
   <!-- ===== Hero =========================================================
-       The thesis: the range IS the story. A grid of identical cards would
-       flatten the one genuinely interesting fact, so the page is organised
-       by MATERIAL rather than by date or importance. -->
+       The thesis: the range IS the story. -->
   <section class="hero wrap">
    <div class="hero-text">
     <h1 class="hero-line rise">
@@ -58,18 +60,19 @@
     </p>
 
     <!-- The legend, not a tagline. It teaches the material codes before the
-         reader meets them in the index below, which is what makes the rail
-         readable instead of decorative. Deliberately NOT a count of projects —
-         a count here would be a second answer to "what has he made" and would
-         drift out of sync with the list the moment an entry is added. -->
+         reader meets them in the rows below. The GROUP headings say what a
+         thing is FOR; the code says what it is MADE OF — "Gear" does not
+         distinguish steel from chemistry from botany, and that distinction is
+         the interesting part. Adding a code means adding it here too.
+         Deliberately NOT a count of projects: a count would be a second answer
+         to "what has he made" and would drift the moment a row is added. -->
     <p class="hero-meta util rise rise-3">
       SW software · ST steel · CH chemistry · BO botany · PR prose · RS research
     </p>
    </div>
 
-    <!-- Swap the portrait by changing this one filename. Alternates already
-         sit in assets/portrait/: alt-mountain, alt-cowboy, alt-illustration.
-         If the file is missing the plate stays a labelled blank, never a
+    <!-- Swap the portrait by changing this one filename. Alternates sit in
+         assets/portrait/. A missing file stays a labelled blank, never a
          broken-image icon. -->
     <div class="plate plate--portrait rise rise-4"
          data-stamp="Fig. A"
@@ -78,278 +81,232 @@
 
 
   <!-- ===== Index of works ================================================
-       ⚠ THE PROJECT DIRECTORY LIVES HERE AND NOWHERE ELSE.
-       design.md §7.1 is closed in favour of one hand-maintained listing in
-       static HTML. The coherence guard enforces it: any project URL that
-       appears in a second file fails the audit. Do not add a footer column of
-       links, a nav menu of projects, or a second listing on another page
-       without re-opening that decision.
+       ⚠ THE PROJECT DIRECTORY LIVES HERE AND NOWHERE ELSE. The coherence
+       guard enforces it: any project URL appearing in a second file fails the
+       audit. Do not add a footer column of links or a second listing.
 
-       Material codes are NOT a sequence. The prefix says what the thing is
-       made of: SW software · ST steel · CH chemistry · BO botany · PR prose ·
-       RS research. Adding a code means adding it to the hero legend too — the
-       legend is what makes the rail readable instead of decorative.
+       ⚠ THE PAGE MUST STAY SMALL. One work = ONE ROW. The old index gave each
+       work a full plate and two paragraphs, which is why nine works ran to 357
+       lines; the cost was verbosity per work, not the number of works. A row
+       gets one line. Anything wanting a paragraph belongs on the project's own
+       site, which is one click away.
 
        ⚠ THE STATUS WORD IS ABOUT THE PRODUCT, NEVER ABOUT THE WEBSITE.
        "Live" means a stranger can get the thing today. A project whose own site
-       says "not yet open" or "in development" is NOT Live here, however finished
-       its landing page looks. Only `status--live` gets the accent colour, so the
-       page cannot quietly imply availability it does not have. Check the
-       project's own site before changing one of these words.
+       says "not yet open" is NOT Live here, however finished its page looks.
+       Only status--live gets the accent colour. Check the project's own site
+       before changing one of these words.
   -->
   <section class="wrap" id="works">
 
-    <div class="index-head">
-      <h2 class="util" style="color: var(--ink);">Index of works</h2>
-      <span class="util">By material</span>
+    <div class="group-head" id="software">
+      <h2 class="group-name">Software</h2>
+      <span class="util">Four</span>
     </div>
 
+    <ul class="work-list">
 
-    <article class="entry">
-      <p class="entry-code">SW·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Deliberon</h3>
-        <p class="entry-what">
-          A council of AI specialists that argue a decision out in front of you,
-          then hand you the record of how they got there.
-        </p>
-        <p class="entry-note">
-          A desktop app for one person with their own model keys — not a service
-          that holds your data. It runs its own agents locally.
-        </p>
-        <ul class="entry-facts util">
-          <li>Software</li>
-          <li class="status status--live">Live</li>
-          <li><a class="go" href="https://deliberon.com">deliberon.com →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/deliberon.webp');"></div>
-    </article>
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/deliberon.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">SW·01</span>Deliberon</span>
+          <span class="work-what">
+            A council of AI specialists that argue a decision out in front of
+            you, then hand you the record of how they got there.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Live</span>
+          <a class="go" href="https://deliberon.com">deliberon.com →</a>
+        </span>
+      </li>
 
+      <!-- ⚠ NOT SHIPPING. madamewhisper.com says "The parlour is not yet open"
+           and its own design doc insists the page must never imply an app
+           exists. This row must not say Live. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/madame-whisper.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">SW·02</span>Madame Whisper</span>
+          <span class="work-what">
+            Name anyone who ever lived. She will fetch them, and then you simply
+            talk.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status">Coming soon</span>
+          <a class="go" href="https://madamewhisper.com">madamewhisper.com →</a>
+        </span>
+      </li>
 
-    <article class="entry">
-      <p class="entry-code">SW·02</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Madame Whisper</h3>
-        <p class="entry-what">
-          Name anyone who ever lived. She will fetch them, and then you simply
-          talk.
-        </p>
-        <p class="entry-note">
-          Every guest is a reconstruction built from what they actually wrote
-          and said — an echo, not a resurrection.
-        </p>
-        <!-- ⚠ NOT SHIPPING. madamewhisper.com says "The parlour is not yet open"
-             and its own design doc insists the page must never imply an app
-             exists. This row must not say Live. -->
-        <ul class="entry-facts util">
-          <li>Software</li>
-          <li class="status">Coming soon</li>
-          <li><a class="go" href="https://madamewhisper.com">madamewhisper.com →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/madame-whisper.webp');"></div>
-    </article>
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/idea-forge-pro.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">SW·03</span>Idea Forge Pro</span>
+          <span class="work-what">
+            A workbench for testing whether an idea can be sold before a line of
+            it gets built. Free, and it runs in the browser.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Live</span>
+          <a class="go" href="https://ideaforgepro.com">ideaforgepro.com →</a>
+        </span>
+      </li>
 
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/kisystem.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">SW·04</span>KiSYSTEM</span>
+          <span class="work-what">
+            A discipline for keeping software simple on purpose. Open source,
+            and used to build most of the software on this page.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Public</span>
+          <a class="go" href="https://github.com/Pr1m4lc0d3/KiSYSTEM">github.com/Pr1m4lc0d3 →</a>
+        </span>
+      </li>
 
-    <article class="entry">
-      <p class="entry-code">ST·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">StealthFyre</h3>
-        <p class="entry-what">
-          Flat-pack stainless stove kits for people who carry their fire with
-          them. Cut, folded and packed by hand, made to order.
-        </p>
-        <!-- ⚠ design.md §7.3 — UNRESOLVED, DO NOT PUBLISH AS WRITTEN.
-             Daladim called this "my stove"; the record has it as GT OUTDOORS
-             LLC with the owner banking the payouts. "My product" and "work I
-             brought back from the dead" are different public claims under his
-             own name. The copy below is deliberately neutral on ownership
-             until he says which is true. -->
-        <p class="entry-note">
-          One person, a brake press and about two weeks per order.
-        </p>
-        <ul class="entry-facts util">
-          <li>Steel</li>
-          <li class="status status--live">Live</li>
-          <li><a class="go" href="https://stealthfyre.com">stealthfyre.com →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/stealthfyre.webp');"></div>
-    </article>
+    </ul>
 
 
-    <article class="entry">
-      <p class="entry-code">CH·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Glowmark Path</h3>
-        <!-- ⚠ It is a POWDER YOU SCATTER, not a compound you paint on. An earlier
-             draft said "brush onto a trail marker" and was simply wrong. Wording
-             here follows glowmarkpath.com's own copy — check it before rewriting. -->
-        <p class="entry-what">
-          A biodegradable powder you scatter behind you to mark the way back. Five
-          minutes of sun charges it; a coin-sized pile every few feet stays lit all
-          night, then biodegrades.
-        </p>
-        <p class="entry-note">
-          Stir it into water and it sets into a gel that holds the glow where you
-          put it — or fills a lamp that recharges itself every morning.
-        </p>
-        <ul class="entry-facts util">
-          <li>Chemistry</li>
-          <li class="status">In development</li>
-          <li><a class="go" href="https://glowmarkpath.com">glowmarkpath.com →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/glowmark-path.webp');"></div>
-    </article>
+    <div class="group-head" id="gear">
+      <h2 class="group-name">Gear</h2>
+      <span class="util">Three · steel, chemistry, botany</span>
+    </div>
+
+    <ul class="work-list">
+
+      <!-- ⚠ design.md §7.3 — UNRESOLVED. He called this "my stove"; the record
+           has it as GT OUTDOORS LLC. "My product" and "work I brought back from
+           the dead" are different public claims under his own name. This copy
+           stays neutral on ownership until he says which is true. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/stealthfyre.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">ST·01</span>StealthFyre</span>
+          <span class="work-what">
+            Flat-pack stainless stove kits for people who carry their fire with
+            them. Cut, folded and packed by hand, made to order.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Live</span>
+          <a class="go" href="https://stealthfyre.com">stealthfyre.com →</a>
+        </span>
+      </li>
+
+      <!-- ⚠ It is a POWDER YOU SCATTER, not a compound you paint on. Wording
+           follows glowmarkpath.com's own copy — check it before rewriting. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/glowmark-path.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">CH·01</span>Glowmark Path</span>
+          <span class="work-what">
+            A biodegradable powder you scatter behind you to mark the way back.
+            Five minutes of sun charges it; it stays lit all night.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status">In development</span>
+          <a class="go" href="https://glowmarkpath.com">glowmarkpath.com →</a>
+        </span>
+      </li>
+
+      <!-- ⚠ NO HEALTH CLAIMS. His own instruction-sheet notes flag that wellness
+           and pain claims attract FDA/FTC attention, so this copy says what the
+           tea IS — never what it does. Do not "improve" it by adding benefits.
+           ⚠ blacktimberapothecary.com is REGISTERED BUT NOT BUILT — a GoDaddy
+           stub that redirects to /lander. Shown as plain text on purpose;
+           linking it would land a visitor on a parking advert. Make it an <a>
+           the moment a real page exists. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/black-timber.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">BO·01</span>Black Timber Apothecary</span>
+          <span class="work-what">
+            Loose-leaf herbal blends, mixed and packed by hand in Montana. The
+            first is Buckshot &amp; Gunpowder — thirteen herbs, green tea and roots.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status">Coming soon</span>
+          <span>blacktimberapothecary.com</span>
+        </span>
+      </li>
+
+    </ul>
 
 
-    <article class="entry">
-      <p class="entry-code">SW·03</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Idea Forge Pro</h3>
-        <p class="entry-what">
-          A workbench for testing whether an idea can be sold before a line of
-          it gets built.
-        </p>
-        <p class="entry-note">
-          Seven gates. It tells you which one the idea fails, before anything
-          gets built. Free, and it runs in the browser.
-        </p>
-        <ul class="entry-facts util">
-          <li>Software</li>
-          <li class="status status--live">Live</li>
-          <li><a class="go" href="https://ideaforgepro.com">ideaforgepro.com →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/idea-forge-pro.webp');"></div>
-    </article>
+    <div class="group-head" id="books">
+      <h2 class="group-name">Books</h2>
+      <span class="util">Twelve · six published</span>
+    </div>
+
+    <ul class="work-list">
+
+      <!-- ⚠ TITLES AND BUY LINKS LIVE ON THE BOOKSHELF AND ITS COLLECTION
+           PAGES, NOT HERE. This row is a door. The coherence guard fails the
+           build on an Amazon ASIN appearing outside those pages. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/books.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">PR·01</span>Books</span>
+          <span class="work-what">
+            Twelve books across two series and a standalone comedy — science
+            fiction, a seven-volume cycle, and one about a man who accidentally
+            acquires a monkey.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Six published</span>
+          <a class="go" href="bookshelf.html">Bookshelf →</a>
+        </span>
+      </li>
+
+    </ul>
 
 
-    <article class="entry">
-      <p class="entry-code">SW·04</p>
-      <div class="entry-body">
-        <h3 class="entry-title">KiSYSTEM</h3>
-        <p class="entry-what">
-          A discipline for keeping software simple on purpose: measure twice,
-          cut once, and let the guards catch what discipline misses.
-        </p>
-        <p class="entry-note">
-          Open source, and used to build most of the software on this page.
-        </p>
-        <ul class="entry-facts util">
-          <li>Software</li>
-          <li class="status status--live">Public</li>
-          <li><a class="go" href="https://github.com/Pr1m4lc0d3/KiSYSTEM">github.com/Pr1m4lc0d3/KiSYSTEM →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/kisystem.webp');"></div>
-    </article>
+    <div class="group-head" id="research">
+      <h2 class="group-name">Research</h2>
+      <span class="util">Free to read</span>
+    </div>
 
+    <ul class="work-list">
 
-    <article class="entry">
-      <p class="entry-code">RS·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">The Aletheia Papers</h3>
-        <p class="entry-what">
-          Research into how symbolically dense language shapes a model's
-          interpretive posture <em>before</em> it reasons — and how an explicit,
-          opt-in constraint can steady what comes out without controlling it.
-        </p>
-        <!-- ⚠ Copy follows the papers' own abstract. Two claims they are careful
-             about, so this page must be too: the work is MODEL-AGNOSTIC and it
-             does NOT prescribe outcomes, beliefs or conclusions. Do not
-             paraphrase it into something that promises alignment or safety
-             results — that is the opposite of what it says about itself. -->
-        <p class="entry-note">
-          Four volumes and a diagnostic protocol, tested across several AI
-          systems. It names the risk that sits beside factual accuracy: meaning
-          amplified without interpretive restraint, which can destabilise a
-          conversation even when every output is accurate and well meant.
-        </p>
-        <ul class="entry-facts util">
-          <li>Research</li>
-          <li class="status status--live">Published · free</li>
-          <li><a class="go" href="https://aletheiaproject.gumroad.com/l/aletheiapapers">Read them →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/aletheia-papers.webp');"></div>
-    </article>
+      <!-- ⚠ Copy follows the papers' own abstract. Two claims they are careful
+           about, so this page must be too: the work is MODEL-AGNOSTIC and it
+           does NOT prescribe outcomes, beliefs or conclusions. Do not
+           paraphrase it into something promising alignment or safety results —
+           that is the opposite of what it says about itself. -->
+      <li class="work-row">
+        <span class="plate plate--thumb"
+              style="background-image: url('assets/works/aletheia-papers.webp');"></span>
+        <span class="work-body">
+          <span class="work-name"><span class="work-code util">RS·01</span>The Aletheia Papers</span>
+          <span class="work-what">
+            Research into how symbolically dense language shapes a model's
+            interpretive posture <em>before</em> it reasons — and how an
+            opt-in constraint can steady what comes out without controlling it.
+          </span>
+        </span>
+        <span class="work-facts util">
+          <span class="status status--live">Free · direct download</span>
+          <a class="go" href="aletheia-papers.html">Read them →</a>
+        </span>
+      </li>
 
-
-    <!-- ===== Entries below still need daladim (design.md §7.4) =============
-         Listed so the shape is visible, marked so they cannot be published by
-         accident. A hub that lists unfinished things as finished is the
-         fastest way to lose the credibility it exists to build. -->
-
-    <article class="entry">
-      <p class="entry-code">BO·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Black Timber Apothecary</h3>
-        <p class="entry-what">
-          Loose-leaf herbal blends, mixed and packed by hand in Montana. The first
-          is Buckshot &amp; Gunpowder — thirteen herbs, green tea and roots, and
-          nothing in it for decoration.
-        </p>
-        <!-- ⚠ NO HEALTH CLAIMS. His own instruction-sheet notes flag that wellness
-             and pain claims attract FDA/FTC attention, so this copy describes what
-             the tea IS — herbs, hand-packed, Montana — never what it does. Do not
-             "improve" it by adding benefits. The pouch carries the full disclaimer;
-             a hub page has no business making a claim the label is careful about. -->
-        <p class="entry-note">
-          Every pouch ships with the bags to brew it and a pinch of peppercorns,
-          because the pepper is what makes the turmeric worth putting in.
-        </p>
-        <!-- ⚠ blacktimberapothecary.com is REGISTERED BUT NOT BUILT — it serves
-             a 114-byte GoDaddy stub that JS-redirects to /lander, the same state
-             madamewhisper.com was in before it was repointed. The domain is
-             shown as plain text on purpose: linking it would land a visitor on
-             a parking advert, which is worse for him than no link at all. Make
-             it an <a> the moment a real page exists. -->
-        <ul class="entry-facts util">
-          <li>Botany</li>
-          <li class="status">Coming soon</li>
-          <li>blacktimberapothecary.com</li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/black-timber.webp');"></div>
-    </article>
-
-
-    <article class="entry">
-      <p class="entry-code">PR·01</p>
-      <div class="entry-body">
-        <h3 class="entry-title">Books</h3>
-        <p class="entry-what">
-          Twelve books across two series and a standalone comedy — science
-          fiction, a seven-volume cycle about how a story gets shaped, and one
-          about a man who accidentally acquires a monkey.
-        </p>
-        <!-- ⚠ TITLES AND LINKS LIVE ON bookshelf.html, NOT HERE. This row is a
-             door, not a catalogue. Re-listing books here would create a second
-             answer to "what has he written" — the coherence guard fails the
-             build on an Amazon ASIN appearing outside the bookshelf. -->
-        <p class="entry-note">
-          Six are published; the rest are written or being written.
-        </p>
-        <ul class="entry-facts util">
-          <li>Prose</li>
-          <li class="status status--live">Six published</li>
-          <li><a class="go" href="bookshelf.html">Bookshelf →</a></li>
-        </ul>
-      </div>
-      <div class="entry-figure plate"
-             style="background-image: url('assets/works/books.webp');"></div>
-    </article>
+    </ul>
 
   </section>
 

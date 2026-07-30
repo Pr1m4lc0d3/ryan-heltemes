@@ -1,0 +1,48 @@
+/* papers.css — the Aletheia Papers index only.
+
+   It reuses the group/heading grammar from index.css, because this page IS an
+   index: the same job, one level down. Only the document row differs, and only
+   that lives here.
+
+   The row is deliberately plainer than a work row on the front page: no
+   thumbnail, no status. Fifty documents want a bibliography, not a gallery —
+   a reader here is scanning for a title and a download, and a picture beside
+   each one would triple the page height while telling them nothing. */
+
+.doc-list { list-style: none; margin: 0; padding: 0; }
+
+.doc-row {
+  display: grid;
+  grid-template-columns: var(--doc-rail) minmax(0, 1fr) auto;
+  gap: var(--space-2) var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  border-bottom: var(--rule) solid var(--ground-edge);
+}
+
+/* Volume numerals are the rail here for the same reason they are on a series
+   page: the papers ARE a sequence, and a reader looking for "the one about
+   falsifiability" still navigates by where it sits in the run. */
+.doc-num { color: var(--accent); }
+
+.doc-title { min-width: 0; }
+
+.doc-get {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  justify-content: flex-end;
+}
+
+.doc-size { color: var(--ink-soft); }
+
+/* An unnumbered row (a transcript, an independent artifact) leaves the rail
+   empty rather than inventing a number for it. */
+.doc-row--plain { grid-template-columns: var(--doc-rail) minmax(0, 1fr) auto; }
+
+@media (max-width: 46rem) {
+  .doc-row,
+  .doc-row--plain { grid-template-columns: var(--doc-rail) minmax(0, 1fr); }
+  .doc-get { grid-column: 2; justify-content: flex-start; }
+}

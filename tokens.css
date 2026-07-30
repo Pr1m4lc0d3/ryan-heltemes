@@ -74,7 +74,13 @@
   --rail:       6.5rem;      /* width of the material-code rail */
   --figure-col:   24rem;     /* width of the plate column beside each entry */
   --portrait-col: 23rem;     /* width of the portrait plate beside the headline */
-  --cover-col:    13rem;     /* width of a book cover on the bookshelf page */
+  --cover-col:    13rem;     /* width of a book cover on a work page */
+  /* A shelf thumbnail. Deliberately small: the bookshelf is an INDEX, and its
+     job is to keep fitting on one screen as the list of books grows, rather
+     than growing a scrollbar with the catalogue. Raise this and the shelf
+     stops doing that job. */
+  --cover-mini:    6.5rem;
+  --shelf-tile:   15rem;     /* min column width of a shelf tile before it wraps */
 
   /* --- Motion -------------------------------------------------------------
      One deliberate moment on load, nothing on scroll. Overridden entirely by

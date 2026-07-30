@@ -70,6 +70,45 @@
 .book-entry--soon .entry-title,
 .book-entry--soon .entry-what { color: var(--ink-soft); }
 
+/* --- The shelf itself: one tile per COLLECTION ---------------------------
+   Small on purpose. This page is an index, and an index that grows a scrollbar
+   every time a book is written has stopped indexing. Tiles stay thumbnail-sized
+   so the shelf still fits one screen several books from now; the reading
+   happens on the collection pages, which is what the tile links to. */
+.shelf-grid {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--shelf-tile), 1fr));
+  gap: var(--space-4) var(--space-3);
+}
+
+.shelf-tile {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+  color: inherit;
+  text-decoration: none;
+}
+
+.plate--mini { width: var(--cover-mini); margin-bottom: var(--space-2); }
+
+.shelf-name {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+}
+
+/* The whole tile is the link, so the cue has to respond to hovering anywhere
+   on it — not only to the few words that look like a link. */
+.shelf-tile .go { margin-top: var(--space-1); }
+.shelf-tile:hover .shelf-name { color: var(--accent); }
+.shelf-tile:hover .go { color: var(--accent-lift); }
+
 /* --- A shelf: volumes as a grid ------------------------------------------
    A series IS a sequence, and a sequence reads better as a block you can take
    in at once than as a column you scroll past one book at a time. The Hole is

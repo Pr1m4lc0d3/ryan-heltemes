@@ -233,9 +233,19 @@ a { color: inherit; }
 .rise-3 { animation-delay: 180ms; }
 .rise-4 { animation-delay: 300ms; }
 
+/* ⚠ THIS ANIMATES TRANSFORM ONLY — DO NOT ADD `opacity: 0` BACK.
+   It used to fade in from zero, which meant that for the first ~900ms (620ms
+   duration plus up to 300ms of delay) the hero headline and the portrait were
+   INVISIBLE, not just un-animated — `animation-fill-mode: both` back-fills the
+   from-state before the animation starts. Anything that photographs the page at
+   load caught a blank grey slab: browser bookmark and speed-dial thumbnails did
+   exactly that, and a page opened in a BACKGROUND TAB is worse, because the
+   animation is throttled and the hero can stay invisible until the tab is
+   focused. Sliding without fading keeps the deliberate moment and can never
+   render the page as empty. */
 @keyframes rise {
-  from { opacity: 0; transform: translateY(var(--space-3)); }
-  to   { opacity: 1; transform: none; }
+  from { transform: translateY(var(--space-3)); }
+  to   { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

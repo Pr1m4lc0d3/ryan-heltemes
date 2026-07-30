@@ -70,12 +70,69 @@
 .book-entry--soon .entry-title,
 .book-entry--soon .entry-what { color: var(--ink-soft); }
 
+/* --- A shelf: volumes as a grid ------------------------------------------
+   A series IS a sequence, and a sequence reads better as a block you can take
+   in at once than as a column you scroll past one book at a time. The Hole is
+   four, so it sits 2×2. The Garden's unpublished six sit 2×3. The shape of the
+   grid states the length of the series before a word is read. */
+.shelf-label {
+  margin: var(--space-5) 0 0;
+  padding-bottom: var(--space-2);
+  border-bottom: var(--rule) solid var(--ground-edge);
+}
+
+.book-grid {
+  display: grid;
+  gap: var(--space-4) var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.book-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.book-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.book-card { display: grid; gap: var(--space-2); align-content: start; }
+.book-card .plate--cover { max-width: var(--cover-col); }
+.book-card .entry-code   { justify-self: start; }
+.book-card .entry-title  { font-size: var(--step-2); }
+.book-card .entry-what   { font-size: var(--step-0); }
+.book-card .entry-facts  { margin-top: var(--space-1); }
+
+.book-card--soon .entry-title,
+.book-card--soon .entry-what { color: var(--ink-soft); }
+
+/* A volume with no cover art is a reserved slot, not a missing file. It holds
+   the same 2:3 as a real cover so the row never goes ragged, and says what it
+   is in the middle of the plate rather than in the corner — a blank that has
+   to be read as deliberate is worth more than a blank that has to be excused. */
+.plate--soon { border-style: dashed; }
+
+/* The corner tab in style.css is a FIGURE LABEL — bottom-left, with a top and
+   right hairline that read as a tab against the plate edge, and mixed case on
+   purpose. Centred, that tab's borders float in open space and read as a stray
+   box. So this override strips the tab entirely rather than moving it: no
+   padding, no rules, no fill, and uppercase, because here it is a status and
+   every other status on the page is uppercase. */
+.plate.plate--soon::after {
+  left: 50%;
+  bottom: 50%;
+  transform: translate(-50%, 50%);
+  padding: 0;
+  border: 0;
+  background: none;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
 @media (max-width: 64rem) {
   .book-entry { grid-template-columns: var(--rail) minmax(0, 1fr); }
   .book-entry .entry-figure { grid-column: 2; max-width: var(--cover-col); }
+  .book-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 46rem) {
   .book-entry { grid-template-columns: 1fr; }
   .book-entry .entry-figure { grid-column: 1; max-width: var(--cover-col); }
+  .book-grid--2,
+  .book-grid--3 { grid-template-columns: minmax(0, 1fr); }
 }

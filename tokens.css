@@ -42,11 +42,13 @@
   --step-1:  1.25rem;
   --step-2:  1.6rem;
   --step-3:  2.4rem;
-  /* Raised to 9rem once the headline became two short words. The earlier 6.5rem
-     cap existed because "I make things out of different materials" ran to five
-     lines beside the portrait; "I build sh!t." does not, so the type can hit
-     harder. Re-check this if the headline ever gets longer again. */
-  --step-display: clamp(2.75rem, 10vw, 9rem);
+  /* Back to 6.5rem — the headline got longer again, exactly as the note here
+     warned it might. "I build sh!t." was two short words and could take 9rem;
+     "I build cool sh!t." cannot, because "I BUILD COOL" has to fit the column
+     beside the portrait and overflows above ~7rem at desktop width. Re-check
+     this AND re-render the home share card if the headline changes again —
+     the card sets its own size and will not follow this token. */
+  --step-display: clamp(2.75rem, 7vw, 6.5rem);
 
   --leading-tight: 0.92;
   --leading-body:  1.55;

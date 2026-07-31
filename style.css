@@ -48,9 +48,29 @@ a { color: inherit; }
   flex-wrap: wrap;
   gap: var(--space-2);
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   padding-block: var(--space-3);
   border-bottom: var(--rule) solid var(--ground-edge);
+}
+
+/* The mark travels WITH the name as one unit. The masthead is space-between,
+   so a bare third child gets flung to the middle of the bar. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* His belt buckle as a single ink stamp — _source-assets/brand/README.md.
+   Masthead only: the hero already shows the real buckle, and a drawing competes. */
+.brandmark {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  background-image: url('assets/icons/brandmark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* --- Hero ----------------------------------------------------------------
@@ -233,16 +253,11 @@ a { color: inherit; }
 .rise-3 { animation-delay: 180ms; }
 .rise-4 { animation-delay: 300ms; }
 
-/* ⚠ THIS ANIMATES TRANSFORM ONLY — DO NOT ADD `opacity: 0` BACK.
-   It used to fade in from zero, which meant that for the first ~900ms (620ms
-   duration plus up to 300ms of delay) the hero headline and the portrait were
-   INVISIBLE, not just un-animated — `animation-fill-mode: both` back-fills the
-   from-state before the animation starts. Anything that photographs the page at
-   load caught a blank grey slab: browser bookmark and speed-dial thumbnails did
-   exactly that, and a page opened in a BACKGROUND TAB is worse, because the
-   animation is throttled and the hero can stay invisible until the tab is
-   focused. Sliding without fading keeps the deliberate moment and can never
-   render the page as empty. */
+/* ⚠ TRANSFORM ONLY — DO NOT ADD `opacity: 0` BACK. `animation-fill-mode: both`
+   back-fills the from-state, so fading from zero left the hero INVISIBLE for
+   ~900ms after load. Thumbnail grabbers photograph exactly then and caught a
+   blank grey slab; a background tab throttles the animation, so it can stay
+   blank until focused. Sliding without fading can never render an empty page. */
 @keyframes rise {
   from { transform: translateY(var(--space-3)); }
   to   { transform: none; }

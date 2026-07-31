@@ -197,10 +197,45 @@
   </section>
 
 
+  <!-- ===== Notify list ==================================================
+       ⚠ THE ONLY PLACE THIS SITE COLLECTS ANYTHING. Opt-in, email only,
+       posted straight to Kit — no JS, no third-party script, no tracking
+       pixel. Kit owns double opt-in and one-click unsubscribe.
+
+       ⚠ ONE LIST ON PURPOSE — no per-volume checkboxes. Kit tags by FORM,
+       so a per-book list can be added later without migrating anyone, and
+       a box-ticking UI invites a reader to opt out of the other six.
+
+       ⚠ The promise in .signup-fine is narrow so it can be kept with no
+       ongoing effort. Do not widen it into a newsletter.
+  -->
+  <section class="signup-block wrap">
+    <h2 class="signup-head">Know when the next volume lands</h2>
+    <p class="signup-what">
+      Six of the seven are still being written. Leave an email and you will
+      hear once, when the next one is available to buy.
+    </p>
+    <form class="signup" method="post"
+          action="https://app.kit.com/forms/KIT_FORM_ID/subscriptions">
+      <div class="signup-row">
+        <label class="vh" for="em">Email address</label>
+        <input id="em" type="email" name="email_address" placeholder="your email"
+               autocomplete="email" required>
+        <button class="btn" type="submit">Notify me</button>
+      </div>
+      <p class="signup-fine">
+        One email per volume. Nothing else, ever — unsubscribe in one click.
+      </p>
+    </form>
+  </section>
+
   <footer class="footer wrap">
     <p class="util"><a class="go" href="bookshelf.html">← Bookshelf</a></p>
     <p class="util"><a class="go" href="index.html">Index of works</a></p>
-    <p class="util">This site uses Google Analytics.</p>
+    <p class="util">
+      This site uses Google Analytics. If you join the notify list above, your
+      email address is stored by Kit and used only to tell you a volume is out.
+    </p>
     <p class="util">© Ryan Heltemes</p>
   </footer>
 

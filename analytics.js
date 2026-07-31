@@ -13,6 +13,9 @@ function gtag() { dataLayer.push(arguments); }
 
 gtag('js', new Date());
 gtag('config', 'G-DB93XB8QNY');
+// Roll-up property — the same id is on every site, so a visit that crosses
+// domains stays ONE session instead of restarting as a new referral.
+gtag('config', 'G-F7WLK0CG8X');
 
 var s = document.createElement('script');
 s.async = true;

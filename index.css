@@ -29,7 +29,7 @@
 .hero-line {
   font-family: var(--font-display);
   font-size: var(--step-display);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-black);
   line-height: var(--leading-tight);
   letter-spacing: var(--track-display);
   text-transform: uppercase;
@@ -38,28 +38,35 @@
   margin: 0;
 }
 
-.hero-line em {
-  font-style: normal;
-  color: var(--accent);
-}
-
-/* The middle word is set thin and spread edge to edge so it reads as a RULE
-   dividing the two heavy words, not as a third one. Flex is what stretches it:
-   no CSS justifies the letters of a single word, so each letter is its own
-   item and space-between does the spacing. The letter spans carry no
-   whitespace between them, so the accessible name is still "I build cool
-   sh!t." Body leading, not the display's 0.92, is what opens the air above and
-   below the rule — it needs to breathe or it reads as a squashed line of type.
-   Mirrored in the share card: _source-assets/og/card.css .headline .rule.
-   Change one, change both. */
-.hero-rule {
+/* The two lower lines are JUSTIFIED — spread edge to edge to the width "I
+   build" sets — so the three stack into one solid rectangle. Flex is what does
+   it: nothing in CSS justifies the letters of a single word, so each letter is
+   its own item and space-between distributes the slack. The letter spans carry
+   no whitespace between them, so the accessible name is still "I build cool
+   sh!t." Mirrored in the share card: _source-assets/og/card.css .headline
+   .rule / .turn. Change one, change both. */
+.hero-rule,
+.hero-turn {
   display: flex;
   justify-content: space-between;
+  letter-spacing: normal;
+}
+
+/* "cool" is the RULE dividing the two heavy words rather than a third one:
+   thin, black, and spread furthest because it has the least ink to spend on
+   the same width. Body leading, not the display's 0.92, is what opens the air
+   above and below it — it needs to breathe or it reads as a squashed line. */
+.hero-rule {
+  font-family: var(--font-display-thin);
   font-size: calc(var(--step-display) * 0.3);
   font-weight: var(--weight-normal);
   line-height: var(--leading-body);
-  letter-spacing: normal;
   color: var(--ink);
+}
+
+.hero-turn {
+  font-style: normal;
+  color: var(--accent);
 }
 
 .hero-sub {
@@ -108,7 +115,7 @@
 .group-name {
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-black);
   letter-spacing: var(--track-display);
   text-transform: uppercase;
   margin: 0;
@@ -138,7 +145,7 @@
 .work-name {
   font-family: var(--font-display);
   font-size: var(--step-1);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-black);
   line-height: var(--leading-tight);
   letter-spacing: var(--track-display);
   text-transform: uppercase;

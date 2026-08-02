@@ -42,12 +42,15 @@
   --step-1:  1.25rem;
   --step-2:  1.6rem;
   --step-3:  2.4rem;
-  /* Back to 6.5rem — the headline got longer again, exactly as the note here
-     warned it might. "I build sh!t." was two short words and could take 9rem;
-     "I build cool sh!t." cannot, because "I BUILD COOL" has to fit the column
-     beside the portrait and overflows above ~7rem at desktop width. Re-check
-     this AND re-render the home share card if the headline changes again —
-     the card sets its own size and will not follow this token. */
+  /* What this number is really tuned against is the headline's LONGEST LINE
+     fitting the column beside the portrait, not the headline's length. That
+     line was "I BUILD COOL", which overflowed above ~7rem and forced this back
+     down to 6.5rem; since "cool" became the thin rule between the two heavy
+     words the longest line is just "I BUILD", and the ceiling is nearer 9rem
+     again. 6.5rem is kept by choice — the hero is a catalogue plate, and the
+     air to the right of the lock-up is doing work. Re-check this AND re-render
+     the home share card if the headline changes again: the card sets its own
+     size and will not follow this token. */
   --step-display: clamp(2.75rem, 7vw, 6.5rem);
 
   --leading-tight: 0.92;

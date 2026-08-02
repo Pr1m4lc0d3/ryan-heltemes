@@ -1,13 +1,83 @@
-/* index.css — the INDEX GRAMMAR: top nav, group headings, and the compact
-   one-row-per-thing list. Used by the front page and by aletheia-papers.html,
-   which is the same job one level down. Separate from style.css because
-   style.css sits at 275 of its 300-line budget.
+/* index.css — the FRONT-PAGE GRAMMAR: the hero, the top nav, group headings,
+   and the compact one-row-per-thing list. The nav and the list are also used by
+   aletheia-papers.html, which is the same job one level down. Separate from
+   style.css because style.css sits at its 300-line budget.
 
    What this file exists to do: keep the landing page SMALL. The old index gave
    every work a full plate and two paragraphs, which is why nine works ran to
    357 lines. The cost was never the number of works — it was the verbosity per
    work. So a work is now one row, and the page stays scannable as the list
    grows. Anything that wants a paragraph belongs on the project's own site. */
+
+/* --- Hero ----------------------------------------------------------------
+   Headline and portrait sit side by side. The portrait is 3:4 because every
+   picture of the subject is portrait or square — a 21:9 band would crop his
+   head off, so the frame follows the photograph rather than the other way
+   round. */
+.hero {
+  padding-block: var(--space-6) var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--portrait-col));
+  gap: var(--space-5);
+  align-items: end;
+}
+
+/* max-content, not the column: the middle line stretches to the width of this
+   box, and a box the width of the COLUMN would make the rule half again wider
+   than the words it sits between. Sized to the longest line instead, it spans
+   exactly the headline. */
+.hero-line {
+  font-family: var(--font-display);
+  font-size: var(--step-display);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+}
+
+.hero-line em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+/* The middle word is set thin and spread edge to edge so it reads as a RULE
+   dividing the two heavy words, not as a third one. Flex is what stretches it:
+   no CSS justifies the letters of a single word, so each letter is its own
+   item and space-between does the spacing. The letter spans carry no
+   whitespace between them, so the accessible name is still "I build cool
+   sh!t." Body leading, not the display's 0.92, is what opens the air above and
+   below the rule — it needs to breathe or it reads as a squashed line of type.
+   Mirrored in the share card: _source-assets/og/card.css .headline .rule.
+   Change one, change both. */
+.hero-rule {
+  display: flex;
+  justify-content: space-between;
+  font-size: calc(var(--step-display) * 0.3);
+  font-weight: var(--weight-normal);
+  line-height: var(--leading-body);
+  letter-spacing: normal;
+  color: var(--ink);
+}
+
+.hero-sub {
+  margin: var(--space-4) 0 0;
+  max-width: var(--measure);
+  font-size: var(--step-1);
+}
+
+.hero-meta { margin-top: var(--space-3); }
+
+/* Portrait drops below the headline rather than beside it. */
+@media (max-width: 46rem) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-5) var(--space-4);
+  }
+}
 
 /* --- Top navigation ------------------------------------------------------
    A sorting mechanism, not a site map: four groups, each jumping to its own

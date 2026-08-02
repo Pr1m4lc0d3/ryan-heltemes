@@ -73,41 +73,9 @@ a { color: inherit; }
   background-position: center;
 }
 
-/* --- Hero ----------------------------------------------------------------
-   Headline and portrait sit side by side. The portrait is 3:4 because every
-   picture of the subject is portrait or square — a 21:9 band would crop his
-   head off, so the frame follows the photograph rather than the other way
-   round. */
-.hero {
-  padding-block: var(--space-6) var(--space-5);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, var(--portrait-col));
-  gap: var(--space-5);
-  align-items: end;
-}
-
-.hero-line {
-  font-family: var(--font-display);
-  font-size: var(--step-display);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  margin: 0;
-}
-
-.hero-line em {
-  font-style: normal;
-  color: var(--accent);
-}
-
-.hero-sub {
-  margin: var(--space-4) 0 0;
-  max-width: var(--measure);
-  font-size: var(--step-1);
-}
-
-.hero-meta { margin-top: var(--space-3); }
+/* The hero belongs to the front page alone and lives in index.css, next to the
+   rest of the front-page grammar. It left this file when the headline grew a
+   third line and this file was already sitting on its 300-line cap. */
 
 /* --- Plate: an image slot that looks deliberate while it is still empty ----
    Uses background-image, never <img>, so a file that does not exist yet
@@ -276,11 +244,7 @@ a { color: inherit; }
 }
 
 @media (max-width: 46rem) {
-  /* Portrait drops below the headline and stops being full-bleed tall. */
-  .hero {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
+  /* Portrait drops below the headline (index.css) and stops being full-bleed. */
   .plate--portrait { max-width: var(--portrait-col); }
 
   .entry {
@@ -296,5 +260,4 @@ a { color: inherit; }
     border-top: none;
     padding-top: 0;
   }
-  .hero { padding-block: var(--space-5) var(--space-4); }
 }

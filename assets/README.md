@@ -18,6 +18,7 @@ missing file never shows a broken-image icon. An empty site looks deliberate.
 | `works/glowmark-path.webp` | Glowmark Path |
 | `works/idea-forge-pro.webp` | Idea Forge Pro |
 | `works/kisystem.webp` | KiSYSTEM |
+| `works/chatterbot-2000.webp` | Chatterbot 2000 |
 | `works/black-timber.webp` | Black Timber Apothecary |
 | `works/books.webp` | Books |
 | `og/og-card.jpg` | the preview card when the link is shared |
@@ -31,7 +32,10 @@ Adding a project later? Add its entry in `index.html` and drop
   product shots all behave well in it, and the files are a fraction of a PNG.
   If a file is already a `.jpg` or `.png`, either convert it or change the
   extension in `index.html` to match — the page does not guess.
-- **Work plates** are cropped to **4:3**. Aim for about **1600 × 1200**.
+- **Work plates** are **1000 × 525** — every plate on the page is that size, and
+  it is the same 1.905 aspect as a 1200 × 630 Open Graph card, so a project's own
+  share card resizes straight into a plate with no cropping. (This line used to
+  say 4:3 / 1600 × 1200; no plate has ever been that shape.)
 - **The portrait plate** is **3:4**. Aim for about **1200 × 1600**.
 - **The share card** must be **1200 × 630** and stay a `.jpg` — several
   platforms will not render a `.webp` preview.

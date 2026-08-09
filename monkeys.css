@@ -120,6 +120,28 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 }
 .mm-tool--hinge .mm-tool-what { color: var(--mm-muted); }
 
+/* One mark per card, stating the card's job before the heading does.
+   Chosen for what each tool IS, not for decoration: a lever for RAID, which
+   is disproportion; a struck seal for FORTRESS, which refuses an unsourced
+   claim; a signature for the console, which writes an order you sign.
+   mask-image, not a background: one file then takes whichever colour the
+   card's ground needs, so the dark card is not a second asset. */
+.mm-ico {
+  width: var(--anchor-offset);
+  height: var(--anchor-offset);
+  background-color: var(--mm-ink);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.mm-tool--yin .mm-ico { background-color: var(--mm-gold); }
+.mm-ico--lever { -webkit-mask-image: url("assets/icons/mm-lever.png"); mask-image: url("assets/icons/mm-lever.png"); }
+.mm-ico--claim-broken { -webkit-mask-image: url("assets/icons/mm-claim-broken.png"); mask-image: url("assets/icons/mm-claim-broken.png"); }
+.mm-ico--sign-pen { -webkit-mask-image: url("assets/icons/mm-sign-pen.png"); mask-image: url("assets/icons/mm-sign-pen.png"); }
+
 .mm-tool-name {
   font-family: var(--font-display-thin);
   font-weight: var(--weight-black);

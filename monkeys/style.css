@@ -1,0 +1,1374 @@
+/* style.css — all styling for the Monkey Console.
+   Palette from the shipped OG cards (design.md §6B / plan Task 5):
+     bone  #F4F1EA   ink   #111113   muted #7A7872   rule  #CECAC1
+   System font stack only — no external font, no CDN. Built for a
+   1440-wide desktop; must not break at 1024 (a slow reader, two-finger
+   typist, cannot always look at the screen — see the plan's persona note).
+   Large targets, generous spacing, high contrast, one idea per region. */
+
+:root {
+  --bone: #F4F1EA;
+  --ink: #111113;
+  --muted: #7A7872;
+  --rule: #CECAC1;
+  --danger: #7a1f1f;
+  --danger-bg: #f6e6e6;
+
+  /* The brand's yellow, and its dark ground. Sampled from the icon sheets and
+     matched to the site's tokens.css so the tool and the page are one thing.
+     TWO yellows, because one cannot do both jobs: --gold reads bright on ink
+     and is for graphics, seams and type on the dark half; on bone it fails
+     contrast, so type there uses --gold-deep (4.82:1, passes AA). Using --gold
+     for text on bone is the one misuse to watch for. */
+  --gold: #F1B207;
+  --gold-deep: #8A6300;
+  --ink-lift: #1C1C20;
+  --rule-dark: #33333A;
+  --muted-up: #96948D;
+}
+
+* { box-sizing: border-box; }
+
+/* ── No-scroll shell ──────────────────────────────────────────────────────
+   The page itself never scrolls, at any viewport size — html/body are
+   height:100% + overflow:hidden, permanently. #app is a flex column filling
+   that fixed height; its header regions (.chooser-header, .door-page-head)
+   are flex:none, and everything below them lives in a single .scroll-body
+   per screen, which is the ONLY thing that ever scrolls (overflow-y:auto).
+   min-height:0 on every flex parent in this chain is mandatory — without it
+   a flex child that wants to overflow just stretches its parent instead of
+   scrolling, which is the bug this shell exists to make structurally
+   impossible. See the height-keyed media query at the bottom of this file
+   for how regions compact on a short viewport instead of overflowing. */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+#app {
+  height: 100%;
+  /* No width cap. A fixed column left most of a wide monitor empty while the
+     content below it scrolled — width the layout already had, refused. The
+     app uses the window; individual prose lines are held to a readable
+     measure where that matters, not the whole app. */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto; /* safety net for the boot-fallback, which has no .scroll-body of its own */
+}
+
+.chooser, .door-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chooser-header, .door-page-head { flex: none; padding: 1.75rem 1.5rem 0; }
+
+.scroll-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1.5rem 2.5rem;
+}
+
+h1 { font-size: 2rem; margin: 0 0 0.25rem; }
+h2 { font-size: 1.4rem; margin: 0 0 0.4rem; }
+h3 { font-size: 1.15rem; margin: 1.75rem 0 0.6rem; }
+p { margin: 0 0 0.75rem; }
+
+/* ---- buttons — large, click-not-type targets ---- */
+
+.btn {
+  display: inline-block;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.85rem 1.4rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--ink);
+  background: var(--bone);
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 3rem;
+}
+.btn:hover, .btn:focus-visible { background: var(--ink); color: var(--bone); }
+.btn:focus-visible { outline: 3px solid var(--muted); outline-offset: 2px; }
+
+.btn-secondary { border-color: var(--rule); }
+.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+
+.btn-back {
+  border: none;
+  padding: 0.6rem 0.2rem;
+  color: var(--muted);
+  background: transparent;
+  min-height: 2.5rem;
+}
+.btn-back:hover, .btn-back:focus-visible { color: var(--ink); background: transparent; }
+
+/* ---- chooser / home screen ---- */
+
+.chooser-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+.mark { width: 84px; height: 84px; object-fit: contain; flex: none; }
+.tagline { color: var(--muted); font-size: 1.05rem; margin: 0; }
+
+.loader-bar {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.pack-status { font-weight: 600; margin-bottom: 0.5rem; }
+.load-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+/* A load that found none of our nine names. Not an error — nothing failed —
+   so it reads as a note, not as red. */
+.load-empty {
+  border-left: 4px solid var(--rule);
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+}
+.load-empty code, .setup-download-destination code { font-size: 0.95em; }
+
+.loader-controls { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 0.75rem; }
+
+/* Where the work is kept, and the one click that erases it. */
+.persist-note { margin-top: 0.9rem; color: var(--muted); font-size: 0.95rem; }
+.persist-off { color: var(--danger); font-weight: 600; }
+.btn-link {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.persist-cleared { margin-top: 0.4rem; }
+
+.doors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.door-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-align: left;
+  font: inherit;
+  background: var(--bone);
+  border: 2px solid var(--ink);
+  border-radius: 0.9rem;
+  padding: 1.75rem 1.5rem;
+  cursor: pointer;
+  min-height: 9rem;
+}
+.door-card:hover, .door-card:focus-visible {
+  background: var(--ink);
+  color: var(--bone);
+}
+.door-card:focus-visible { outline: 3px solid var(--muted); outline-offset: 3px; }
+.door-title { font-size: 1.3rem; font-weight: 700; }
+.door-blurb { color: var(--muted); }
+.door-card:hover .door-blurb, .door-card:focus-visible .door-blurb { color: var(--rule); }
+
+/* One quiet line standing in for the door cards when no pack is loaded yet
+   (FIX 3 — the empty state never renders the loaded state's primary
+   content, and vice versa). Plain inline buttons, not cards. */
+.doors-line { margin-top: 1rem; }
+.doors-line .door-link {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.doors-line .door-sep { color: var(--rule); margin: 0 0.5rem; }
+
+/* ---- first-run onboarding (no pack loaded) ---- */
+
+.onboarding { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+.onboard-explainer { color: var(--muted); }
+.onboard-routes {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+/* Three columns, held. auto-fit with a 200px floor dropped to two columns
+   below ~820px of effective width — which is exactly what browser zoom
+   produces — so the three starting buttons broke onto two rows and the
+   screen started scrolling. There are always exactly three routes; the
+   columns are fixed at three and the CONTENT shrinks instead, down to the
+   width where three columns genuinely cannot work. */
+.onboard-route-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.onboard-route { min-width: 0; }
+/* The labels never wrap: a two-line button is taller than its neighbours,
+   which is what actually broke the row — not the column count. The type
+   scales with the window instead, so all three stay one line and one row. */
+.onboard-route > .btn {
+  width: 100%;
+  padding: 0.7rem 0.4rem;
+  font-size: clamp(0.78rem, 1.35vw, 1rem);
+  min-height: 2.6rem;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .onboard-route-grid { grid-template-columns: 1fr; }
+  .onboard-route > .btn { white-space: normal; font-size: 1rem; }
+}
+/* Three cards, one shape: heading on top, the button on the bottom edge, and
+   whatever explains the route in between. margin-top:auto on the action is
+   what keeps the three buttons on one row no matter how much text sits above
+   any one of them — a link above route 2's button used to push it down a line
+   while route 3 had no button at all. */
+.onboard-route { display: flex; flex-direction: column; gap: 0.35rem; }
+.onboard-route > .btn {
+  margin-top: auto;
+  align-self: start;
+  text-align: center;
+  text-decoration: none;
+}
+.onboard-route h3 { margin: 0; font-size: 1.05rem; }
+.onboard-route p { margin: 0; color: var(--muted); }
+.onboard-sample { color: var(--muted); }
+.loader-controls-hint { margin-bottom: 0.5rem; }
+
+/* The collapsed "What is a pack?" disclosure shown once a pack IS loaded —
+   same onboarding content as above, folded behind a native <details> toggle
+   so it never competes with the doors for primary attention. */
+.pack-toggle { margin-bottom: 1.5rem; }
+.pack-toggle summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.4rem 0;
+}
+.pack-toggle .onboarding { margin-top: 0.75rem; margin-bottom: 0; }
+
+/* The loaded sample pack's own unmistakable "this is an example" label. */
+.sample-banner {
+  border-left: 4px solid var(--rule);
+  padding: 0.6rem 0 0.6rem 1rem;
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+/* ---- needs-pack prompt ---- */
+
+.needs-pack {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+.needs-pack-routes { margin-top: 1.25rem; }
+
+/* ---- door pages (today / setup / check) ---- */
+
+.door-page-head { padding-bottom: 0.5rem; }
+.door-page-head h1 { margin-top: 0.25rem; }
+.placeholder-body {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.today-view .today-stage {
+  /* Gold, not ink: this line sits under the one fact the console computes. */
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.stage-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+.stage-heading { margin-bottom: 0.4rem; }
+.stage-why { color: var(--muted); }
+
+.today-section {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.muted-note { color: var(--muted); }
+
+.action-list, .generic-list, .gate-list, .waiting-list, .attention-list, .malformed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.generic-list { list-style: disc; padding-left: 1.4rem; gap: 0.4rem; }
+.generic-list li { display: list-item; }
+
+.action-item, .gate-block, .attention-item {
+  border-left: 4px solid var(--ink);
+  padding: 0.15rem 0 0.15rem 1rem;
+}
+.action-text { font-weight: 600; margin-bottom: 0.15rem; }
+.action-meta { color: var(--muted); margin: 0; }
+
+.gate-block { border-left-color: var(--danger); }
+.gate-condition { font-weight: 700; margin-bottom: 0.2rem; }
+.gate-unmet { margin-bottom: 0.35rem; }
+.gate-unblock { color: var(--muted); margin: 0; }
+
+.waiting-list li {
+  border-left: 4px solid var(--muted);
+  padding: 0.15rem 0 0.15rem 1rem;
+}
+
+.malformed-list { gap: 0.75rem; margin-top: 0.6rem; }
+.malformed-entry { border-left: 4px solid var(--danger); padding-left: 1rem; }
+.malformed-loc { font-weight: 600; margin-bottom: 0.25rem; }
+.malformed-raw {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Unrecognised headings — the same shape as malformed, because it is the
+   same promise: retained, shown verbatim, never repaired or guessed at. */
+.unrecognised-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.unrecognised-entry { border-left: 4px solid var(--danger); padding-left: 1rem; }
+.unrecognised-loc { font-weight: 600; margin-bottom: 0.25rem; }
+.unrecognised-expected { color: var(--muted); margin-bottom: 0.4rem; }
+.unrecognised-raw {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* First-use glosses. Deliberately quiet: they explain the door, they are not
+   the door. */
+.gloss-list {
+  list-style: none;
+  margin: 0.4rem 0 1.5rem;
+  padding: 0.6rem 0 0.6rem 1rem;
+  border-left: 2px dotted var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.skill-note { margin-bottom: 0.5rem; }
+
+/* ---- check-before-publish (door 3) ---- */
+
+.check-view .check-section {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.check-view .check-section:first-of-type { margin-top: 0; }
+
+.check-notice {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+.check-notice code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.05em 0.35em;
+  border-radius: 0.25rem;
+}
+
+.draft-input {
+  width: 100%;
+  font: inherit;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  background: var(--bone);
+  color: var(--ink);
+  resize: vertical;
+}
+.draft-input:focus-visible { outline: 3px solid var(--muted); outline-offset: 1px; }
+
+.finding-list, .claim-list, .avoided-list, .fix-list, .checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.checklist { list-style: disc; padding-left: 1.4rem; gap: 0.4rem; }
+.checklist li { display: list-item; }
+
+.finding-item, .claim-item, .avoided-item, .fix-item {
+  border-left: 4px solid var(--ink);
+  padding: 0.15rem 0 0.15rem 1rem;
+}
+.finding-error, .fix-item.finding-error { border-left-color: var(--danger); }
+.finding-warn, .fix-item.finding-warn { border-left-color: var(--muted); }
+
+.finding-meta { color: var(--muted); margin-bottom: 0.15rem; }
+.finding-span, .claim-span, .fix-span { font-weight: 600; margin-bottom: 0.15rem; }
+.claim-source, .avoided-reason { margin: 0; }
+.avoided-fact { font-weight: 600; margin-bottom: 0.15rem; }
+
+.fix-options {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--muted);
+}
+
+.check-paste { border-color: var(--ink); border-width: 2px; }
+.check-blocked { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
+/* Neither green nor red: an empty draft has earned no verdict at all. */
+.check-idle { border-style: dashed; color: var(--muted); }
+.paste-block {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  padding: 0.9rem 1rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+/* ---- guided setup (door 1) ---- */
+
+.setup-view .setup-section {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.setup-view > .setup-intro { margin-bottom: 1.25rem; }
+.setup-intro { color: var(--muted); }
+.setup-divider { border: none; border-top: 1px solid var(--rule); margin: 1.5rem 0; }
+
+.setup-kickoff {
+  border: 2px solid var(--ink);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.setup-kickoff-prompt {
+  width: 100%;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  background: var(--bone);
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  resize: vertical;
+}
+
+.setup-gate-note {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  margin: 0.75rem 0;
+}
+
+.setup-view .setup-unrecognised { border-color: var(--danger); border-width: 2px; }
+.setup-download-note:empty { display: none; }
+.setup-download-note { margin-top: 0.75rem; font-weight: 600; }
+
+.setup-entry-list {
+  list-style: none;
+  margin: 0.5rem 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.setup-entry { border-left: 4px solid var(--ink); padding: 0.15rem 0 0.15rem 1rem; }
+.setup-current { margin: 0.4rem 0; }
+
+/* Two fields per row above 720px. One field per row put a four-field form at
+   493px on its own — a full screen and a half for four text boxes. The error
+   line and the Add button below still span the whole width. */
+.setup-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem 1.25rem;
+  margin-top: 0.75rem;
+  /* Cells stretch to the tallest in their row (the grid default) so the
+     inputs can line up along the bottom — see .setup-field below. `start`
+     here left every input hanging from the top of its own cell, so a field
+     whose help text wrapped to two lines sat a line lower than the one
+     beside it. */
+  align-items: stretch;
+}
+/* Column tiers. bailey.md's Active form carries six fields once its two
+   conditionals open; at two columns that is three rows and it overflowed
+   from 1024px down. More columns earlier means fewer rows, which is the
+   only reason to use the width at all. */
+@media (min-width: 600px) {
+  .setup-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-form > textarea { grid-column: 1 / -1; }
+}
+@media (min-width: 960px) { .setup-form { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.setup-field { display: flex; flex-direction: column; gap: 0.25rem; }
+/* MUST come after the rule above. `display: flex` on a class beats the
+   browser's own [hidden] { display: none }, so a conditional field marked
+   hidden stayed on screen anyway — the attribute was right and the page was
+   wrong. Any rule that sets display on .setup-field has to be followed by
+   this one. */
+.setup-field[hidden] { display: none; }
+.setup-field-label { font-weight: 600; }
+.setup-field-help { color: var(--muted); font-size: 0.92rem; }
+.setup-input, .setup-select, .setup-textarea {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 0.4rem;
+  background: var(--bone);
+  color: var(--ink);
+}
+.setup-textarea { resize: vertical; }
+.setup-error { color: var(--danger); font-weight: 600; min-height: 1.3em; margin: 0; }
+
+.setup-save-bar {
+  border: 1px solid var(--rule);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .chooser-header, .door-page-head { padding: 1.5rem 1rem 0; }
+  .scroll-body { padding: 1rem 1rem 2rem; }
+  .chooser-header { flex-wrap: wrap; }
+  html, body { font-size: 17px; }
+}
+
+/* ── Height-keyed responsive tiers ───────────────────────────────────────
+   The failure this whole shell exists to prevent is vertical, not
+   horizontal, so these tiers key on viewport HEIGHT: they compact spacing
+   and shrink the header art so more of a short window is left for the
+   .scroll-body's own internal scroll to work with, rather than pushing
+   content off-screen with no way back. Body text is never reduced below
+   15px at any tier — a scrollbar is a smaller failure than illegible type
+   for a reader who is already slow. */
+@media (max-height: 760px) {
+  .chooser-header, .door-page-head { padding-top: 1rem; margin-bottom: 0.5rem; }
+  .scroll-body { padding-top: 0.5rem; }
+  .mark { width: 56px; height: 56px; }
+  .loader-bar, .onboard-routes, .needs-pack, .today-section, .check-view .check-section,
+  .setup-view .setup-section { padding: 1rem 1.25rem; }
+}
+
+@media (max-height: 560px) {
+  /* The mark and tagline are decorative; the title and the door page's own
+     back button are never hidden — losing the way back out of a door would
+     trade one structural failure for a worse one. */
+  .mark, .tagline { display: none; }
+  .chooser-header, .door-page-head { padding-top: 0.5rem; margin-bottom: 0.25rem; }
+  h1 { font-size: 1.5rem; }
+}
+
+/* ── Boot fallback ─────────────────────────────────────────────────────────
+   Shown only when the module script never ran. mountApp() replaces #app on a
+   successful boot, so a blank page is impossible: the user always gets either
+   the console or an explanation of why they did not. */
+.boot-fallback { max-width: 46rem; margin: 4rem auto; padding: 0 1.5rem; }
+.boot-fallback h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 1.25rem; }
+.boot-fallback p { font-size: 1.05rem; line-height: 1.65; margin: 0 0 1rem; }
+.boot-fallback pre {
+  background: var(--ink, #111113); color: var(--bone, #F4F1EA);
+  padding: .9rem 1.1rem; border-radius: 3px; overflow-x: auto; font-size: 1rem;
+}
+.boot-fallback code { background: rgba(0,0,0,.06); padding: .1em .35em; border-radius: 2px; }
+.boot-fallback pre code { background: none; padding: 0; }
+.boot-fallback__aside { color: var(--muted, #7A7872); font-size: .95rem; border-top: 1px solid var(--rule, #CECAC1); padding-top: 1rem; margin-top: 1.75rem; }
+
+
+/* Door 1's file tabs — every panel is in the DOM, one is visible. Six stacked
+   file forms measured 11,337px; a hidden sibling contributes no height, so the
+   door now shows the one file it always said it showed. See setup.js panel(). */
+.setup-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--rule, #d8d3c6);
+}
+.setup-tab {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted, #6b6559);
+  padding: 0.4rem 0.7rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.setup-tab:hover { color: var(--ink, #1a1a1a); }
+.setup-tab.is-active {
+  color: var(--ink, #1a1a1a);
+  font-weight: 600;
+  border-bottom-color: currentColor;
+}
+.setup-panel { display: none; }
+.setup-panel.is-active { display: block; }
+
+
+/* Door 1's save bar rides the bottom of the door rather than sitting at the
+   end of a long form — the download button is the point of the door. */
+.setup-save-bar {
+  border-top: 1px solid var(--rule, #d8d3c6);
+  padding-top: 0.6rem;
+  margin-top: 1rem;
+}
+.setup-where { margin-top: 0.5rem; }
+.setup-where > summary { cursor: pointer; color: var(--muted, #6b6559); }
+.setup-where > p { margin: 0.4rem 0 0; }
+
+.setup-save-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+.setup-save-row > p { margin: 0; }
+
+
+/* The hub uses the window too. Only running prose gets a reading measure. */
+.chooser { max-width: none; margin: 0; width: 100%; }
+.tagline, .setup-intro, .today-note, .check-note { max-width: 70ch; }
+
+
+/* campaign.md's four steps — one showing, same rule as the file tabs. */
+.setup-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.5rem 0 1rem;
+}
+.setup-step-tab {
+  border: 1px solid var(--rule, #d8d3c6);
+  border-radius: 2rem;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.94rem;
+  color: var(--muted, #6b6559);
+  padding: 0.3rem 0.8rem 0.3rem 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.setup-step-tab .setup-step-n {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--rule, #d8d3c6);
+  color: var(--ink, #1a1a1a);
+  font-size: 0.8rem;
+}
+.setup-step-tab.is-active {
+  color: var(--ink, #1a1a1a);
+  border-color: currentColor;
+  font-weight: 600;
+}
+.setup-step-tab.is-active .setup-step-n { background: var(--ink, #1a1a1a); color: var(--bg, #f4f1ea); }
+.setup-step { display: none; }
+.setup-step.is-active { display: block; }
+.setup-step-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.9rem;
+}
+
+/* Tighter forms: motte and bailey were within ~90px of fitting. */
+.setup-form { gap: 0.6rem 1.25rem; }
+.setup-section { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+.setup-section h4 { margin: 0.8rem 0 0.3rem; }
+
+/* The glossary, folded. Open on demand, never occupying the briefing. */
+.gloss { margin: 0 0 0.75rem; }
+.gloss > summary { cursor: pointer; color: var(--muted); font-size: 0.95rem; }
+.gloss .gloss-list { margin-top: 0.4rem; }
+
+/* Tighter briefing/check sections — the day's work has to fit on one screen. */
+.today-section, .check-section { margin-bottom: 1rem; }
+.today-section h3, .check-section h3 { margin: 0.6rem 0 0.4rem; }
+
+/* Last of the slack. The 2.5rem tail on .scroll-body was dead space that
+   still counted toward the overflow, and door-body headings were sized for
+   a page that scrolls rather than one that has to fit. */
+.scroll-body { padding-bottom: 1rem; }
+.today-view h3, .check-view h3, .setup-view h3 { font-size: 1.05rem; }
+.today-section, .check-section { padding: 0.9rem 1.25rem; margin-bottom: 0.8rem; }
+.today-stage { margin-bottom: 0.8rem; }
+.setup-entry-list { margin: 0.3rem 0 0.6rem; }
+
+
+/* With the full window available, the working forms can go wider than two
+   columns on a big monitor — fewer rows means less height, which is the
+   whole point of using the width. */
+@media (min-width: 1500px) { .setup-form { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 2100px) { .setup-form { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+/* Door 3 stacked six sections in one column — the draft box, then four
+   result panels, then a seventh saying the same "nothing pasted yet". They
+   are independent readings of one draft, so they tile. The draft box itself
+   spans the full width; the readings fill the rest. */
+@media (min-width: 700px) {
+  .check-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 0.9rem;
+    align-content: start;
+  }
+  .check-view > .check-section:first-child { grid-column: 1 / -1; }
+  .check-view > .check-section { margin-bottom: 0; }
+}
+
+/* The paste box takes what is left of the screen rather than a fixed ten
+   rows. rows="10" is 240px whether the window is 1440 tall or 700, and on
+   the short end it was the whole reason Door 3 still scrolled. */
+.draft-input { height: 22vh; min-height: 5rem; max-height: 34vh; }
+
+/* Below 900px of effective width the check sections are already two-up and
+   still tight, so their chrome comes down too rather than the layout
+   breaking back into one tall column. */
+@media (max-width: 900px) {
+  .check-section { padding: 0.7rem 0.9rem; }
+  .check-view { gap: 0.6rem; }
+  .draft-input { height: 16vh; }
+}
+
+/* Existing entries are a reference column, not the thing being read closely:
+   0.6rem between every one of them plus a 1rem tail was more space than the
+   form doing the work. */
+.setup-entry-list { gap: 0.25rem; margin: 0.3rem 0 0.5rem; font-size: 0.95rem; }
+.setup-entry { padding: 0 0 0 0.7rem; border-left-width: 3px; }
+.setup-section h4 { margin: 0.5rem 0 0.2rem; }
+.setup-step-nav { margin-top: 0.5rem; }
+.setup-intro { margin-bottom: 0.5rem; }
+
+.setup-form { margin-top: 0.5rem; }
+.setup-current { margin: 0.25rem 0; }
+
+
+/* The folded tail of a long entry list. */
+.entry-more { margin: 0 0 0.5rem; }
+.entry-more > summary { cursor: pointer; color: var(--muted); font-size: 0.92rem; }
+
+
+/* ── Frame budget ────────────────────────────────────────────────────────
+   At a 900px-tall window the door frame alone was taking 290px before any
+   content: a 156px header, a 134px save bar, and a 54px Back/Next row on
+   every single step. The content was never the problem at that size — the
+   chrome around it was. */
+
+/* One line, not three: back link and title side by side. */
+.door-page-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1.5rem 0.3rem;
+}
+.door-page-head h2 { font-size: 1.25rem; margin: 0; }
+.door-page-head .btn-back { padding: 0.2rem 0; min-height: 0; }
+
+/* The save bar is one row; the "where do these go" note folds into it. */
+.setup-save-bar { padding-top: 0.4rem; margin-top: 0.6rem; }
+.setup-save-row { align-items: baseline; gap: 0.75rem; }
+.setup-save-row .btn { padding: 0.5rem 0.9rem; min-height: 2.4rem; }
+.setup-where { margin: 0; }
+.setup-where > p { margin-top: 0.3rem; }
+.setup-download-note:empty { display: none; }
+
+/* The numbered strip is the navigation now — no second row of links. */
+.setup-step-nav { display: none; }
+
+/* The header on the home screen gets the same treatment. */
+.chooser-header { margin-bottom: 0.6rem; padding-top: 1rem; }
+.mark { width: 56px; height: 56px; }
+h1 { font-size: 1.6rem; }
+.loader-bar { padding: 0.8rem 1.1rem; margin-bottom: 1rem; }
+.setup-section { padding: 0.8rem 1.1rem; }
+
+/* Door 2's briefing tiles too. Four independent readings of one day stacked
+   in a single column is a scroll for no reason on a wide screen. */
+@media (min-width: 700px) {
+  .today-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 0.8rem;
+    align-content: start;
+  }
+  .today-view > .today-stage { grid-column: 1 / -1; }
+  .today-view > .today-section, .today-view > .today-stage { margin-bottom: 0; }
+  /* The glossaries are tiny folded lines, one per section. Spanning the
+     full width made each of them a row break, which split four cards that
+     fit on one row into two rows — the tiling made it TALLER. They tile
+     alongside the sections instead. */
+  .today-view > .gloss { grid-column: auto; align-self: start; }
+}
+
+/* align-content positions the rows; align-ITEMS is what stops every card
+   stretching to the tallest one in its row. Five result cards were all
+   504px tall because one of them was. */
+.check-view, .today-view { align-items: start; }
+.draft-input { height: 15vh; }
+
+.check-section, .today-section { padding: 0.7rem 1rem; }
+.draft-input { height: 13vh; }
+
+.check-view { gap: 0.6rem; }
+
+
+/* Door 3 is a step group now, not a tiled grid — see check.js. The grid
+   rules above no longer apply to it, and a stray display:grid would put the
+   step strip in a column of its own. */
+.check-view { display: block; }
+.check-view > .setup-step { margin-top: 0.2rem; }
+
+
+/* Step numbers come from a CSS counter, not from the markup. Door 3 lints
+   the rendered view for numbers that do not appear in the draft, and a
+   literal "1" in a badge is exactly the kind of invented figure that guard
+   exists to catch — it was right, so the digits left the HTML. */
+.setup-steps { counter-reset: step; }
+.setup-step-tab { counter-increment: step; }
+.setup-step-n::before { content: counter(step); }
+
+
+/* ── Actions sit in the grid, not under it ───────────────────────────────
+   The Add button used to span the full width on its own row while the last
+   row of fields sat half empty next to it — a whole row of height bought
+   for one button, with the space for it already there. It is a grid cell
+   now: it drops into the next free slot beside the fields, and only starts
+   a row of its own when the fields happen to fill the last one exactly. */
+.setup-form > .btn {
+  grid-column: auto;
+  justify-self: start;
+  align-self: end;
+  padding: 0.55rem 1.1rem;
+  min-height: 2.5rem;
+}
+
+/* The error line takes no space until there is an error to show. When there
+   is, it spans the row so a long message is readable. */
+.setup-error { margin: 0; }
+.setup-error:empty { display: none; }
+.setup-form > .setup-error:not(:empty) { grid-column: 1 / -1; }
+
+/* Same rule for the two single-field save forms (canonical source, delivery,
+   why-this-stage): label and button on one line, not stacked. */
+.setup-form[data-setup-form="truth-canonical"],
+.setup-form[data-setup-form="campaign-delivery"] { align-items: end; }
+
+
+/* The file heading and its intro sit above a strip that names the section
+   anyway; both come down to one compact line each. */
+.setup-section > h3 { font-size: 1rem; margin: 0 0 0.15rem; }
+.setup-section > .setup-intro { margin-bottom: 0.35rem; font-size: 0.95rem; }
+.setup-step > .setup-intro { margin-bottom: 0.4rem; font-size: 0.95rem; }
+.setup-steps { margin: 0.3rem 0 0.6rem; }
+
+/* ── Short-window tier ───────────────────────────────────────────────────
+   Below ~820px of viewport height the app tightens as a whole rather than
+   me tuning one panel at a time and finding the next one. Everything here
+   is spacing and type scale — no content is hidden and no layout changes,
+   so a short window shows the same screen, closer together. */
+@media (max-height: 820px) {
+  html, body { font-size: 16px; }
+  .door-page-head { padding: 0.35rem 1.25rem 0.2rem; }
+  .door-page-head h2 { font-size: 1.1rem; }
+  .scroll-body { padding: 0.5rem 1.25rem 0.6rem; }
+  .setup-section { padding: 0.55rem 0.9rem; }
+  .setup-section > h3 { margin-bottom: 0.1rem; }
+  .setup-section > .setup-intro,
+  .setup-step > .setup-intro { margin-bottom: 0.25rem; font-size: 0.9rem; }
+  .setup-steps { margin: 0.25rem 0 0.45rem; }
+  .setup-step-tab { padding: 0.2rem 0.6rem 0.2rem 0.25rem; font-size: 0.88rem; }
+  .setup-form { gap: 0.45rem 1rem; margin-top: 0.35rem; }
+  .setup-field-label { font-size: 0.92rem; }
+  .setup-input, .setup-select { padding: 0.4rem 0.55rem; }
+  .setup-entry-list { gap: 0.15rem; margin: 0.2rem 0 0.35rem; font-size: 0.9rem; }
+  .setup-save-bar { padding-top: 0.3rem; margin-top: 0.4rem; }
+  .setup-save-row .btn { padding: 0.4rem 0.8rem; min-height: 2.1rem; }
+  .setup-form > .btn { padding: 0.4rem 0.9rem; min-height: 2.1rem; }
+  .loader-bar { padding: 0.6rem 0.9rem; margin-bottom: 0.7rem; }
+  .chooser-header { padding-top: 0.6rem; margin-bottom: 0.4rem; }
+  .mark { width: 44px; height: 44px; }
+  h1 { font-size: 1.35rem; }
+  .today-section, .check-section { padding: 0.55rem 0.85rem; }
+}
+
+
+/* ── Input alignment across a row ────────────────────────────────────────
+   Labels and help text are different lengths; the boxes are not. The input
+   is pushed to the bottom of its cell, so every input in a row shares one
+   baseline no matter how many lines the label above it took. This is the
+   whole reason .setup-form uses align-items: stretch. */
+.setup-field { justify-content: flex-start; }
+.setup-field > .setup-input,
+.setup-field > .setup-select,
+.setup-field > .setup-textarea { margin-top: auto; }
+
+/* Checkbox rows are a horizontal label, not a stacked field — they must not
+   inherit the bottom-push above. */
+.setup-field > input[type="checkbox"] { margin-top: 0; }
+
+/* A <select> and an <input> with identical padding still come out different
+   heights — the select adds room for its own arrow and uses a different
+   default line-height. Two pixels is enough to make a row of boxes look
+   crooked, so both are pinned to one height and one line-height. */
+.setup-input, .setup-select {
+  height: 2.75rem;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+@media (max-height: 820px) {
+  .setup-input, .setup-select { height: 2.3rem; }
+}
+
+/* A select's help line is the only one left on screen (text fields carry
+   theirs as placeholders). Standing's ran to two lines, which set the row's
+   height and left a band of dead space above every other input beside it.
+   One line each; the full text is on the control's title attribute. */
+.setup-field-help {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+/* Kickoff: action and note on one line, then the prompt box taking whatever
+   height is left. rows="8" was a fixed 240px regardless of the window. */
+.kickoff-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.kickoff-row > p { margin: 0; }
+.kickoff-row > .btn { padding: 0.45rem 0.9rem; min-height: 2.3rem; }
+/* Height is set by sizeKickoff() in setup.js, from the text and the room
+   left on the page. No fixed value here to fight with it. */
+.setup-kickoff-prompt {
+  display: block;
+  width: 100%;
+  min-height: 5rem;
+  resize: vertical;
+  overflow: auto;
+}
+
+
+/* Door 3's write panel: the ask and the button on one line, the provider
+   fields folded away once they are set. */
+.write-row { display: flex; gap: 0.6rem; align-items: center; }
+.write-row > .setup-input { flex: 1 1 auto; min-width: 0; }
+.write-row > .btn { flex: none; padding: 0.5rem 1rem; min-height: 2.6rem; white-space: nowrap; }
+.write-provider { margin-top: 0.5rem; }
+.write-provider > summary { cursor: pointer; color: var(--muted); font-size: 0.95rem; }
+.write-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.6rem 1rem;
+  align-items: end;
+  margin: 0.5rem 0;
+}
+.write-config > .btn { padding: 0.45rem 0.9rem; min-height: 2.4rem; justify-self: start; }
+
+
+/* ── The agent sidebar ───────────────────────────────────────────────────
+   Main pane and sidebar side by side, both filling the fixed page height.
+   min-width:0 on the main column is load-bearing: without it a wide table or
+   a long code block inside a door pushes the sidebar off the screen instead
+   of scrolling inside its own region. */
+.shell {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0;
+}
+.shell-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.guide {
+  flex: 0 0 clamp(280px, 24vw, 420px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--rule);
+  padding: 0.8rem 1rem;
+  gap: 0.5rem;
+}
+.guide-head { display: flex; align-items: baseline; gap: 0.6rem; flex: none; }
+.guide-head h2 { font-size: 1.05rem; margin: 0; }
+.guide-nokey { color: var(--muted); font-size: 0.85rem; }
+
+/* The ONE scroll region in the app. A conversation grows without bound, so
+   this is the single case where hiding content would lose the thread rather
+   than save space. The header and the ask box are flex:none, so the input is
+   never scrolled away from. */
+.guide-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+.guide-opening { color: var(--muted); }
+.guide-turn { margin-bottom: 0.8rem; }
+.guide-turn p { margin: 0 0 0.4rem; font-size: 0.95rem; }
+.guide-who {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.guide-user { border-left: 3px solid var(--rule); padding-left: 0.6rem; }
+
+.guide-ask { flex: none; display: flex; gap: 0.4rem; }
+.guide-ask > .setup-input { flex: 1 1 auto; min-width: 0; }
+.guide-ask > .btn { flex: none; padding: 0.4rem 0.8rem; min-height: 2.4rem; }
+.guide-hint { flex: none; font-size: 0.85rem; margin: 0; }
+
+/* On a narrow window the sidebar would leave the doors unusable, so it drops
+   under the main pane and takes a fixed slice rather than competing for it. */
+@media (max-width: 900px) {
+  .shell { flex-direction: column; }
+  .guide {
+    flex: 0 0 40vh;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+}
+
+
+/* The provider box in the sidebar. flex:none so it never eats the transcript. */
+.guide-provider { flex: none; border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+.guide-provider > summary { cursor: pointer; color: var(--muted); font-size: 0.9rem; }
+.guide-provider .setup-field { margin-top: 0.4rem; }
+.guide-provider .setup-input { height: 2.2rem; }
+.guide-provider .btn { margin-top: 0.5rem; padding: 0.35rem 0.8rem; min-height: 2.1rem; }
+.guide-provider .muted-note { font-size: 0.82rem; margin: 0.4rem 0 0; }
+
+
+.guide-provider-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+.guide-provider-actions .btn { margin-top: 0; }
+.guide-provider .setup-select { height: 2.2rem; }
+
+
+/* Kickoff leads with the agent; the copyable prompt for a tool-using agent
+   folds away behind it. */
+.kickoff-handoff { margin-top: 0.8rem; }
+.kickoff-handoff > summary { cursor: pointer; color: var(--muted); }
+.kickoff-handoff .setup-kickoff-prompt { margin-top: 0.5rem; }
+.kickoff-row > .btn { font-weight: 600; }
+
+
+.guide-search { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
+.guide-searching {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--rule);
+  border-radius: 1rem;
+  padding: 0.05rem 0.5rem;
+  color: var(--muted);
+}
+
+
+/* The import plan. A table because it IS a comparison — four columns the
+   founder reads across to see a claim being refused and why. */
+.imp-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.4rem 0 0.8rem; }
+.imp-table th, .imp-table td { text-align: left; padding: 0.3rem 0.5rem 0.3rem 0; vertical-align: top; }
+.imp-table thead th { border-bottom: 1px solid var(--rule); font-size: 0.85rem; color: var(--muted); }
+.imp-table tbody tr { border-bottom: 1px solid var(--rule); }
+.imp-clear td:nth-child(3) { font-weight: 600; }
+.imp-hold td:nth-child(3) { color: var(--muted); }
+.imp-table .muted-note { font-size: 0.88rem; }
+
+
+/* ── Icons ──────────────────────────────────────────────────────────────────
+   One PNG per concept, painted as a MASK rather than dropped in as an image,
+   so the shape takes currentColor. That is the whole reason the icon sheets
+   were asked for in black only: .door-card inverts bone->ink on hover and the
+   mask inverts with it, where a coloured PNG would need a second asset and a
+   rule to swap it.
+
+   Sized in `em`, never px, so an icon tracks the type beside it at every
+   responsive tier the no-scroll brief sets — a px icon would grow relative to
+   shrinking text and be the one thing that pushes a door over the fold.
+
+   Concept -> file is bound in src/ui/icons.js, never here and never at a call
+   site; this file only knows how to paint them. */
+.ico {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -0.18em;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;    mask-repeat: no-repeat;
+  -webkit-mask-position: center;     mask-position: center;
+  -webkit-mask-size: contain;        mask-size: contain;
+}
+
+.ico-door         { -webkit-mask-image: url("assets/icons/door.png");         mask-image: url("assets/icons/door.png"); }
+.ico-motte-keep   { -webkit-mask-image: url("assets/icons/motte-keep.png");   mask-image: url("assets/icons/motte-keep.png"); }
+.ico-gate         { -webkit-mask-image: url("assets/icons/gate.png");         mask-image: url("assets/icons/gate.png"); }
+.ico-claim-sealed { -webkit-mask-image: url("assets/icons/claim-sealed.png"); mask-image: url("assets/icons/claim-sealed.png"); }
+.ico-claim-broken { -webkit-mask-image: url("assets/icons/claim-broken.png"); mask-image: url("assets/icons/claim-broken.png"); }
+.ico-sell-kit     { -webkit-mask-image: url("assets/icons/sell-kit.png");     mask-image: url("assets/icons/sell-kit.png"); }
+.ico-bailey-tent  { -webkit-mask-image: url("assets/icons/bailey-tent.png");  mask-image: url("assets/icons/bailey-tent.png"); }
+.ico-binoculars   { -webkit-mask-image: url("assets/icons/binoculars.png");   mask-image: url("assets/icons/binoculars.png"); }
+.ico-lever        { -webkit-mask-image: url("assets/icons/lever.png");        mask-image: url("assets/icons/lever.png"); }
+.ico-campaign     { -webkit-mask-image: url("assets/icons/campaign.png");     mask-image: url("assets/icons/campaign.png"); }
+.ico-avoided      { -webkit-mask-image: url("assets/icons/avoided.png");      mask-image: url("assets/icons/avoided.png"); }
+.ico-fix-plan     { -webkit-mask-image: url("assets/icons/fix-plan.png");     mask-image: url("assets/icons/fix-plan.png"); }
+.ico-sign-pen     { -webkit-mask-image: url("assets/icons/sign-pen.png");     mask-image: url("assets/icons/sign-pen.png"); }
+.ico-moment       { -webkit-mask-image: url("assets/icons/moment.png");       mask-image: url("assets/icons/moment.png"); }
+.ico-scars        { -webkit-mask-image: url("assets/icons/scars.png");        mask-image: url("assets/icons/scars.png"); }
+
+/* The door title carries its icon inline rather than stacked above it. A
+   stacked icon added ~34px to a card whose content already sat close to its
+   9rem min-height, and the doors grid is the one screen that must never be
+   the reason the page scrolls. */
+/* MEASURED: at 1400x700 a 1.15em mark plus a 0.5rem gap took enough width
+   out of "What do I do today" to wrap it to a second line, adding 15px to the
+   chooser — the hub, the one screen that must never scroll. A 1em mark and a
+   tighter gap leave the title on one line. */
+.door-title { display: flex; align-items: center; gap: 0.4rem; }
+.door-title .ico { width: 1em; height: 1em; }
+
+/* Below these tiers the seven-tab strip wraps to a second row once it carries
+   marks, which costs 2-23px of overflow in motte/bailey/recon at 1100x640.
+   The mark is an aid; the label is the information, and it stays. So the aid
+   is what gives way. */
+@media (max-width: 1250px), (max-height: 680px) {
+  .setup-tabs .ico, .setup-steps .ico { display: none; }
+}
+
+/* The tab strip pays for its icons out of its own padding.
+   MEASURED, not reasoned about: adding a mark to each of seven tabs widened
+   the strip enough to wrap an extra row, and .setup-tabs is flex-wrap: wrap,
+   so that row pushed motte/bailey/recon/campaign into overflow by 2-23px at
+   1100x640. Trimming the horizontal padding gives back more width than the
+   marks take. */
+.setup-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-left: 0.45rem;
+  padding-right: 0.45rem;
+}
+.setup-tab .ico { width: 1em; height: 1em; }
+
+/* The folded loader. With a pack already loaded, "how to load a pack" is not
+   what the hub is for — MEASURED at 190px (1400x700) and 260px (1100x640)
+   above the doors, which was most of the reason the hub scrolled. Folded, the
+   status line stays visible and every control is one click away. */
+.loader-bar-folded > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  cursor: pointer;
+  list-style: none;
+}
+.loader-bar-folded > summary::-webkit-details-marker { display: none; }
+.loader-bar-folded > summary .pack-status { margin: 0; }
+.loader-more {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.loader-bar-folded[open] > summary { margin-bottom: 0.6rem; }
+
+/* Short viewports: the cards give up height they were only using as padding,
+   so four doors in two rows still fit above the fold. */
+@media (max-height: 760px) {
+  .door-card { min-height: 6.5rem; padding: 1.1rem 1.1rem; gap: 0.35rem; }
+  .doors-grid { gap: 1rem; }
+}
+
+/* Asking for a draft and reading the draft are one job, so they sit side by
+   side rather than stacked. MEASURED: stacked, the write panel cost 117px of
+   a 582px viewport at 1100x640 and put the claim map and the avoided list
+   below the fold. Side by side it costs nothing — the draft box was always
+   the taller of the two. */
+.check-compose { display: grid; gap: 0.6rem; align-items: start; }
+@media (min-width: 900px) {
+  .check-compose { grid-template-columns: 1fr 1fr; }
+}
+.check-compose > .check-section { margin: 0; }
+
+/* Door 3's own children. .today-view is still the grid the tiled sections
+   needed; the step strip and its panels are full-width things, so they span
+   rather than being dealt into columns — which had the four tabs stacking
+   three-deep beside a half-width panel. */
+.today-view > .setup-steps, .today-view > .setup-step { grid-column: 1 / -1; }
+
+/* ── The theme ───────────────────────────────────────────────────────────────
+   Black, grey and yellow, matching the icon sheets and the site's tokens.
+
+   THE SPLIT IS THE BRAND, not decoration: the console is a taijitu, so the
+   workspace is bone (the light half — the work you are doing) and the agent
+   is ink (the dark half — the counsel beside it). That is also why the agent
+   stopped reading as something stuffed into a corner: it is now its own
+   ground rather than a narrow strip of the same page.
+
+   Gold marks one thing only — WHERE YOU ARE, and WHAT IS LOAD-BEARING. Active
+   tab, active step, focus, the stage you are on. If everything is gold,
+   nothing is. */
+
+/* Focus, everywhere. One colour for "the keyboard is here". */
+:focus-visible { outline-color: var(--gold-deep); }
+.door-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+/* Where you are: the active file tab and the active step. */
+.setup-tab.is-active { border-bottom-color: var(--gold-deep); }
+.setup-step-tab.is-active { border-color: var(--ink); background: var(--ink); color: var(--bone); }
+.setup-step-tab.is-active .setup-step-n { background: var(--gold); color: var(--ink); }
+.setup-step-tab.is-active .ico { background-color: var(--gold); }
+
+/* A door card inverts on hover; its mark goes gold on the dark ground, the
+   same relationship the site's dark tool card uses. One asset, both states. */
+.door-card:hover .ico, .door-card:focus-visible .ico { background-color: var(--gold); }
+
+/* The stage you are on — the one fact this whole console computes. The rule
+   under it is set on .today-view .today-stage above, where the original lives;
+   a second, less specific copy here silently lost and is not worth keeping. */
+.stage-kicker { color: var(--gold-deep); }
+.gate-unblock strong { color: var(--gold-deep); }
+
+/* A cleared claim is the currency here; a sealed seam marks it. */
+.check-paste { border-left: 4px solid var(--gold); }
+.sample-banner { border-left-color: var(--gold); }
+
+/* ── The agent, on ink ──────────────────────────────────────────────────── */
+.guide {
+  background: var(--ink);
+  color: var(--bone);
+  border-left: 2px solid var(--gold);
+}
+.guide-head h2 { color: var(--bone); }
+.guide-nokey, .guide-opening, .guide-hint, .guide .muted-note { color: var(--muted-up); }
+.guide-who { color: var(--gold); }
+.guide-user { border-left-color: var(--gold); }
+.guide-turn p { color: var(--bone); }
+.guide-provider { border-top-color: var(--rule-dark); }
+.guide-provider > summary { color: var(--muted-up); }
+.guide-provider > summary:hover { color: var(--gold); }
+.guide a { color: var(--gold); }
+
+/* Unset key: the summary is the prompt, so it is the loud thing — it is no
+   longer force-opened, because open it was 486px of a 700px sidebar and left
+   the conversation 35px at 1100x640. */
+.guide-provider-unset > summary {
+  color: var(--ink);
+  background: var(--gold);
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+}
+
+/* Fields on the dark ground. */
+.guide .setup-input, .guide .setup-select {
+  background: var(--ink-lift);
+  color: var(--bone);
+  border: 1px solid var(--rule-dark);
+}
+.guide .setup-input::placeholder { color: var(--muted-up); }
+.guide .setup-field-label { color: var(--muted-up); }
+.guide .btn {
+  background: var(--ink-lift);
+  color: var(--bone);
+  border-color: var(--rule-dark);
+}
+.guide .btn:hover, .guide .btn:focus-visible {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+
+/* The conversation gets a floor it cannot be squeezed below. It is the reason
+   the sidebar exists; the key panel is not. */
+.guide-body { min-height: 6rem; }

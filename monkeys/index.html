@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monkey Console</title>
+<meta name="description" content="A static reader for your .monkeys/ pack — no account, no key, no backend.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--
+  This fallback is deliberate. It renders immediately, and mountApp() replaces it
+  on a successful boot. So if the modules never load, the user reads an explanation
+  instead of staring at a blank page wondering whether the tool is broken.
+-->
+<div id="app">
+  <main class="boot-fallback">
+    <h1>The console needs to be served, not opened directly</h1>
+    <p>
+      You are seeing this because the page was opened straight from disk
+      (a <code>file://</code> address). Browsers refuse to load JavaScript modules
+      that way, so nothing could start. This is a browser security rule, not a fault
+      in the tool, and it is why you got a page instead of a console.
+    </p>
+    <p>Serve the folder over HTTP and it will work. From this directory:</p>
+    <pre>python -m http.server 8123</pre>
+    <p>Then open <code>http://localhost:8123</code> — and stop the server with Ctrl+C when you are done.</p>
+    <p class="boot-fallback__aside">
+      Hosted copies are unaffected: on a normal web address everything below loads by itself.
+      If you are seeing this <em>on</em> a hosted copy, then a script genuinely failed —
+      open the browser console for the error.
+    </p>
+  </main>
+</div>
+<script type="module">
+  import { mountApp } from './src/ui/home.js';
+  mountApp(document.getElementById('app'));
+</script>
+</body>
+</html>

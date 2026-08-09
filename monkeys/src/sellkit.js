@@ -121,24 +121,76 @@ export function parseClaimLine(line) {
   const raw = String(line || '').trim().replace(/^[-*]\s*/, '');
   if (!raw) return null;
 
-  const g = raw.match(/(?:^|[\s(\[—-])(?:level\s*|evidence:?\s*|grade:?\s*)?([A-F])(?=[\s)\].,—-]|$)/i);
+  // "A" IS ALSO A WORD. A bare letter A-F is ambiguous with the English
+  // article, and a case-insensitive bare match graded "a line with no grade at
+  // all" as an A — a claim that establishes nothing, promoted to attested,
+  // silently. So a bare letter counts only when it is UPPERCASE and set off by
+  // a delimiter; lower case needs an explicit marker (level / evidence /
+  // grade) or parentheses to be read as a grade at all.
+  //
+  // Tried in order of how explicit the writer was being.
+  const GRADE_PATTERNS = [
+    /(?:level|evidence|grade)\s*:?\s*([A-Fa-f])(?=[\s)\].,:;—–-]|$)/,  // "grade B:", "evidence: c"
+    /\(\s*([A-Fa-f])\s*\)/,                                            // "(A)"
+    /^([A-F])\s*[—–|:-]/,                                              // "A — the claim"
+    /[\s(\[—–|-]([A-F])(?=[\s)\].,:;—–|-]|$)/,                         // " B " mid-line, uppercase only
+  ];
+  let g = null;
+  for (const re of GRADE_PATTERNS) { g = raw.match(re); if (g) break; }
   const grade = g ? g[1].toUpperCase() : 'F';
 
   const s = raw.match(/(?:source|per|from|said by|seen in|cited)\s*:?\s*([^—|]+)/i);
   const source = s ? s[1].trim().replace(/[.,;]$/, '') : '';
 
+  // A LEADING GRADE IS NOT THE CLAIM. Models commonly write the register as
+  // "A — the claim — source: …", putting the grade first. Splitting on the
+  // first delimiter then returned "A" as the entire claim, so every row read
+  // as a one-letter fact — graded correctly and about nothing. Strip a
+  // leading grade marker before deciding where the claim ends.
+  // Strip a leading grade ONLY when a delimiter proves it is one. The first
+  // version also accepted a bare letter followed by a space, which ate the "a"
+  // from "a line with no grade at all" and left a claim missing its first
+  // word. An article is not a grade.
+  const body = raw.replace(
+    /^(?:(?:level|evidence|grade)\s*:?\s*)?[A-Fa-f]\s*[—–|:-]+\s*(?=\S)/,
+    '',
+  );
+
   // The claim is everything before the first delimiter that introduces
   // metadata, so a claim containing a comma is not truncated at it.
-  const claim = raw.split(/\s+[—|]\s+|\s*\((?=[A-F][\s)])/)[0].trim().replace(/[.,;]$/, '');
+  const claim = body.split(/\s+[—|]\s+|\s*\((?=[A-F][\s)])/)[0].trim().replace(/[.,;]$/, '');
 
   return { claim, grade, source, raw, ungraded: !g };
 }
 
+// SILENT TOTAL LOSS, found 2026-08-09 by importing a kit in Idea Forge Pro's
+// REAL export shape rather than the hand-written fixture.
+//
+// IFP renders every field as ONE bullet — `- **Claim + evidence register:**
+// <value>` — and parseKitFields strips the label before this ever sees it. So
+// the value's first line does not begin with a dash. This used to require one,
+// which discarded the entire register and reported zero claims with no error.
+// A kit whose claims all vanish imports as a kit with nothing to grade, and
+// grading is the only reason the import exists.
+//
+// The lesson is the fixture's, not the parser's: console/tests/pack-fixtures
+// held a hand-written approximation using `- Label: value`, where the real
+// exporter writes `- **Label:** value`. A fixture invented to stand in for a
+// generator's output tests the invention.
+//
+// So: split on newlines OR on a pipe used as a separator (a model asked for
+// several claims in one field commonly writes either), and never require a
+// leading dash. Anything left that carries no grade falls to F by
+// parseClaimLine's own rule — which is the safe direction, because an
+// unrecognised fragment lands in Uncleared where a human sees it, rather than
+// disappearing.
 export function parseClaimRegister(text) {
   return String(text || '')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l && (l.startsWith('-') || l.startsWith('*')))
+    .split(/\r?\n|\s+\|\s+/)
+    .map((l) => l.trim().replace(/^[-*]\s*/, ''))
+    // Short fragments are punctuation and stray words, not claims. A real
+    // claim line carries a claim, and usually a grade and a source too.
+    .filter((l) => l.length >= 8)
     .map(parseClaimLine)
     .filter(Boolean);
 }

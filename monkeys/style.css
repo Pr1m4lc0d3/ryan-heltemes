@@ -1372,3 +1372,24 @@ h1 { font-size: 1.6rem; }
 /* The conversation gets a floor it cannot be squeezed below. It is the reason
    the sidebar exists; the key panel is not. */
 .guide-body { min-height: 6rem; }
+
+/* NO ORPHAN IN THE LAST ROW — the same house rule the site page follows.
+   Four doors at three columns left "Check before I publish" alone underneath,
+   reading as an afterthought rather than the fourth of four. A last row
+   holding a single card spans the full width instead.
+
+   Explicit counts, not auto-fit: the rule has to know the column count, and
+   auto-fit never says. */
+.doors-grid { grid-template-columns: 1fr; }
+@media (min-width: 34rem) {
+  .doors-grid { grid-template-columns: repeat(2, 1fr); }
+  .doors-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (min-width: 68rem) {
+  .doors-grid { grid-template-columns: repeat(3, 1fr); }
+  .doors-grid > :last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
+}
+@media (min-width: 92rem) {
+  .doors-grid { grid-template-columns: repeat(4, 1fr); }
+  .doors-grid > :last-child { grid-column: auto; }
+}

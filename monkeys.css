@@ -88,11 +88,27 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 
 /* ---- The three tools --------------------------------------------------- */
 
+/* NO ORPHAN IN THE LAST ROW. auto-fit gave two columns in the middle band,
+   which left the console sitting alone in one of them looking like an
+   afterthought rather than the third of three. The house rule: when the last
+   row would hold a single card, it spans the full width instead.
+
+   Explicit column counts rather than auto-fit, because the orphan rule has to
+   know how many columns there are — `:last-child:nth-child(odd)` is only
+   correct at two, and auto-fit never says. */
 .mm-tools {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--figure-col), 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   padding: var(--space-5) var(--space-4);
+}
+@media (min-width: 54rem) {
+  .mm-tools { grid-template-columns: repeat(2, 1fr); }
+  .mm-tools > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (min-width: 80rem) {
+  .mm-tools { grid-template-columns: repeat(3, 1fr); }
+  .mm-tools > :last-child:nth-child(odd) { grid-column: auto; }
 }
 
 .mm-tool {
@@ -113,10 +129,14 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 .mm-tool--yang { background: var(--mm-bone-deep); }
 .mm-tool--yang .mm-tool-what { color: var(--mm-muted); }
 /* The console is neither half — it is where both are operated from. */
+/* The console is neither half — it is where both are operated from — and gold
+   says so on its own. It used to also carry a 2px left edge against 1px on its
+   other three sides and on every other card; asymmetric by intent, but it read
+   as a rendering fault rather than a signal, and once this card began spanning
+   the full width the mismatch got louder. One cue, evenly applied. */
 .mm-tool--hinge {
   background: var(--mm-bone);
   border-color: var(--mm-gold);
-  border-left-width: var(--rule-heavy);
 }
 .mm-tool--hinge .mm-tool-what { color: var(--mm-muted); }
 

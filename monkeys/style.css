@@ -1069,8 +1069,25 @@ h1 { font-size: 1.6rem; }
   flex-direction: column;
 }
 
+/* THE LEFT WALL DOES NOT MOVE. min-width:0 is the whole fix and it is not
+   optional: a flex item defaults to min-width:auto, which means its width is
+   max(flex-basis, its own min-content), so ANY change to what is inside the
+   sidebar can widen it and drag its left border across the screen.
+
+   MEASURED at 1100x640, where the clamp floors the basis at 280px but the ask
+   row's intrinsic width is 297.91px, so the sidebar was running on min-content
+   rather than on its basis. Pressing Ask relabels the button "Ask" -> "…",
+   which is 13.66px narrower, so the wall stepped 13.66px right on send and
+   13.66px back on the answer — once per prompt, exactly as reported. Wider
+   windows never showed it, because there the basis wins and min-content is
+   never consulted.
+
+   With min-width:0 the width is the basis and nothing else. The button below
+   is ALSO pinned to one width, because a fix that depends on nobody ever
+   putting a long word in this column is not a fix. */
 .guide {
   flex: 0 0 clamp(280px, 24vw, 420px);
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -1094,7 +1111,10 @@ h1 { font-size: 1.6rem; }
 }
 .guide-opening { color: var(--muted); }
 .guide-turn { margin-bottom: 0.8rem; }
-.guide-turn p { margin: 0 0 0.4rem; font-size: 0.95rem; }
+/* anywhere, not break-word: a citation URL is one unbreakable token and the
+   sidebar no longer widens to accommodate it, so without this it would push a
+   horizontal scrollbar into the one column that must never gain one. */
+.guide-turn p { margin: 0 0 0.4rem; font-size: 0.95rem; overflow-wrap: anywhere; }
 .guide-who {
   display: block;
   font-size: 0.78rem;
@@ -1113,7 +1133,16 @@ h1 { font-size: 1.6rem; }
 
 .guide-ask { flex: none; display: flex; gap: 0.4rem; }
 .guide-ask > .setup-input { flex: 1 1 auto; min-width: 0; }
-.guide-ask > .btn { flex: none; padding: 0.4rem 0.8rem; min-height: 2.4rem; }
+/* One width for both labels. The button reads "Ask", then "…" while the
+   request is out; letting the box follow the text moved everything to its left
+   twice per prompt, including the wall. */
+.guide-ask > .btn {
+  flex: none;
+  width: 4.2rem;
+  padding: 0.4rem 0.5rem;
+  min-height: 2.4rem;
+  text-align: center;
+}
 .guide-hint { flex: none; font-size: 0.85rem; margin: 0; }
 
 /* On a narrow window the sidebar would leave the doors unusable, so it drops
@@ -1130,6 +1159,13 @@ h1 { font-size: 1.6rem; }
 
 /* The provider box in the sidebar. flex:none so it never eats the transcript. */
 .guide-provider { flex: none; border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+/* A <select> is as wide as its longest <option>, and these carry whole
+   sentences ("OpenRouter — works in the browser, can search") and model ids
+   that run to forty characters. That intrinsic width is what used to stretch
+   the sidebar; now that it cannot, the field has to be told to fit the column
+   instead. The full text is still there when the list is dropped open. */
+.guide-provider .setup-input,
+.guide-provider .setup-select { width: 100%; min-width: 0; max-width: 100%; }
 .guide-provider > summary { cursor: pointer; color: var(--muted); font-size: 0.9rem; }
 .guide-provider .setup-field { margin-top: 0.4rem; }
 .guide-provider .setup-input { height: 2.2rem; }
@@ -1426,3 +1462,18 @@ h1 { font-size: 1.6rem; }
   .guide-dots i { animation: none; opacity: 0.7; }
 }
 .guide-thinking { display: flex; align-items: center; gap: 0.45rem; color: var(--muted-up); margin: 0; }
+
+/* The wait counter. Tabular figures and a floor width so the row does not
+   twitch as 9s becomes 10s — the point of the thing is to be readable at a
+   glance by someone who looked away, and a number that shuffles its
+   neighbours every second defeats that. It sits at the far end of the row so
+   the eye finds it in the same place every time. */
+.guide-elapsed {
+  margin-left: auto;
+  min-width: 3.2rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.88rem;
+  color: var(--gold);
+  opacity: 0.85;
+}

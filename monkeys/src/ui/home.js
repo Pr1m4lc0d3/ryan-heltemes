@@ -40,7 +40,7 @@ import { icon } from './icons.js';
 import { activateStep } from './steps.js';
 import { buildDraftPrompt, callProvider, loadAgentConfig, saveAgentConfig, listModels, providerById, providerFor, PROVIDERS, supportsSearch } from '../agent.js';
 import { buildGuidePrompt, openingLine } from '../guide.js';
-import { renderSidebarHTML } from './sidebar.js';
+import { renderSidebarHTML, tickElapsed } from './sidebar.js';
 import { evaluate } from '../stages.js';
 import { mountSetup, renderKickoffCallout, appendBulletToFile } from './setup.js';
 import { planImport, applyImport } from '../sellkit.js';
@@ -190,7 +190,11 @@ export function mountApp(root) {
     agent: { cfg: loadAgentConfig(), ask: '', busy: false, error: '' },
     // The sidebar agent. history is [{role, text}] oldest first; it is the
     // only conversation state in the app and it lives as long as the page.
-    guide: { history: [], question: '', busy: false, error: '', opening: '', mode: '' },
+    // startedAt is the wait counter's zero. Stamped once when the request
+    // goes out and read by the sidebar's ticker, so the number on screen is
+    // the real elapsed time rather than a count of how many times the app
+    // happened to re-render.
+    guide: { history: [], question: '', busy: false, error: '', opening: '', mode: '', startedAt: 0 },
     // The provider's own model list, fetched on request. Empty until then,
     // which is what keeps the model field a text box rather than an empty
     // dropdown offering nothing.
@@ -358,6 +362,7 @@ export function mountApp(root) {
     state.guide.history.push({ role: 'user', text: q });
     state.guide.question = '';
     state.guide.busy = true;
+    state.guide.startedAt = Date.now();
     state.guide.error = '';
     render();
     try {
@@ -367,6 +372,7 @@ export function mountApp(root) {
       state.guide.error = err && err.message ? err.message : 'The request failed.';
     }
     state.guide.busy = false;
+    state.guide.startedAt = 0;
     render();
   }
 
@@ -453,6 +459,25 @@ export function mountApp(root) {
     }
   }
 
+  // THE WAIT COUNTER'S HEARTBEAT, and the reason it is a timer rather than a
+  // re-render: render() replaces root.innerHTML wholesale, so ticking the
+  // clock through it would throw away focus and the caret once a second, for
+  // the whole length of every wait. This touches one text node instead.
+  //
+  // One timer, ever. It is started when a counter appears and stopped the
+  // moment tickElapsed reports none left, so a finished answer never leaves
+  // an interval running behind it.
+  let waitTimer = null;
+  function syncWaitCounter() {
+    const stop = () => {
+      if (waitTimer !== null && typeof clearInterval === 'function') clearInterval(waitTimer);
+      waitTimer = null;
+    };
+    if (!tickElapsed(root)) { stop(); return; }
+    if (waitTimer !== null || typeof setInterval !== 'function') return;
+    waitTimer = setInterval(() => { if (!tickElapsed(root)) stop(); }, 1000);
+  }
+
   function render() {
     // Main pane and sidebar, side by side. The sidebar is on every screen:
     // the agent's whole job is knowing what to do next, which is a question
@@ -478,6 +503,7 @@ export function mountApp(root) {
       if (mount) mountSetup(mount, state.pack, handleSetupPackChange, state.openPanel);
     }
     restoreUiState(uiBefore);
+    syncWaitCounter();
   }
 
   // A selection with none of our nine names in it is NOT a loaded pack —

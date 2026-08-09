@@ -8,8 +8,15 @@
 // the page and the main pane do not, and the sidebar's header and ask box
 // stay pinned so the input is never scrolled away from.
 //
-// PURE. mountApp's delegated listener in home.js drives every data-action
-// here, and home.js owns the state.
+// PURE, with one labelled exception. renderSidebarHTML() and formatElapsed()
+// take values and return strings — no DOM, no clock. tickElapsed() is the
+// exception and it is here rather than in home.js because it belongs beside
+// the markup it updates: the wait counter has to advance once a second, and
+// render() replaces root.innerHTML wholesale, so re-rendering the app to move
+// a digit would throw away focus and caret every second of every wait.
+//
+// mountApp's delegated listener in home.js drives every data-action here, and
+// home.js owns the state.
 
 import { PROVIDERS, providerById, supportsSearch } from '../agent.js';
 
@@ -99,6 +106,44 @@ function renderProviderHTML(cfg, configured, models, loading, error, providerId,
     </details>`;
 }
 
+// formatElapsed(ms) -> "4s" | "1m 07s". PURE, so the wording is testable
+// without a clock.
+//
+// Seconds only under a minute, because that is the whole of a normal wait and
+// "0m 04s" reads as a stopwatch rather than an answer on its way. Past a
+// minute the minutes appear and the seconds are zero-padded, so the number
+// stops changing width mid-count — the same reason the counter is set in
+// tabular figures. Negative and nonsense inputs floor at zero: a counter that
+// can run backwards is worse than no counter.
+export function formatElapsed(ms) {
+  const total = Math.max(0, Math.floor((Number(ms) || 0) / 1000));
+  if (total < 60) return `${total}s`;
+  const mins = Math.floor(total / 60);
+  return `${mins}m ${String(total % 60).padStart(2, '0')}s`;
+}
+
+// tickElapsed(root, now) — advance every wait counter inside `root` once.
+//
+// IMPURE by design and the only impure thing in this file. It reads the clock
+// and writes textContent, and nothing else: no re-render, no state, no
+// layout-affecting change. Returns the number of counters it found, so the
+// caller can stop its interval when the wait is over rather than leaving a
+// timer running against a transcript that is no longer waiting for anything.
+//
+// Guarded on querySelectorAll because the test DOM is a stand-in and a
+// missing method must mean "nothing to update", never a thrown exception in
+// the middle of a render.
+export function tickElapsed(root, now) {
+  if (!root || typeof root.querySelectorAll !== 'function') return 0;
+  const nodes = [...root.querySelectorAll('.guide-elapsed')];
+  const at = Number(now) || Date.now();
+  for (const node of nodes) {
+    const since = Number(node.getAttribute('data-since')) || 0;
+    node.textContent = formatElapsed(since ? at - since : 0);
+  }
+  return nodes.length;
+}
+
 function renderTurn(m) {
   const who = m.role === 'user' ? 'You' : 'Agent';
   return `<div class="guide-turn guide-${escapeHtml(m.role)}"><span class="guide-who">${who}</span>${asParagraphs(m.text)}</div>`;
@@ -118,11 +163,21 @@ export function renderSidebarHTML(state) {
   //
   // aria-live so it is announced rather than only shown, and the visible word
   // "Thinking" carries it for anyone who cannot see the dots animate.
+  //
+  // And it COUNTS. Dots alone say "something is happening" but not "for how
+  // long", which is the only question during a wait — a founder who cannot
+  // watch the screen needs to come back and tell at a glance whether this is
+  // a normal four seconds or a request that has hung. The clock is read by
+  // tickElapsed below, from data-since, so the counter advances without the
+  // app re-rendering underneath the user's hands.
   const thinking = g.busy
     ? '<div class="guide-turn guide-agent" aria-live="polite">'
       + '<span class="guide-who">Agent</span>'
-      + '<p class="guide-thinking"><span class="guide-dots" aria-hidden="true"><i></i><i></i><i></i></span> Thinking&hellip;</p>'
-      + '</div>'
+      + '<p class="guide-thinking"><span class="guide-dots" aria-hidden="true"><i></i><i></i><i></i></span>'
+      + '<span>Thinking&hellip;</span>'
+      + `<span class="guide-elapsed" data-since="${Number(g.startedAt) || 0}">`
+      + `${escapeHtml(formatElapsed(0))}</span>`
+      + '</p></div>'
     : '';
 
   const body = (history.length

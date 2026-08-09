@@ -1103,7 +1103,13 @@ h1 { font-size: 1.6rem; }
   color: var(--muted);
   margin-bottom: 0.15rem;
 }
-.guide-user { border-left: 3px solid var(--rule); padding-left: 0.6rem; }
+/* MEASURED: this indented your turns 13px while the agent's turns and the
+   opening line sat flush, so the conversation's left wall jumped right the
+   moment you sent — reported as "the left wall moves in to the right when I
+   send". The "You"/"Agent" label already names the speaker, so the indent was
+   a second cue costing alignment. One cue per distinction: the label differs,
+   the text edge does not. */
+.guide-user .guide-who { color: var(--muted-up); }
 
 .guide-ask { flex: none; display: flex; gap: 0.4rem; }
 .guide-ask > .setup-input { flex: 1 1 auto; min-width: 0; }
@@ -1393,3 +1399,30 @@ h1 { font-size: 1.6rem; }
   .doors-grid { grid-template-columns: repeat(4, 1fr); }
   .doors-grid > :last-child { grid-column: auto; }
 }
+
+/* Thinking. A request can take several seconds and the only sign of life was
+   a button reading "…", which is easy to miss and impossible to see if you
+   are not looking at the screen when you press Enter. This sits in the
+   transcript, where the answer will appear, so the eye is already in the
+   right place. */
+.guide-dots { display: inline-flex; gap: 0.28rem; align-items: center; height: 1.1em; }
+.guide-dots i {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: guide-blink 1.1s ease-in-out infinite;
+}
+.guide-dots i:nth-child(2) { animation-delay: 0.16s; }
+.guide-dots i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes guide-blink {
+  0%, 70%, 100% { opacity: 0.25; transform: translateY(0); }
+  35%           { opacity: 1;    transform: translateY(-0.15rem); }
+}
+/* Motion is decoration here; the dots still say "working" without it, and a
+   reader who has asked the system to stop moving things has asked for a
+   reason. */
+@media (prefers-reduced-motion: reduce) {
+  .guide-dots i { animation: none; opacity: 0.7; }
+}
+.guide-thinking { display: flex; align-items: center; gap: 0.45rem; color: var(--muted-up); margin: 0; }

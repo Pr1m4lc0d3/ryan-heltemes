@@ -110,9 +110,24 @@ export function renderSidebarHTML(state) {
   const s = state || {};
   const g = s.guide || {};
   const history = g.history || [];
-  const body = history.length
+  // The thinking row lives in the TRANSCRIPT, at the end, exactly where the
+  // answer is about to appear — so the eye is already in the right place and
+  // the wait reads as progress rather than as nothing happening. A disabled
+  // button reading "…" was the only signal before, which is easy to miss and
+  // no use at all to someone who looked away after pressing Enter.
+  //
+  // aria-live so it is announced rather than only shown, and the visible word
+  // "Thinking" carries it for anyone who cannot see the dots animate.
+  const thinking = g.busy
+    ? '<div class="guide-turn guide-agent" aria-live="polite">'
+      + '<span class="guide-who">Agent</span>'
+      + '<p class="guide-thinking"><span class="guide-dots" aria-hidden="true"><i></i><i></i><i></i></span> Thinking&hellip;</p>'
+      + '</div>'
+    : '';
+
+  const body = (history.length
     ? history.map(renderTurn).join('')
-    : `<p class="guide-opening">${escapeHtml(g.opening || '')}</p>`;
+    : `<p class="guide-opening">${escapeHtml(g.opening || '')}</p>`) + thinking;
 
   return `
     <aside class="guide" aria-label="Campaign agent">

@@ -1,0 +1,167 @@
+/* ============================================================================
+   monkeys.css — mavericks-monkeys.html only.
+
+   THE ONE SUB-PAGE WITH ITS OWN GROUND. Every work plate on the index shows a
+   project in its own colours; this page extends that to a whole page, because
+   the project's identity IS a colour relationship. The brand is a taijitu:
+   RAID is yang — light, initiating, offense. FORTRESS is yin — dark, holding,
+   defense. So the page splits light and dark and the mark sits on the seam,
+   with each half of it landing on its opposite ground. That is the taijitu
+   doing its own job rather than a logo dropped onto a background.
+
+   Every literal comes from tokens.css (--mm-*). No hex, no numeric size, no
+   numeric radius lives here — the coherence audit fails the build on any.
+   ========================================================================= */
+
+/* The page ground is bone, and the dark half is painted on top of it, so a
+   short viewport never shows an unpainted strip below the fold. */
+body.mm { background: var(--mm-bone); color: var(--mm-ink); }
+
+/* ---- The hero: bone left, ink right, mark on the seam ------------------- */
+
+.mm-hero {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  position: relative;
+}
+/* The dark half. A pseudo-element rather than a wrapper so the markup stays
+   about content and the split stays a presentational fact. */
+.mm-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 50%;
+  background: var(--mm-ink);
+  border-left: var(--rule-heavy) solid var(--accent);
+  z-index: 0;
+}
+.mm-hero > * { position: relative; z-index: 1; }
+
+.mm-pair { text-align: right; }
+.mm-pair dt {
+  font-family: var(--font-display-thin);
+  font-weight: var(--weight-black);
+  font-size: var(--step-2);
+  letter-spacing: var(--track-display);
+}
+.mm-pair dd {
+  margin: 0 0 var(--space-3);
+  color: var(--mm-muted);
+  font-size: var(--step-0);
+}
+
+.mm-mark {
+  width: var(--shelf-tile);
+  height: var(--shelf-tile);
+  background: url("assets/works/monkeys-mark.png") center / contain no-repeat;
+}
+
+.mm-say { color: var(--mm-bone); }
+.mm-kicker {
+  font-family: var(--font-util);
+  letter-spacing: var(--track-util);
+  color: var(--mm-muted-up);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+}
+.mm-title {
+  font-family: var(--font-display);
+  font-size: var(--step-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  margin: var(--space-1) 0 var(--space-2);
+}
+.mm-sub { max-width: var(--measure); font-size: var(--step-1); }
+
+/* ---- The three tools --------------------------------------------------- */
+
+.mm-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--figure-col), 1fr));
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+}
+
+.mm-tool {
+  border: var(--rule) solid var(--mm-rule);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+/* Each tool wears its own half of the pair, so the card tells you which side
+   it is on before you have read a word of it. */
+.mm-tool--yin {
+  background: var(--mm-ink);
+  color: var(--mm-bone);
+  border-color: var(--mm-rule-dark);
+}
+.mm-tool--yin .mm-tool-what { color: var(--mm-muted-up); }
+.mm-tool--yang { background: var(--mm-bone-deep); }
+.mm-tool--yang .mm-tool-what { color: var(--mm-muted); }
+/* The console is neither half — it is where both are operated from. */
+.mm-tool--hinge {
+  background: var(--mm-bone);
+  border-color: var(--accent);
+  border-left-width: var(--rule-heavy);
+}
+.mm-tool--hinge .mm-tool-what { color: var(--mm-muted); }
+
+.mm-tool-name {
+  font-family: var(--font-display-thin);
+  font-weight: var(--weight-black);
+  font-size: var(--step-2);
+  letter-spacing: var(--track-display);
+  margin: 0;
+}
+.mm-tool-role {
+  font-family: var(--font-util);
+  font-size: var(--step--1);
+  letter-spacing: var(--track-util);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.mm-tool--yin .mm-tool-role { color: var(--accent-lift); }
+.mm-tool-what { margin: 0; line-height: var(--leading-body); }
+.mm-tool-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* ---- How they fit: the workflow, as a numbered spine -------------------- */
+
+.mm-flow { padding: var(--space-5) var(--space-4); background: var(--mm-bone-deep); }
+.mm-flow ol {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  counter-reset: mm;
+}
+.mm-flow li {
+  counter-increment: mm;
+  display: grid;
+  grid-template-columns: var(--anchor-offset) 1fr;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+.mm-flow li::before {
+  content: counter(mm);
+  font-family: var(--font-util);
+  color: var(--accent);
+  font-size: var(--step-1);
+}
+.mm-flow b { font-weight: var(--weight-black); }
+.mm-flow .mm-gate { color: var(--accent); font-weight: var(--weight-black); }
+
+/* ---- Short viewports and phones ---------------------------------------- */
+
+@media (max-width: 60rem) {
+  /* Stacked, the vertical seam is meaningless, so the dark half becomes the
+     bottom half and the mark sits between them — the same relationship
+     rotated, rather than a split that no longer splits anything. */
+  .mm-hero { grid-template-columns: 1fr; text-align: center; }
+  .mm-hero::after { inset: 50% 0 0 0; border-left: 0; border-top: var(--rule-heavy) solid var(--accent); }
+  .mm-pair { text-align: center; }
+  .mm-mark { margin: 0 auto; }
+}

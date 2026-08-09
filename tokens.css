@@ -25,6 +25,23 @@
   --accent:       #2f5d50;   /* deep verdigris — material codes and rules ONLY */
   --accent-lift:  #3d7565;   /* accent on hover */
 
+  /* --- Mavericks Monkeys ------------------------------------------------
+     ONE sub-page carries a second palette on purpose: mavericks-monkeys.html.
+     Every other work plate on this site shows a project in ITS OWN colours,
+     and that project's colours are bone-and-ink, not cool zinc. The page is
+     split light/dark because the brand is a taijitu — RAID is yang, light and
+     initiating; FORTRESS is yin, dark and holding — so the split IS the
+     product's own logic rather than decoration laid over it.
+     Used only by monkeys.css. Nothing else may reference these. */
+  --mm-bone:      #f4f1ea;   /* the light half — RAID's ground */
+  --mm-bone-deep: #e8e4da;   /* raised panels on the light half */
+  --mm-ink:       #111113;   /* the dark half — FORTRESS's ground */
+  --mm-ink-lift:  #1c1c20;   /* raised panels on the dark half */
+  --mm-rule:      #cecac1;   /* hairlines on bone */
+  --mm-rule-dark: #33333a;   /* hairlines on ink */
+  --mm-muted:     #7a7872;   /* secondary type on bone */
+  --mm-muted-up:  #96948d;   /* secondary type on ink */
+
   /* --- Type --------------------------------------------------------------
      No webfont. This site's owner's stated position is that it collects
      nothing, ever, so hot-linking a font CDN would be a third-party request

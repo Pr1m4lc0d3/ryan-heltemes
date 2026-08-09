@@ -52,6 +52,17 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   font-size: var(--step-0);
 }
 
+/* Bottom-left of the bone half, small and quiet. It fills the empty ground
+   under the pair without competing with the mark on the seam. */
+.mm-peel {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  width: var(--work-thumb);
+  height: var(--work-thumb);
+  background: url("assets/works/monkeys-peel.png") left bottom / contain no-repeat;
+}
+
 .mm-mark {
   width: var(--shelf-tile);
   height: var(--shelf-tile);
@@ -164,4 +175,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   .mm-hero::after { inset: 50% 0 0 0; border-left: 0; border-top: var(--rule-heavy) solid var(--mm-gold); }
   .mm-pair { text-align: center; }
   .mm-mark { margin: 0 auto; }
+  /* Stacked, bottom-left of the section is the DARK half — where a
+     black-outlined peel disappears. It moves to the top corner. */
+  .mm-peel { bottom: auto; top: var(--space-2); left: var(--space-2); }
 }

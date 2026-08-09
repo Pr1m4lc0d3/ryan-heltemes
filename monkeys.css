@@ -34,7 +34,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   position: absolute;
   inset: 0 0 0 50%;
   background: var(--mm-ink);
-  border-left: var(--rule-heavy) solid var(--accent);
+  border-left: var(--rule-heavy) solid var(--mm-gold);
   z-index: 0;
 }
 .mm-hero > * { position: relative; z-index: 1; }
@@ -104,7 +104,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 /* The console is neither half — it is where both are operated from. */
 .mm-tool--hinge {
   background: var(--mm-bone);
-  border-color: var(--accent);
+  border-color: var(--mm-gold);
   border-left-width: var(--rule-heavy);
 }
 .mm-tool--hinge .mm-tool-what { color: var(--mm-muted); }
@@ -121,9 +121,9 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   font-size: var(--step--1);
   letter-spacing: var(--track-util);
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--mm-gold-deep);
 }
-.mm-tool--yin .mm-tool-role { color: var(--accent-lift); }
+.mm-tool--yin .mm-tool-role { color: var(--mm-gold); }
 .mm-tool-what { margin: 0; line-height: var(--leading-body); }
 .mm-tool-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
@@ -148,11 +148,11 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 .mm-flow li::before {
   content: counter(mm);
   font-family: var(--font-util);
-  color: var(--accent);
+  color: var(--mm-gold-deep);
   font-size: var(--step-1);
 }
 .mm-flow b { font-weight: var(--weight-black); }
-.mm-flow .mm-gate { color: var(--accent); font-weight: var(--weight-black); }
+.mm-flow .mm-gate { color: var(--mm-gold-deep); font-weight: var(--weight-black); }
 
 /* ---- Short viewports and phones ---------------------------------------- */
 
@@ -161,7 +161,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
      bottom half and the mark sits between them — the same relationship
      rotated, rather than a split that no longer splits anything. */
   .mm-hero { grid-template-columns: 1fr; text-align: center; }
-  .mm-hero::after { inset: 50% 0 0 0; border-left: 0; border-top: var(--rule-heavy) solid var(--accent); }
+  .mm-hero::after { inset: 50% 0 0 0; border-left: 0; border-top: var(--rule-heavy) solid var(--mm-gold); }
   .mm-pair { text-align: center; }
   .mm-mark { margin: 0 auto; }
 }

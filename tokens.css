@@ -41,6 +41,13 @@
   --mm-rule-dark: #33333a;   /* hairlines on ink */
   --mm-muted:     #7a7872;   /* secondary type on bone */
   --mm-muted-up:  #96948d;   /* secondary type on ink */
+  /* Black, white, grey and yellow — the brand's own palette, sampled from its
+     sheet. TWO yellows because one cannot do both jobs: --mm-gold reads 9.98:1
+     on ink and only 1.68:1 on bone, so it is for the dark half and for graphic
+     marks, never for text on a light ground. --mm-gold-deep is the same hue
+     darkened to 4.82:1 on bone, for the places yellow has to be readable. */
+  --mm-gold:      #f1b207;   /* graphics, seams, and type on the ink half */
+  --mm-gold-deep: #8a6300;   /* type on the bone half — passes AA at 4.82:1 */
 
   /* --- Type --------------------------------------------------------------
      No webfont. This site's owner's stated position is that it collects

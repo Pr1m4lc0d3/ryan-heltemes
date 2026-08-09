@@ -81,7 +81,13 @@ export const PROVIDERS = Object.freeze([
     label: 'DeepSeek — cheap',
     baseUrl: 'https://api.deepseek.com',
     keyUrl: 'https://platform.deepseek.com/api_keys',
-    note: 'May refuse browser calls. If it does, use OpenRouter instead.',
+    // VERIFIED 2026-08-09 against api.deepseek.com from a browser origin:
+    // a POST to /chat/completions and a GET to /models both return a 401
+    // whose body the page can READ, which a browser only permits when the
+    // server has allowed the origin. This note used to say DeepSeek 'may
+    // refuse browser calls' — it does not, and saying so sent people to a
+    // provider they did not need. Check before restoring a warning here.
+    note: 'Works in the browser. Cannot search the live web — OpenRouter can.',
   },
   {
     id: 'custom',

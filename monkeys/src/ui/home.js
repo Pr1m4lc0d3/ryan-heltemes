@@ -345,6 +345,13 @@ export function mountApp(root) {
     // brief is no longer what the founder needs, and leaving it on would have
     // the agent re-interviewing someone who has already answered.
     if (state.pack && state.guide.mode === 'kickoff') state.guide.mode = '';
+    // AND IT BEGINS BY BEING ASKED. With no pack the ask box says "Ask me how
+    // to start" — and answering that invitation used to get "Load a pack
+    // first", which is the agent refusing the exact question it just offered
+    // to take. Reported as "the agent doesn't answer, instead I get a message
+    // to set up the tool". Someone with no pack is precisely who kickoff is
+    // for: it interviews them until there is one.
+    if (!state.pack && !state.guide.mode) state.guide.mode = 'kickoff';
     const canSearch = state.searchOn && supportsSearch(state.providerId);
     const prompt = buildGuidePrompt(state.pack, evaluate(state.pack || {}), state.guide.history, q, state.guide.mode, canSearch);
     if (prompt.blocked) { state.guide.error = prompt.blocked; render(); return; }
@@ -392,10 +399,65 @@ export function mountApp(root) {
     if (!state.agent.cfg.baseUrl) state.agent.cfg.baseUrl = PROVIDERS[0].baseUrl;
   }
 
+  // A RE-RENDER MUST NOT COST YOU YOUR PLACE.
+  //
+  // render() replaces root.innerHTML wholesale, which is what makes the
+  // rendering functions pure and testable — but every replacement threw away
+  // three things the browser was holding for the user: which <details> were
+  // open, what had focus, and where the caret was. Choosing a provider closed
+  // the API-key panel the user was standing in, so setting up a key meant
+  // clicking back in after every single field. Reported as "the entire page
+  // refreshes and I have to click back in to settings", and it made the agent
+  // look broken: picking a provider clears the model by design, and the panel
+  // where you would choose a new one had just shut.
+  //
+  // Door 3's textarea already restored its own caret by hand. This does it for
+  // everything, so the next field that needs it does not have to remember.
+  // Guarded, and not only for the tests: this is a convenience layer over the
+  // browser's own bookkeeping, and losing a caret is a papercut where a thrown
+  // exception is a blank screen. Anything absent means "nothing to restore",
+  // never "stop rendering" — the same no-blank-screen rule the renderers hold.
+  function captureUiState() {
+    if (!root || typeof root.querySelectorAll !== 'function') return null;
+    const active = root.ownerDocument && root.ownerDocument.activeElement;
+    const canSelect = active && typeof active.selectionStart === 'number';
+    return {
+      // Identify by id where there is one. The provider panel's CLASS changes
+      // the moment a key is entered (guide-provider-unset -> guide-provider),
+      // so a class-keyed restore would drop it open-state exactly at the step
+      // where the user is mid-setup — the one moment it matters most.
+      openDetails: [...root.querySelectorAll('details')]
+        .filter((d) => d.open)
+        .map((d) => (d.id ? `#${d.id}` : (d.className ? `.${d.className.trim().split(/\s+/)[0]}` : '')))
+        .filter(Boolean),
+      focusId: active && active.id ? active.id : '',
+      selStart: canSelect ? active.selectionStart : null,
+      selEnd: canSelect ? active.selectionEnd : null,
+    };
+  }
+
+  function restoreUiState(before) {
+    if (!before || typeof root.querySelector !== 'function') return;
+    for (const sel of before.openDetails) {
+      const d = root.querySelector(`details${sel}`) || root.querySelector(sel);
+      if (d) d.open = true;
+    }
+    if (!before.focusId) return;
+    const safeId = (typeof CSS !== 'undefined' && CSS.escape)
+      ? CSS.escape(before.focusId) : before.focusId;
+    const el = root.querySelector(`#${safeId}`);
+    if (!el) return;
+    el.focus();
+    if (before.selStart !== null && typeof el.setSelectionRange === 'function') {
+      try { el.setSelectionRange(before.selStart, before.selEnd); } catch { /* not a text field */ }
+    }
+  }
+
   function render() {
     // Main pane and sidebar, side by side. The sidebar is on every screen:
     // the agent's whole job is knowing what to do next, which is a question
     // you have from inside a door as often as from the hub.
+    const uiBefore = captureUiState();
     state.guide.opening = openingLine(state.pack, evaluate(state.pack || {}));
     const cfg = state.agent.cfg;
     root.innerHTML = `<div class="shell"><div class="shell-main">${view()}</div>`
@@ -415,6 +477,7 @@ export function mountApp(root) {
       const mount = root.querySelector('#setup-mount');
       if (mount) mountSetup(mount, state.pack, handleSetupPackChange, state.openPanel);
     }
+    restoreUiState(uiBefore);
   }
 
   // A selection with none of our nine names in it is NOT a loaded pack —
@@ -601,6 +664,28 @@ export function mountApp(root) {
   root.addEventListener('change', (event) => {
     if (event.target && event.target.id === 'file-input') {
       doFileInputChange(event.target.files);
+    }
+  });
+
+  // ENTER SENDS. A chat box where Enter does nothing and you must aim for a
+  // button is a chat box that does not work — and this one is used by someone
+  // who cannot always look at the screen while typing, so hunting for a target
+  // costs more here than it would elsewhere. Shift+Enter still makes a newline,
+  // which is the convention every other chat box has taught.
+  root.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    const el = event.target;
+    if (!el || !el.id) return;
+    if (el.id === 'guide-question') {
+      event.preventDefault();
+      state.guide.question = el.value;
+      askGuide();
+      return;
+    }
+    if (el.id === 'write-ask') {
+      event.preventDefault();
+      state.agent.ask = el.value;
+      writeDraft();
     }
   });
 

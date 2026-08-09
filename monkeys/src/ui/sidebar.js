@@ -55,7 +55,7 @@ function renderProviderHTML(cfg, configured, models, loading, error, providerId,
     : `<input type="text" id="write-model" class="setup-input" value="${escapeHtml(cfg.model || '')}" placeholder="press Load models">`;
 
   return `
-    <details class="guide-provider${configured ? '' : ' guide-provider-unset'}">
+    <details id="guide-provider" class="guide-provider${configured ? '' : ' guide-provider-unset'}">
       <summary>${configured ? `Provider: ${escapeHtml(cfg.model)}` : 'Set your API key to talk to the agent'}</summary>
 
       <label class="setup-field" for="write-provider">

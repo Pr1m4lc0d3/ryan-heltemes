@@ -562,8 +562,9 @@ export function mountApp(root) {
   // motte.md when the human presses the confirm button, after reading the
   // grading table — importing a file and accepting its claims stay two
   // separate acts, which is the entire point of the grading.
-  async function doKitFile(fileList) {
-    const file = fileList && fileList[0];
+  // Takes a File, never a FileList — see the change listener for why that
+  // distinction is the whole bug this function once had.
+  async function doKitFile(file) {
     if (!file) return;
     state.kitError = '';
     state.kitNote = '';
@@ -753,12 +754,19 @@ export function mountApp(root) {
     if (event.target.id === 'file-input') {
       doFileInputChange(event.target.files);
     } else if (event.target.id === 'kit-input') {
-      const picked = event.target.files;
-      // Clear it so choosing the SAME file again still fires a change event.
-      // Without this, correcting a mistake by re-picking the file you just
-      // fixed does nothing at all and reads as the console ignoring you.
+      // 🚨 TAKE THE FILE OUT FIRST. `input.files` is a LIVE FileList, and
+      // setting `input.value = ''` EMPTIES IT — so holding a reference to the
+      // list and clearing the input afterwards handed doKitFile an empty list
+      // and it returned silently. Picking a file did nothing at all, with no
+      // error anywhere: reported as "it's just a dead interface", and it was.
+      //
+      // ⛔ Never pass the FileList here. The File object survives the clear;
+      // the list does not.
+      const file = event.target.files && event.target.files[0];
+      // Cleared so choosing the SAME file again still fires a change event.
+      // Without this, re-picking the file you just fixed does nothing.
       event.target.value = '';
-      doKitFile(picked);
+      doKitFile(file);
     }
   });
 

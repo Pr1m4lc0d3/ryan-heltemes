@@ -585,6 +585,18 @@ export function mountApp(root) {
         state.pack = parsePack(files);
         state.packSource = state.packSource || 'setup';
         state.kitNote = read.note;
+        // ⛔ GO TO THE REVIEW. Without this the import "did nothing": storing
+        // the kit gave the app a pack, so the home screen swapped the
+        // onboarding routes for the door cards, and every word about the kit
+        // — the note, the grading table, the button that actually imports it
+        // — was left inside the collapsed "What is a pack?" disclosure or two
+        // clicks deep in Door 2. A founder picked a file, watched the screen
+        // change into something unrelated, and was right to call it broken.
+        //
+        // Reading a kit and accepting its claims stay two separate acts; this
+        // only carries you to the screen where you make the second one.
+        state.view = 'setup';
+        state.openPanel = 'sell-kit';
         persist();
       }
     } catch (err) {

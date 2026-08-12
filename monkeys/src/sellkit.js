@@ -77,6 +77,100 @@ const KIT_FIELDS = [
 export const IMPORTABLE_FIELDS = Object.freeze(KIT_FIELDS);
 
 // ---------------------------------------------------------------------------
+// The same kit, arriving as JSON.
+//
+// A `-forge.json` is Idea Forge Pro's whole session snapshot, and the kit
+// inside it is keyed by FIELD KEY, not by label. This table is the bridge.
+//
+// ⚠ READ THE RIGHT LABELS. Idea Forge Pro has TWO label sets and they are not
+// the same: `SELLKIT_FIELDS` in schema.ts drives its own UI rail ("Problem —
+// their words", "Offer + outcome", "Pre-build test"), while `toMarkdown` in
+// markdown.ts prints shorter ones ("Problem", "Offer", "The ask"). The
+// markdown is what a `-sell-kit.md` actually contains, so KIT_FIELDS above is
+// written against the markdown set — and so is this. Mapping to the schema
+// labels instead would parse cleanly and match nothing, which is the silent
+// shape every defect in this file has taken.
+//
+// Every key IFP can export is listed, including ones KIT_FIELDS deliberately
+// ignores. A key missing here is dropped before the routing rules ever see
+// it, so the decision to skip a field belongs in KIT_FIELDS where it is
+// written down with a reason, never in an omission here.
+// ---------------------------------------------------------------------------
+
+export const KIT_KEY_LABELS = Object.freeze({
+  buyer: 'Buyer',
+  problem: 'Problem',
+  whyNow: 'Why now',
+  offer: 'Offer',
+  price: 'Price',
+  edgeVerdict: 'Edge: verdict',
+  edgeTensionA: 'Edge: first pole',
+  edgeTensionB: 'Edge: opposed pole',
+  edgeExitTaken: 'Edge: the exit already taken',
+  edgeMechanism: 'Edge: the mechanism between them',
+  edgeRivalCost: 'Edge: what a rival gives up',
+  edgeCandidates: 'Edge: candidates examined',
+  edgeRejected: 'Edge: dismissed, and why',
+  artifact: 'Value artifact',
+  channel: 'Channel',
+  intentSignal: 'Intent signal',
+  testAsk: 'The ask',
+  passLine: 'PASS if',
+  killLine: 'KILL if',
+  byWhen: 'By when',
+  commitmentSignal: 'Commitment signal',
+  testCanProve: 'What this test CAN prove',
+  testCannotProve: 'What this test CANNOT prove',
+  stopCondition: 'Stop condition',
+  realityStatus: 'Reality status',
+  whatIsKnown: 'What is known',
+  whatIsHypothesized: 'What is hypothesized',
+  claimRegister: 'Claim + evidence register',
+  acceptance: 'Acceptance criteria',
+  mustNail: 'Must nail',
+  outOfScope: 'Out of scope (v1)',
+});
+
+// fieldsFromKit(kit) -> { Label: value }, the SAME shape parseKitFields
+// returns from markdown. That sameness is the whole design: JSON and markdown
+// converge here, and everything downstream — the routing rules, the grading,
+// the confirm table, the writes — has exactly one implementation.
+export function fieldsFromKit(kit) {
+  const out = {};
+  if (!kit || typeof kit !== 'object') return out;
+  for (const [key, label] of Object.entries(KIT_KEY_LABELS)) {
+    const value = String(kit[key] ?? '').trim();
+    if (value) out[label] = value;
+  }
+  return out;
+}
+
+// toKitMarkdown(fields) -> the `- **Label:** value` document IFP would have
+// written for the same kit.
+//
+// 🔑 THIS IS WHERE THE TWO READERS BECOME ONE. A `-forge.json` is turned into
+// the markdown a `-sell-kit.md` already is, and only then stored and graded.
+// So the pack holds ONE kind of sell-kit.md whatever you dropped, the founder
+// can read and download it, and planImport keeps its single implementation
+// instead of growing a JSON branch that would need its own tests forever.
+//
+// Values keep their newlines: parseKitFields treats an unlabelled line as a
+// continuation of the field above it, which is what carries a multi-line
+// claim register through intact. That round trip is asserted in the tests —
+// parse(render(fields)) must equal fields, or a kit loses data on the way in.
+export function toKitMarkdown(fields, source) {
+  const from = String(source || '').trim();
+  const out = ['# Sell-Kit'];
+  if (from) out.push('', `Imported from: ${from}`);
+  out.push('');
+  for (const [label, value] of Object.entries(fields || {})) {
+    const v = String(value ?? '').trim();
+    if (v) out.push(`- **${label}:** ${v}`);
+  }
+  return `${out.join('\n')}\n`;
+}
+
+// ---------------------------------------------------------------------------
 // Parsing. The kit's markdown is "- **Label:** value" lines under headings,
 // plus a claim register whose lines carry their own grade.
 // ---------------------------------------------------------------------------
@@ -205,7 +299,7 @@ export function parseClaimRegister(text) {
 
 export function planImport(kitText) {
   const text = String(kitText || '').trim();
-  if (!text) return { claims: [], fields: [], blocked: 'No sell-kit.md in this pack.' };
+  if (!text) return { claims: [], fields: [], blocked: 'No Sell-Kit imported yet.' };
 
   const fieldValues = parseKitFields(text);
   const register = fieldValues['Claim + evidence register'] || '';

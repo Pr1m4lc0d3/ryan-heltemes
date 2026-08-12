@@ -1209,6 +1209,34 @@ h1 { font-size: 1.6rem; }
 .imp-table .muted-note { font-size: 0.88rem; }
 
 
+/* The Sell-Kit drop. It sits in a route card on the empty state and in the
+   setup panel, so it sets no width of its own and inherits the column it is
+   put in. The hint and the forge link are one line each on purpose: the
+   empty-state screen has a hard 120-word budget and this control spends
+   three of its lines. */
+.kit-drop { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.kit-drop-hint, .kit-drop-forge { font-size: 0.85rem; margin: 0; }
+.kit-drop-hint code { font-size: 0.95em; word-break: break-all; }
+/* A refusal is the whole point of this control, so it is styled like the
+   loader's own error rather than as a muted aside. Someone who dropped the
+   work order by mistake must not have to hunt for why nothing happened. */
+.kit-drop-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin: 0;
+}
+/* Which of the three files was read, said plainly. An import that changes the
+   pack silently is the same failure shape as a claim that vanishes. */
+.kit-drop-note { font-size: 0.85rem; font-weight: 600; margin: 0; }
+.kit-drop-swap { margin-top: 0.9rem; }
+.kit-drop-swap > summary { cursor: pointer; font-size: 0.88rem; color: var(--muted); }
+.kit-drop-swap[open] > summary { margin-bottom: 0.5rem; }
+
+
 /* ── Icons ──────────────────────────────────────────────────────────────────
    One PNG per concept, painted as a MASK rather than dropped in as an image,
    so the shape takes currentColor. That is the whole reason the icon sheets

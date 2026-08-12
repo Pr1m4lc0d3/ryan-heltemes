@@ -43,7 +43,8 @@ import { buildGuidePrompt, openingLine } from '../guide.js';
 import { renderSidebarHTML, tickElapsed } from './sidebar.js';
 import { evaluate } from '../stages.js';
 import { mountSetup, renderKickoffCallout, appendBulletToFile } from './setup.js';
-import { planImport, applyImport } from '../sellkit.js';
+import { planImport, applyImport, toKitMarkdown } from '../sellkit.js';
+import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
 
 // Re-exported unchanged: the loader markup moved to ./loader.js so today.js
@@ -121,8 +122,8 @@ export function renderChooserHTML(state) {
         ${renderSampleBannerHTML(s.packSource)}
 
         ${hasPack
-          ? `${renderPackToggleHTML()}<nav class="doors-grid">${doorCards}</nav>`
-          : renderOnboardingHTML()}
+          ? `${renderPackToggleHTML(s)}<nav class="doors-grid">${doorCards}</nav>`
+          : renderOnboardingHTML(s)}
       </div>
     </div>`;
 }
@@ -210,6 +211,10 @@ export function mountApp(root) {
     // choose is worse than a capability they had to switch on.
     searchOn: false,
     emptyLoadNote: '', packSource: '', savedAt: '', clearedNote: '',
+    // The Sell-Kit drop. kitError is what went wrong in words a human can act
+    // on; kitNote says which of Idea Forge Pro's three files we read it as, so
+    // an import is never silent about what it took.
+    kitBusy: false, kitError: '', kitNote: '',
     persistenceOff: !storageAvailable(),
   };
 
@@ -248,7 +253,7 @@ export function mountApp(root) {
       case 'today':
         return pageShell('What do I do today', state.pack
           ? renderTodayHTML(state.pack)
-          : renderNeedsPackHTML('This door', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote));
+          : renderNeedsPackHTML('This door', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state));
       case 'kickoff':
         return pageShell('Start here', renderKickoffCallout(state.pack ? state.pack.raw : {}));
       case 'setup':
@@ -256,7 +261,7 @@ export function mountApp(root) {
       case 'check':
         return pageShell('Check before I publish', state.pack
           ? renderCheckHTML(state.pack, state.checkDraft, state.agent)
-          : renderNeedsPackHTML('This door', CHECK_NEEDS_PACK_REASON, caps, state.emptyLoadNote));
+          : renderNeedsPackHTML('This door', CHECK_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state));
       default:
         return renderChooserHTML({ ...state, caps });
     }
@@ -500,7 +505,7 @@ export function mountApp(root) {
       + '</div>';
     if (state.view === 'setup') {
       const mount = root.querySelector('#setup-mount');
-      if (mount) mountSetup(mount, state.pack, handleSetupPackChange, state.openPanel);
+      if (mount) mountSetup(mount, state.pack, handleSetupPackChange, state.openPanel, state);
     }
     restoreUiState(uiBefore);
     syncWaitCounter();
@@ -545,6 +550,47 @@ export function mountApp(root) {
     } catch (err) {
       state.loadError = err.message || 'Could not read those files.';
     }
+    render();
+  }
+
+  // Taking an Idea Forge Pro export. The whole route from a downloaded file
+  // to a pack the console can work on.
+  //
+  // ⛔ IT NEVER REPLACES A PACK. The kit lands as sell-kit.md and nothing
+  // else is touched, so dropping a kit onto work already in progress cannot
+  // erase any of it. The kit's claims only move into truth.md / recon.md /
+  // motte.md when the human presses the confirm button, after reading the
+  // grading table — importing a file and accepting its claims stay two
+  // separate acts, which is the entire point of the grading.
+  async function doKitFile(fileList) {
+    const file = fileList && fileList[0];
+    if (!file) return;
+    state.kitError = '';
+    state.kitNote = '';
+    state.kitBusy = true;
+    render();
+    try {
+      const text = await file.text();
+      const read = readKitFile(file.name, text);
+      if (read.blocked) {
+        state.kitError = read.blocked;
+      } else {
+        // A forge.json becomes the markdown a sell-kit.md already is, so the
+        // pack holds one kind of file whichever one was dropped.
+        const markdown = read.kind === 'forge-json'
+          ? toKitMarkdown(read.fields, file.name)
+          : text;
+        const files = { ...(state.pack ? state.pack.raw : {}) };
+        files['sell-kit.md'] = markdown;
+        state.pack = parsePack(files);
+        state.packSource = state.packSource || 'setup';
+        state.kitNote = read.note;
+        persist();
+      }
+    } catch (err) {
+      state.kitError = err.message || 'Could not read that file.';
+    }
+    state.kitBusy = false;
     render();
   }
 
@@ -676,6 +722,9 @@ export function mountApp(root) {
     } else if (action === 'choose-files') {
       const input = root.querySelector('#file-input');
       if (input) input.click();
+    } else if (action === 'choose-kit') {
+      const input = root.querySelector('#kit-input');
+      if (input) input.click();
     } else if (action === 'clear-saved') {
       doClearSaved();
     } else if (action === 'load-sample') {
@@ -688,8 +737,16 @@ export function mountApp(root) {
   });
 
   root.addEventListener('change', (event) => {
-    if (event.target && event.target.id === 'file-input') {
+    if (!event.target) return;
+    if (event.target.id === 'file-input') {
       doFileInputChange(event.target.files);
+    } else if (event.target.id === 'kit-input') {
+      const picked = event.target.files;
+      // Clear it so choosing the SAME file again still fires a change event.
+      // Without this, correcting a mistake by re-picking the file you just
+      // fixed does nothing at all and reads as the console ignoring you.
+      event.target.value = '';
+      doKitFile(picked);
     }
   });
 

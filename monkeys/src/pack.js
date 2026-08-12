@@ -326,41 +326,6 @@ function parseScars(text, malformedSink) {
   return result;
 }
 
-// sell-kit.md is read-only input with its own single-colon "- Label: value"
-// bullets (no em-dash secondary fields), so it gets its own small parser
-// rather than sharing parseEntry. Never validated as malformed here — it is
-// a founder's own import, recorded as given (see raid's kickoff step 11).
-const SELL_KIT_LABELS = {
-  'the ask': 'ask',
-  'pass if': 'passIf',
-  'kill if': 'killIf',
-  'by when': 'byWhen',
-  'commitment signal': 'commitmentSignal',
-  'what this test can prove': 'canProve',
-  'what this test cannot prove': 'cannotProve',
-  'stop condition': 'stopCondition',
-};
-
-function parseSellKit(text) {
-  if (text === undefined) return null;
-  const fields = {};
-  for (const raw of text.split('\n')) {
-    const trimmed = raw.trim();
-    let m = trimmed.match(/^Imported from:\s*(.*?)\s*—\s*on:\s*(.*)$/);
-    if (m) {
-      fields.importedFrom = m[1].trim();
-      fields.importedOn = m[2].trim();
-      continue;
-    }
-    m = trimmed.match(/^-\s*([^:]+):\s*(.*)$/);
-    if (m) {
-      const key = SELL_KIT_LABELS[m[1].trim().toLowerCase()];
-      if (key) fields[key] = m[2].trim();
-    }
-  }
-  return { fields, raw: text, malformed: false };
-}
-
 const BRIEFING_STAGE_RE = /^\*\*Stage \(from campaign\.md\):\*\*\s*(\d+)\s*—\s*(.*)$/;
 const BRIEFING_FILE_RE = /^briefings\/(\d{4}-\d{2}-\d{2})\.md$/;
 
@@ -520,6 +485,20 @@ export function parsePack(files) {
     return text;
   }
 
+  // sell-kit.md is CACHED but never parsed here, and the call's return value
+  // is deliberately discarded. sellkit.js is the ONE reader of a kit; the
+  // second parser that used to live in this file matched `- Label: value`
+  // while Idea Forge Pro emits `- **Label:** value`, so it returned nothing
+  // from a real kit, and the fixture that "proved" it worked was hand-written
+  // in the wrong shape.
+  //
+  // ⚠ THE CALL IS NOT OPTIONAL just because nothing reads what it returns.
+  // need() also records the file in `missing` and caches its text in `raw` so
+  // serialise() hands it back. Removing this line dropped a founder's
+  // sell-kit.md on download — the identical silent loss voice.md once had,
+  // caught here by the round-trip test rather than by a person.
+  need('sell-kit.md');
+
   const pack = {
     truth: parseTruth(section('truth.md'), malformed),
     motte: parseMotte(section('motte.md'), malformed),
@@ -534,9 +513,20 @@ export function parsePack(files) {
     // rather than risk a misparse dropping the one thing standing between a
     // draft and an invented house style.
     voice: need('voice.md'),
+    // sell-kit.md is CACHED but not parsed here, for exactly voice.md's
+    // reason above and one more: sellkit.js is the only reader of a kit, and
+    // a second parser in this file disagreed with it for months. The one that
+    // used to live here matched `- Label: value` while Idea Forge Pro emits
+    // `- **Label:** value`, so it returned nothing from a real kit and the
+    // fixture that "proved" it worked was hand-written in the wrong shape.
+    //
+    // ⚠ need() IS NOT OPTIONAL, and its return value being unused is not a
+    // reason to drop the call. It does two things besides returning text: it
+    // records the file in `missing`, and it caches the text in `raw` so
+    // serialise() gives it back. Deleting this line silently dropped a
+    // founder's sell-kit.md on download — the identical bug voice.md had.
     numbers: parseNumbers(need('numbers.md'), malformed),
     briefings: parseBriefings(files, malformed, raw, unrecognised),
-    sellKit: parseSellKit(need('sell-kit.md')),
     scars: parseScars(need('scars.md'), malformed),
     missing,
     malformed,

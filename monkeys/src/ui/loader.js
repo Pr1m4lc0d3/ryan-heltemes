@@ -10,6 +10,7 @@
 // nothing here attaches a handler.
 
 import { capabilities, PACK_FILES } from '../fs.js';
+import { renderKitDropHTML } from './kitdrop.js';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -133,7 +134,8 @@ export function renderPackExplainerHTML() {
 // Each route: a 2-4 word heading, one short line, one button. No paragraph,
 // no parentheticals. Full URLs live in the href, not the visible text, so a
 // reader never pays word-cost for a link they are not going to type by hand.
-export function renderGetPackRoutesHTML() {
+export function renderGetPackRoutesHTML(state) {
+  const s = state || {};
   return `
     <section class="onboard-routes">
       <div class="onboard-route-grid">
@@ -149,8 +151,8 @@ export function renderGetPackRoutesHTML() {
         </div>
         <div class="onboard-route">
           <h3>From a Sell-Kit</h3>
-          <p>ideaforgepro.com. <strong>Not</strong> a pack; the skills convert it.</p>
-          <a class="btn btn-secondary" href="https://ideaforgepro.com" target="_blank" rel="noopener">Get a Sell-Kit</a>
+          <p>A kit is <strong>not</strong> a pack &mdash; every line is graded on the way in.</p>
+          ${renderKitDropHTML(s)}
         </div>
       </div>
     </section>`;
@@ -165,11 +167,11 @@ export function renderSampleLoaderHTML() {
 // around without one yet. home.js renders this only when state.pack is
 // falsy — see the header on why "before anything else" means before the
 // door cards, not before the header.
-export function renderOnboardingHTML() {
+export function renderOnboardingHTML(state) {
   return `
     <div class="onboarding">
       ${renderPackExplainerHTML()}
-      ${renderGetPackRoutesHTML()}
+      ${renderGetPackRoutesHTML(state)}
       ${renderSampleLoaderHTML()}
     </div>`;
 }
@@ -178,11 +180,11 @@ export function renderOnboardingHTML() {
 // a pack IS loaded, so the routes never compete with the doors for primary
 // attention (see FIX 3 in the no-scroll brief). No JS wiring needed: the
 // browser's own disclosure widget handles open/closed.
-export function renderPackToggleHTML() {
+export function renderPackToggleHTML(state) {
   return `
     <details class="pack-toggle">
       <summary>What is a pack?</summary>
-      ${renderOnboardingHTML()}
+      ${renderOnboardingHTML(state)}
     </details>`;
 }
 
@@ -207,14 +209,14 @@ export function renderSampleBannerHTML(packSource) {
 // console-onboarding brief): "Choose files" to someone with no files yet.
 // ---------------------------------------------------------------------------
 
-export function renderNeedsPackHTML(doorTitle, reason, caps, note) {
+export function renderNeedsPackHTML(doorTitle, reason, caps, note, state) {
   return `
     <div class="needs-pack">
       <p>${escapeHtml(doorTitle)} needs a loaded pack — it ${escapeHtml(reason)}</p>
       ${note ? `<p class="load-empty">${note}</p>` : ''}
       ${renderLoaderControls(caps)}
       <div class="needs-pack-routes">
-        ${renderGetPackRoutesHTML()}
+        ${renderGetPackRoutesHTML(state)}
       </div>
     </div>`;
 }

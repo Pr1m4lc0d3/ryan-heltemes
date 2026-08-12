@@ -44,9 +44,9 @@
 // contain "<".
 
 import { parsePack } from '../pack.js';
+import { renderSellKitImport } from './kitdrop.js';
 import { evaluate } from '../stages.js';
 import { downloadPack } from '../fs.js';
-import { planImport, EVIDENCE_GRADES } from '../sellkit.js';
 import { icon } from './icons.js';
 import { renderStepGroup, activateStep, stepGroupOf } from './steps.js';
 
@@ -642,57 +642,6 @@ function renderUnrecognisedNotice(draftPack) {
     </section>`;
 }
 
-// The import plan. Shown BEFORE anything is written, because the review is
-// the whole safeguard: a kit is largely model-written, and an import nobody
-// read is the same as trusting that prose. Every row says where the line goes
-// and why, so the founder can see a claim being refused rather than discover
-// later that it never arrived.
-export function renderSellKitImport(kitText) {
-  const plan = planImport(kitText);
-  if (plan.blocked) {
-    return `
-      <section class="setup-section">
-        <p class="setup-intro muted-note">${escapeHtml(plan.blocked)} Export one from Idea Forge Pro and put it in your <code>.monkeys/</code> folder.</p>
-        <p class="muted-note"><strong>Importing a kit is not clearance.</strong> A kit is largely model-written. Every line is graded on arrival, and only a sourced A&ndash;D claim can be said in public.</p>
-      </section>`;
-  }
-
-  const row = (c) => {
-    const clears = c.destination.endsWith('Cleared');
-    return `
-      <tr class="${clears ? 'imp-clear' : 'imp-hold'}">
-        <td>${escapeHtml(c.claim)}</td>
-        <td><strong>${escapeHtml(c.grade)}</strong> ${escapeHtml((EVIDENCE_GRADES[c.grade] || {}).label || '')}</td>
-        <td>${clears ? 'Cleared' : 'Uncleared'}</td>
-        <td class="muted-note">${escapeHtml(c.reason)}</td>
-      </tr>`;
-  };
-
-  const cleared = plan.claims.filter((c) => c.destination.endsWith('Cleared')).length;
-  const held = plan.claims.length - cleared;
-
-  return `
-    <section class="setup-section">
-      <p class="setup-intro muted-note"><strong>Importing a kit is not clearance.</strong> ${cleared} of ${plan.claims.length} claims can be said in public; ${held} cannot, yet.</p>
-
-      ${plan.claims.length ? `
-      <table class="imp-table">
-        <thead><tr><th>Claim</th><th>Grade</th><th>Lands in</th><th>Why</th></tr></thead>
-        <tbody>${plan.claims.map(row).join('')}</tbody>
-      </table>` : '<p class="muted-note">This kit has no claim register, so there is nothing to grade. Every field below lands uncleared.</p>'}
-
-      <h4>Fields</h4>
-      <ul class="setup-entry-list">
-        ${plan.fields.map((f) => `<li class="setup-entry"><strong>${escapeHtml(f.label)}</strong> &rarr; ${f.to === 'skip' ? '<em>not imported</em>' : escapeHtml(f.to)} &mdash; <span class="muted-note">${escapeHtml(f.note)}</span></li>`).join('')}
-      </ul>
-
-      <form class="setup-form">
-        <button type="button" class="btn btn-secondary" data-action="apply-import">Import into my pack</button>
-      </form>
-      <p class="setup-error" data-setup-error="sell-kit"></p>
-    </section>`;
-}
-
 export function renderKickoffCallout(files) {
   const prompt = buildKickoffPrompt(files);
   return `
@@ -798,7 +747,7 @@ function panel(key, activeKey, html) {
   return `<div class="${cls}" data-setup-panel="${key}">${html}</div>`;
 }
 
-export function renderSetupHTML(files, activePanel) {
+export function renderSetupHTML(files, activePanel, uiState) {
   const safeFiles = files || {};
   const draftPack = parsePack(safeFiles);
   const evalResult = evaluate(draftPack);
@@ -822,7 +771,7 @@ export function renderSetupHTML(files, activePanel) {
       ${renderUnrecognisedNotice(draftPack)}
       <nav class="setup-tabs" aria-label="Pack file">${tabs}</nav>
       ${panel('truth.md', active, renderTruthSection(draftPack, evalResult))}
-      ${panel('sell-kit', active, renderSellKitImport(safeFiles['sell-kit.md']))}
+      ${panel('sell-kit', active, renderSellKitImport(safeFiles['sell-kit.md'], uiState))}
       ${panel('motte.md', active, renderFileGroup('motte.md — what cannot be confiscated', 'What you hold, and what you still want.', stepsFor('motte.md')))}
       ${panel('bailey.md', active, renderFileGroup('bailey.md — rented ground', 'What is active, and what you excluded and why.', stepsFor('bailey.md')))}
       ${panel('recon.md', active, renderFileGroup('recon.md — who hurts, and where', 'No gate of its own — but skipping it means your agent guesses.', stepsFor('recon.md')))}
@@ -840,7 +789,7 @@ export function renderSetupHTML(files, activePanel) {
 // then repaints this container from the same renderSetupHTML() the tests
 // exercise. Re-rendering happens only after a successful Add/Save, never on
 // a keystroke — see rule 1 in the header for why that matters here.
-export function mountSetup(container, pack, onPackChange, openPanel) {
+export function mountSetup(container, pack, onPackChange, openPanel, uiState) {
   const files = pack ? { ...pack.raw } : {};
 
   function notifyChange() {
@@ -854,7 +803,7 @@ export function mountSetup(container, pack, onPackChange, openPanel) {
   let activePanel = openPanel;
 
   function paint() {
-    container.innerHTML = renderSetupHTML(files, activePanel);
+    container.innerHTML = renderSetupHTML(files, activePanel, uiState);
     wire();
   }
 

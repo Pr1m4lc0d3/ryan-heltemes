@@ -771,6 +771,13 @@ export function mountApp(root) {
     } else if (action === 'see-truth') {
       state.openPanel = 'truth.md';
       render();
+      // ⛔ AND OPEN THE STEP THE CLAIMS ARE ON. The truth panel renders three
+      // steps and shows the FIRST, which is the "Add a claim" form. Landing
+      // there after an import means being handed an empty form instead of the
+      // claims you just imported — the same "it did nothing" the receipt above
+      // exists to answer. Must run AFTER render(): mountSetup rebuilds the
+      // panel and resets the strip to step one.
+      activateStep(root, 'truth:cleared');
     } else if (action === 'choose-kit') {
       const input = root.querySelector('#kit-input');
       if (input) input.click();

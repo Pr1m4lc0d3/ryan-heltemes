@@ -1233,6 +1233,11 @@ h1 { font-size: 1.6rem; }
    pack silently is the same failure shape as a claim that vanishes. */
 .kit-drop-note { font-size: 0.85rem; font-weight: 600; margin: 0; }
 .kit-drop-swap { margin-top: 0.9rem; }
+/* The import receipt. Deliberately not muted: it is the answer to "did that
+   button do anything", which was previously unanswerable without pressing it
+   again. */
+.kit-done { font-size: 1rem; margin: 0 0 0.5rem; }
+.kit-done-next { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0 0; }
 .kit-drop-swap > summary { cursor: pointer; font-size: 0.88rem; color: var(--muted); }
 .kit-drop-swap[open] > summary { margin-bottom: 0.5rem; }
 

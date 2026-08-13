@@ -214,7 +214,7 @@ export function mountApp(root) {
     // The Sell-Kit drop. kitError is what went wrong in words a human can act
     // on; kitNote says which of Idea Forge Pro's three files we read it as, so
     // an import is never silent about what it took.
-    kitBusy: false, kitError: '', kitNote: '',
+    kitBusy: false, kitError: '', kitNote: '', kitResult: null,
     persistenceOff: !storageAvailable(),
   };
 
@@ -316,15 +316,44 @@ export function mountApp(root) {
   // the pack's only writer — so the never-destroy-existing-data rule holds
   // here exactly as it does for a hand-typed entry, and an import lands
   // alongside existing work rather than over it.
+  // Pressing "Import into my pack" used to change nothing you could see: the
+  // same grading table, the same button, the same screen. The claims DID land
+  // in truth.md and recon.md, but nothing said so, so the only way to find out
+  // was to press it again — which appended every claim a SECOND time. Both
+  // halves of that are fixed here: it reports what it wrote, and a line
+  // already in a file is never written twice.
   function applySellKit() {
     if (!state.pack) return;
     const files = { ...state.pack.raw };
     const plan = planImport(files['sell-kit.md']);
     if (plan.blocked) return;
     const today = new Date().toISOString().slice(0, 10);
+
+    // ⛔ COMPARE WITHOUT THE DATE STAMP. Every written line ends in
+    // " — imported: <today>", so comparing whole lines would dedupe a second
+    // press today and duplicate the same claim tomorrow. The claim is the
+    // part in front of the stamp.
+    const body = (line) => String(line).split(' — imported:')[0].trim();
+
+    const touched = new Map();
+    let already = 0;
     for (const w of applyImport(plan, today)) {
+      const existing = files[w.file] || '';
+      if (existing.split('\n').some((l) => body(l.replace(/^-\s*/, '')) === body(w.line))) {
+        already += 1;
+        continue;
+      }
       files[w.file] = appendBulletToFile(files[w.file], w.heading, w.line);
+      touched.set(w.file, (touched.get(w.file) || 0) + 1);
     }
+
+    // What landed, in the words of the files it landed in. Read by the panel
+    // so the button has a visible consequence.
+    state.kitResult = {
+      wrote: [...touched.entries()].map(([file, n]) => `${n} into ${file}`),
+      already,
+      when: today,
+    };
     state.pack = parsePack(files);
     state.packSource = 'setup';
     // persist() is the one saver: it serialises, handles a storage refusal by
@@ -586,6 +615,10 @@ export function mountApp(root) {
         state.pack = parsePack(files);
         state.packSource = state.packSource || 'setup';
         state.kitNote = read.note;
+        // A new kit means a new plan to review, so the previous import's
+        // receipt must go — otherwise dropping a second file shows the first
+        // one's result and no table.
+        state.kitResult = null;
         // ⛔ GO TO THE REVIEW. Without this the import "did nothing": storing
         // the kit gave the app a pack, so the home screen swapped the
         // onboarding routes for the door cards, and every word about the kit
@@ -735,6 +768,9 @@ export function mountApp(root) {
     } else if (action === 'choose-files') {
       const input = root.querySelector('#file-input');
       if (input) input.click();
+    } else if (action === 'see-truth') {
+      state.openPanel = 'truth.md';
+      render();
     } else if (action === 'choose-kit') {
       const input = root.querySelector('#kit-input');
       if (input) input.click();

@@ -103,6 +103,35 @@ export function renderSellKitImport(kitText, state) {
   const held = plan.claims.length - cleared;
   const s = state || {};
 
+  // WHAT THE BUTTON DID. Without this the screen after "Import into my pack"
+  // was identical to the screen before it, so the only way to find out whether
+  // it worked was to press it again — which used to write everything twice.
+  // It names the files, because "imported" without a destination is the same
+  // silence in politer words.
+  if (s.kitResult) {
+    const r = s.kitResult;
+    const wrote = r.wrote.length
+      ? `Written: ${r.wrote.join(', ')}.`
+      : 'Nothing new to write.';
+    const dupes = r.already
+      ? ` ${r.already} ${r.already === 1 ? 'line was' : 'lines were'} already in your pack, so ${r.already === 1 ? 'it was' : 'they were'} left alone.`
+      : '';
+    return `
+      <section class="setup-section">
+        <p class="kit-done"><strong>Imported.</strong> ${escapeHtml(wrote)}${escapeHtml(dupes)}</p>
+        <p class="muted-note">A cleared claim is one you can say in public. Everything else is in
+        <code>truth.md</code> under Uncleared, with the reason it did not clear.</p>
+        <p class="kit-done-next">
+          <button type="button" class="btn" data-setup-step-go="truth.md" data-action="see-truth">See truth.md</button>
+          <button type="button" class="btn btn-secondary" data-action="navigate" data-door="today">What do I do today</button>
+        </p>
+        <details class="kit-drop-swap">
+          <summary>Import a different Sell-Kit</summary>
+          ${renderKitDropHTML(state)}
+        </details>
+      </section>`;
+  }
+
   return `
     <section class="setup-section">
       <p class="setup-intro muted-note"><strong>Importing a kit is not clearance.</strong> ${cleared} of ${plan.claims.length} claims can be said in public; ${held} cannot, yet.</p>

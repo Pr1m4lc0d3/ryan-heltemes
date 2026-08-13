@@ -1232,14 +1232,15 @@ h1 { font-size: 1.6rem; }
 /* Which of the three files was read, said plainly. An import that changes the
    pack silently is the same failure shape as a claim that vanishes. */
 .kit-drop-note { font-size: 0.85rem; font-weight: 600; margin: 0; }
-.kit-drop-swap { margin-top: 0.9rem; }
+/* ⛔ Never a <details>. See kitdrop.js's header: folding this away left no
+   visible way to import a kit anywhere in the app once a pack existed. */
+.kit-drop-swap { margin-top: 1.1rem; border-top: 1px solid var(--rule); padding-top: 0.8rem; }
+.kit-drop-swap > h4 { margin: 0 0 0.5rem; font-size: 0.92rem; }
 /* The import receipt. Deliberately not muted: it is the answer to "did that
    button do anything", which was previously unanswerable without pressing it
    again. */
 .kit-done { font-size: 1rem; margin: 0 0 0.5rem; }
 .kit-done-next { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0 0; }
-.kit-drop-swap > summary { cursor: pointer; font-size: 0.88rem; color: var(--muted); }
-.kit-drop-swap[open] > summary { margin-bottom: 0.5rem; }
 
 
 /* ── Icons ──────────────────────────────────────────────────────────────────

@@ -62,7 +62,11 @@ const DOORS = [
   // Kickoff is the first door, not a tab buried inside the second one. It is
   // where someone with nothing starts, so it is the first thing they see.
   { id: 'kickoff', title: 'Start here', blurb: 'The agent interviews you' },
-  { id: 'setup', title: 'Set up my ground', blurb: 'Build your pack' },
+  // ⚠ The blurb names the Sell-Kit import ON PURPOSE. Once a pack exists the
+  // home screen folds the onboarding routes away, so this door card is the
+  // only visible route to importing a kit — and "Build your pack" gave a
+  // person holding an Idea Forge Pro download no reason to open it.
+  { id: 'setup', title: 'Set up my ground', blurb: 'Build your pack, or import a Sell-Kit' },
   { id: 'today', title: 'What do I do today', blurb: 'Stage, actions, blockers' },
   { id: 'check', title: 'Check before I publish', blurb: 'Lint a draft against truth.md' },
 ];

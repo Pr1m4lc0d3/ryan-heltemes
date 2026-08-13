@@ -13,6 +13,14 @@
 // ⛔ NO NETWORK. FileReader on a file the human picked, nothing else. Same
 // rule as the rest of the console: the pack never leaves the browser.
 //
+// ⛔ THE CONTROL IS NEVER COLLAPSED. It sat inside a <details> here, and the
+// home screen's own "What is a pack?" fold hides the other copy the moment a
+// pack exists. Net result: once you had a pack there was NO visible way to
+// import a Sell-Kit anywhere in the app, including on the panel literally
+// named "import a Sell-Kit". Reported as "I have no fucking clue how to add a
+// sell kit from IFP", and there genuinely was not one. A disclosure widget on
+// the one control a screen exists for is not tidiness, it is a dead end.
+//
 // Every function here is PURE — string in, string out, no DOM and no
 // handlers, the same house rule loader.js states. The `data-action` and the
 // #kit-input change event are read by mountApp's single delegated listener in
@@ -129,10 +137,10 @@ export function renderSellKitImport(kitText, state) {
           <button type="button" class="btn" data-action="see-truth">See truth.md</button>
           <button type="button" class="btn btn-secondary" data-action="navigate" data-door="today">What do I do today</button>
         </p>
-        <details class="kit-drop-swap">
-          <summary>Import a different Sell-Kit</summary>
+        <div class="kit-drop-swap">
+          <h4>Import another Sell-Kit</h4>
           ${renderKitDropHTML(state)}
-        </details>
+        </div>
       </section>`;
   }
 
@@ -157,10 +165,10 @@ export function renderSellKitImport(kitText, state) {
       </form>
       <p class="setup-error" data-setup-error="sell-kit"></p>
 
-      <details class="kit-drop-swap">
-        <summary>Open a different Sell-Kit</summary>
+      <div class="kit-drop-swap">
+        <h4>Open a different Sell-Kit</h4>
         ${renderKitDropHTML(state)}
-      </details>
+      </div>
     </section>`;
 }
 

@@ -122,7 +122,11 @@ export function renderSellKitImport(kitText, state) {
         <p class="muted-note">A cleared claim is one you can say in public. Everything else is in
         <code>truth.md</code> under Uncleared, with the reason it did not clear.</p>
         <p class="kit-done-next">
-          <button type="button" class="btn" data-setup-step-go="truth.md" data-action="see-truth">See truth.md</button>
+          <!-- ⛔ NO data-setup-step-go HERE. mountApp's click handler checks
+               for a step attribute FIRST and returns, so a button carrying
+               both never reaches its own data-action. This button did, and
+               "See truth.md" silently did nothing. -->
+          <button type="button" class="btn" data-action="see-truth">See truth.md</button>
           <button type="button" class="btn btn-secondary" data-action="navigate" data-door="today">What do I do today</button>
         </p>
         <details class="kit-drop-swap">

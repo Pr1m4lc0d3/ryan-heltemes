@@ -132,10 +132,13 @@ export function landingViewFor() {
 function renderStartHereHTML(state) {
   return `
     <div class="step-have-pack">
+      <p class="step-sample">
+        <button type="button" class="btn btn-link" data-action="load-sample">See a finished example</button>
+        for a made-up product, so you can look around before starting.
+      </p>
       <details class="loader-bar loader-bar-folded">
         <summary>Already have a <code>.monkeys/</code> folder?<span class="loader-more">Load it</span></summary>
         ${renderLoaderControls(state.caps || capabilities())}
-        <p class="muted-note"><button type="button" class="btn btn-link" data-action="load-sample">Or try a sample</button>, an example rather than a template.</p>
       </details>
     </div>`;
 }
@@ -288,7 +291,15 @@ function pageShell(title, bodyHtml, { pinned = false, back = true } = {}) {
 
 export function mountApp(root) {
   const state = {
-    pack: null, view: 'home', loadError: '', skippedNote: '', checkDraft: '',
+    // view is SEEDED from landingViewFor, not hardcoded.
+    //
+    // It said 'home' here, and landingViewFor was only ever CALLED on the
+    // restore and load paths. A first-time visitor has nothing to restore, so
+    // nothing called it and this literal won: they got the old chooser while
+    // every test asserting landingViewFor(null) === 'step' passed, because the
+    // function was right and unreachable. Reported three times as "I do not see
+    // how the console has changed at all", and it was not the cache.
+    pack: null, view: landingViewFor(null), loadError: '', skippedNote: '', checkDraft: '',
     // The agent starts closed. It is optional and it cannot act without a key,
     // so it does not get to own the screen until it is asked for.
     agentOpen: false,
@@ -370,7 +381,13 @@ export function mountApp(root) {
           ? (STEPS.find((x) => x.id === state.stepId) || currentStep(state.pack))
           : currentStep(state.pack);
         return pageShell('',
-          `${renderPackStatus(state)}${state.pack ? renderPersistenceNote(state) : ''}`
+          // The persistence warning shows with or without a pack: it matters
+          // MOST before any work exists, because it is the warning that the
+          // next refresh will lose whatever you are about to type.
+          // The sample banner travels too. It only ever rendered in the
+          // chooser, so loading the example on the step screen showed
+          // somebody else's product with nothing saying it was not theirs.
+          `${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}`
           + renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen, caps })
           + (state.pack ? '' : renderStartHereHTML(state)),
         { pinned: true, back: false });

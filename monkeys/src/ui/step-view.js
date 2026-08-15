@@ -105,6 +105,10 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
   return `
     <div class="step-screen">
       <div class="step-screen-head">
+        <div class="step-brand">
+          <img class="step-mark-img" src="assets/mark-combined.png" alt="">
+          <span class="step-brand-name">Monkey Console</span>
+        </div>
         ${renderProgressHTML(pack, step && step.id)}
         <p class="step-progress-line">${done} of ${STEPS.length} finished</p>
       </div>

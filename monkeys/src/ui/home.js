@@ -107,8 +107,37 @@ export function doorsFor(pack) {
  *  already holding. Land on the answer; "← All doors" is in the page header of
  *  every door, so nothing becomes unreachable.
  */
-export function landingViewFor(pack) {
-  return pack ? 'step' : 'home';
+export function landingViewFor() {
+  // ALWAYS the step screen, pack or no pack.
+  //
+  // This returned 'home' with no pack, so a first-time visitor got the old
+  // chooser and never saw a single thing built for them. Reported, accurately,
+  // as "I do not see how the monkey console has changed at all": the whole
+  // redesign lived behind a pack they did not have.
+  //
+  // It was the wrong model as well as the wrong gate. Having no pack is not an
+  // empty state needing a menu of ways to begin. It means step 1 is not done.
+  // The pack is what the steps PRODUCE, not what you must bring to see them,
+  // and currentStep(null) already returns step 1 without being asked to.
+  return 'step';
+}
+
+/** For the visitor who ALREADY has files. One line, under the step.
+ *
+ *  This replaces the three-column chooser as the first thing anyone saw. Two
+ *  of its three routes were ways to begin, which step 1 now is, and the third
+ *  was a file picker for people who had files already. That third case is real
+ *  and rare, so it gets a line rather than a third of the screen.
+ */
+function renderStartHereHTML(state) {
+  return `
+    <div class="step-have-pack">
+      <details class="loader-bar loader-bar-folded">
+        <summary>Already have a <code>.monkeys/</code> folder?<span class="loader-more">Load it</span></summary>
+        ${renderLoaderControls(state.caps || capabilities())}
+        <p class="muted-note"><button type="button" class="btn btn-link" data-action="load-sample">Or try a sample</button>, an example rather than a template.</p>
+      </details>
+    </div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -340,10 +369,11 @@ export function mountApp(root) {
         const step = state.stepId
           ? (STEPS.find((x) => x.id === state.stepId) || currentStep(state.pack))
           : currentStep(state.pack);
-        return pageShell('', state.pack
-          ? `${renderPackStatus(state)}${renderPersistenceNote(state)}${renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen })}`
-          : renderNeedsPackHTML('This screen', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state),
-        { pinned: Boolean(state.pack), back: false });
+        return pageShell('',
+          `${renderPackStatus(state)}${state.pack ? renderPersistenceNote(state) : ''}`
+          + renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen, caps })
+          + (state.pack ? '' : renderStartHereHTML(state)),
+        { pinned: true, back: false });
       }
       case 'today':
         // The pack's identity travels with the landing screen. Loading now

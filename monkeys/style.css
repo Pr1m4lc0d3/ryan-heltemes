@@ -1983,3 +1983,15 @@ h1 { font-size: 1.6rem; }
   padding: 0 var(--step);
   text-align: left;
 }
+
+/* The "I already have files" line, under the step. Replaces the three-column
+   chooser that used to BE the first screen: two of its routes were ways to
+   begin, which step 1 now is, and the third was a file picker for the rare
+   visitor who already has a folder. That case gets a line, not a third of the
+   screen. */
+.step-have-pack {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--step) var(--step) 0;
+}
+.step-have-pack .loader-bar { margin: 0; }

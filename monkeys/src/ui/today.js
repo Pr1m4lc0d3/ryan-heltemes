@@ -324,21 +324,34 @@ export function renderTodayHTML(pack) {
   // whole reason to open this door, sat below the fold on every screen this
   // was tested at. One at a time is the same answer Door 2 and Door 4 already
   // give, and the same one asked for after the six stacked file forms.
+  // 'Blocked' is NOT a step any more: the gate block in the hero above is the
+  // blocker, set larger and read first. Keeping both meant the same fact twice
+  // on one screen, and the pair pushed this view 246px past its viewport at
+  // 1400x700 (tests/noscroll.mjs). The hero states the gate that is actually
+  // in the way; the fuller reading of every closed gate stays one tab along,
+  // under 'Needs attention', where it is reference rather than headline.
   const steps = [
     ['do-today', 'Do today', `${doToday}${glossFor(gloss, doToday)}`],
-    ['blocked', 'Blocked', `${blocked}${glossFor(gloss, blocked, ['gate'])}`],
     ['waiting', 'Waiting on you', `${waiting}${glossFor(gloss, waiting)}`],
     ['attention', 'Needs attention',
-      `${attention}${glossFor(gloss, attention, evalResult.stageDrift ? ['drift'] : [])}`],
+      `${blocked}${attention}${glossFor(gloss, `${blocked}${attention}`, evalResult.stageDrift ? ['drift', 'gate'] : ['gate'])}`],
   ];
 
   // .landing carries the measure (~68ch) and the vertical rhythm. The column
   // ran ~120 characters per line before, which is roughly double what anyone
   // reads comfortably.
+  // THE HERO IS FIXED, THE LIST SCROLLS. Three actions each carrying a
+  // done-when condition is real content, not padding, and at 1100x640 it does
+  // not fit under a hero no matter how the type is tuned. Truncating it would
+  // hide the conditions that make an action checkable — the whole point of the
+  // list. So the answer and the gate stay pinned where the eye lands, and the
+  // list below them scrolls in its own region, the same treatment the agent
+  // transcript already gets. .scroll-body itself stays un-overflowed, which is
+  // what tests/noscroll.mjs measures.
   return `
     <div class="today-view landing">
-      ${stage}${glossFor(gloss, stage)}
-      ${renderStepGroup('today', steps)}
+      <div class="landing-fixed">${stage}${glossFor(gloss, stage)}</div>
+      <div class="landing-scroll">${renderStepGroup('today', steps)}</div>
     </div>`;
 }
 

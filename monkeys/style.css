@@ -1609,20 +1609,25 @@ h1 { font-size: 1.6rem; }
    ═════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --t-display: 2.75rem;   /* the one sentence that matters. Once per screen. */
+  /* MEASURED, not chosen by feel. At 2.75rem the hero pushed the today view
+     246px past its viewport at 1400x700 and 306px at 1100x640 — the display
+     size and the gate block together cost more height than the column had.
+     clamp() lets it stay emphatic on a big screen and stop competing with the
+     content on a small one. Re-run tests/noscroll.mjs before raising it. */
+  --t-display: clamp(1.5rem, 2.4vw + 0.6rem, 2.125rem);
   --t-title: 1.375rem;
   --t-body: 1.0625rem;
   --t-meta: 0.8125rem;    /* uppercase, tracked — labels and conditions */
   --t-micro: 0.75rem;
 
   --measure: 46rem;       /* ~68ch at --t-body */
-  --step: 1.5rem;         /* the one vertical rhythm unit */
+  --step: clamp(0.9rem, 1.4vh + 0.3rem, 1.4rem);  /* the one vertical rhythm unit */
 }
 
 .landing {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: calc(var(--step) * 1.5) var(--step) var(--step);
+  padding: var(--step) var(--step) calc(var(--step) * 0.5);
 }
 
 /* ── Eyebrow: context, not the point ─────────────────────────────────────── */
@@ -1650,8 +1655,8 @@ h1 { font-size: 1.6rem; }
   background: var(--ink);
   color: var(--bone);
   border-left: 4px solid var(--gold);
-  padding: calc(var(--step) * 0.9) var(--step);
-  margin: 0 0 calc(var(--step) * 1.5);
+  padding: calc(var(--step) * 0.7) var(--step);
+  margin: 0 0 var(--step);
   border-radius: 2px;
 }
 .gate-label {
@@ -1663,7 +1668,7 @@ h1 { font-size: 1.6rem; }
   margin: 0 0 0.5rem;
 }
 .gate-condition {
-  font-size: var(--t-title);
+  font-size: clamp(0.95rem, 0.5vw + 0.8rem, var(--t-title));
   line-height: 1.35;
   margin: 0;
   font-weight: 500;
@@ -1726,3 +1731,15 @@ h1 { font-size: 1.6rem; }
 @media (max-width: 34rem) {
   :root { --t-display: 1.875rem; --t-title: 1.1875rem; }
 }
+
+/* The landing splits: the answer and the gate are pinned, the list scrolls.
+   Three actions with their done-when conditions do not fit under a hero at
+   1100x640, and shortening them would remove the conditions that make an
+   action checkable. min-height:0 on the column and the flex child is what
+   actually lets the inner region scroll instead of stretching its parent —
+   the same rule the shell comment at the top of this file states. */
+.scroll-body-pinned { display: flex; flex-direction: column; overflow: hidden; }
+.scroll-body-pinned > .today-view.landing { flex: 1 1 auto; }
+.today-view.landing { display: flex; flex-direction: column; min-height: 0; }
+.landing-fixed { flex: none; }
+.landing-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }

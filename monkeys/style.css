@@ -2322,3 +2322,65 @@ h1 { font-size: 1.6rem; }
   .step-carried-label::after { content: ' · recorded'; font-weight: 400; letter-spacing: 0; text-transform: none; }
   .step-example { display: none; }
 }
+
+/* ── WHICH STEP AM I ON ───────────────────────────────────────────────────
+   Reported: no distinguishing mark at a glance. Correct. Done and current
+   differed only by the colour of a 3px bar, and both drew their number in the
+   same ink, so the two states read identically from more than a foot away.
+   Gold on bone is also weak as a hairline: it carries as a FILL, not a line.
+
+   Three states now differ in three ways each, not one:
+     future   thin grey bar, muted number, no label
+     done     ink bar, a tick instead of the number
+     here     thick gold bar, number reversed out of a filled ink chip, and
+              the step's name beside it
+
+   The label returns for the CURRENT mark only. It shoved the numbers out of
+   line when every mark carried one; one label in a flexible row does not, and
+   it is the fastest possible answer to "where am I". */
+.step-mark { border-top-width: 3px; transition: none; }
+.step-mark-n {
+  display: inline-block;
+  min-width: 1.35rem;
+  text-align: center;
+  line-height: 1.35rem;
+  border-radius: 2px;
+}
+.step-mark.is-done { border-top-color: var(--ink); }
+.step-mark.is-done .step-mark-n { color: var(--ink); }
+
+.step-mark.is-here {
+  flex-grow: 2.4;
+  border-top-color: var(--gold);
+  border-top-width: 5px;
+  padding-top: 0.35rem;
+}
+.step-mark.is-here .step-mark-n {
+  background: var(--ink);
+  color: var(--bone);
+  font-weight: 800;
+}
+.step-mark-here {
+  margin-left: 0.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.step-mark.is-here { display: flex; align-items: center; min-width: 0; }
+
+/* A step can be finished AND the one you are on. `is-here` wins every
+   collision, because "where am I" is the question the rail exists to answer
+   and "already done" is the one it can afford to say second. Doubling the
+   selector raises specificity without !important. */
+.step-mark.is-here.is-here { border-top-color: var(--gold); border-top-width: 5px; }
+.step-mark.is-here.is-here .step-mark-n {
+  background: var(--ink);
+  color: var(--bone);
+  font-weight: 800;
+}
+/* No tick inside the chip on the current step: the gold bar and the reversed
+   number already say "here", and a tick crowded against the numeral read as a
+   second digit. Finished-ness is carried by the bar being gold rather than
+   grey, and by the step's own panel saying "Finished." */

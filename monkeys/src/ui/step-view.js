@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto } from './steps-model.js';
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15b · carries-forward';
+export const BUILD = '2026-08-15c · rail';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -48,13 +48,20 @@ function escapeHtml(value) {
  */
 export function renderProgressHTML(pack, activeId) {
   const marks = stepStates(pack).map((s) => {
-    const state = s.isDone ? 'is-done' : (s.id === activeId ? 'is-here' : '');
+    // BOTH, not either. This read `isDone ? 'is-done' : (here ? 'is-here' : '')`,
+    // so a step that was finished AND the one you were standing on rendered as
+    // merely finished and lost every here-marker. On a pack with any work in it
+    // that is most steps, which is why the current step was unfindable at a
+    // glance. Being finished and being here are different facts and the mark
+    // has to carry both.
+    const state = [s.isDone ? 'is-done' : '', s.id === activeId ? 'is-here' : ''].filter(Boolean).join(' ');
     return `
       <button type="button" class="step-mark ${state}" data-action="go-step" data-step="${s.id}"
         aria-current="${s.id === activeId ? 'step' : 'false'}"
         aria-label="${escapeHtml(`Step ${s.n}, ${s.title}`)}"
         title="${escapeHtml(`${s.n}. ${s.title}`)}">
-        <span class="step-mark-n">${s.n}</span>
+        <span class="step-mark-n">${s.isDone && s.id !== activeId ? '&#10003;' : s.n}</span>
+        ${s.id === activeId ? `<span class="step-mark-here">${escapeHtml(s.title)}</span>` : ''}
       </button>`;
   }).join('');
   return `<nav class="step-rail" aria-label="Steps">${marks}</nav>`;

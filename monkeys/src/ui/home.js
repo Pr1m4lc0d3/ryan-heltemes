@@ -918,6 +918,15 @@ export function mountApp(root) {
         /^\*\*Delivery check:\*\*/i,
         `**Delivery check:** confirmed ${new Date().toISOString().slice(0, 10)} - ${values.outcome}`,
       );
+    } else if (step.form.table) {
+      // numbers.md is a TABLE. appendBulletToFile would put a bullet under a
+      // heading that does not exist and corrupt the file, so a row goes on the
+      // end, after the header and separator that must already be there.
+      const existing = files[step.writesTo] || '';
+      const body = existing.replace(/\s+$/, '');
+      files[step.writesTo] = `${body}
+${step.form.compose(values)}
+`;
     } else if (!step.form.compose || !step.form.heading) {
       if (note) {
         note.textContent = 'This step is recorded by hand for now. Open the file and add it.';

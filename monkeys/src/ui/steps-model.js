@@ -218,22 +218,32 @@ export const STEPS = [
   },
   {
     id: 'keep',
+    // A TABLE ROW, not a bullet, and it carries the OWNED/RENTED column.
+    //
+    // This form had date, metric, value and source and no kind at all, while
+    // the gate requires at least one row marked owned. Filled in perfectly it
+    // could never open its own step. It also had no writer, so Save dead-ended
+    // on "recorded by hand for now", and numbers.md is a table, so the bullet
+    // writer every other step uses would have corrupted it.
     form: {
       heading: null,
+      table: true,
       fields: [
-      { key: 'date', label: 'Date', placeholder: '2026-09-01' },
-      { key: 'metric', label: 'What you counted', placeholder: 'signups from the guide' },
-      { key: 'value', label: 'How many', placeholder: '14' },
-      { key: 'source', label: 'Where the number came from', placeholder: 'site analytics' },
+        { key: 'date', label: 'Date', placeholder: '2026-09-01' },
+        { key: 'metric', label: 'What you counted', placeholder: 'downloads of the installer' },
+        { key: 'kind', label: 'Owned or rented?', placeholder: 'owned' },
+        { key: 'value', label: 'How many', placeholder: '14' },
+        { key: 'source', label: 'Where you read it', placeholder: 'the releases page download count' },
       ],
+      compose: (v) => `| ${v.date} | ${v.metric} | ${/^own/i.test(v.kind) ? 'motte' : 'bailey'} | ${v.value} | ${v.source} |`,
     },
     n: 8,
     title: 'Keep what worked',
-    why: 'You cannot drop what failed until you have written down what happened, and memory is not a record.',
-    todo: 'Record dated results, including at least one from something you own rather than a platform. Then stop doing whatever produced nothing.',
-    example: '2026-09-01 · signups from the guide · 14 · site analytics',
-    tip: 'Likes on a platform are the easiest number to collect and the least useful. Count the ones that reached something you own.',
-    agentAsk: 'Which of these results came from something I own, and which came from rented attention?',
+    why: 'This step is for after you have sent people somewhere. Until then there is nothing to judge, and saying so is the honest answer rather than a gap to fill.',
+    todo: 'Once a week write down what actually happened: the date, what you counted, how many, and where you read it. Two entries is enough to start telling what worked from what did not.',
+    example: '2026-09-01 · downloads of the installer · owned · 14 · the releases page download count',
+    tip: 'Where to look, best first: your store’s order count, because it is the only number that means somebody paid. Then your own site analytics and your own download counts, since nobody can take those away. Views and likes on a platform are the easiest to collect and the least useful, so mark those rented and never let them be the only thing you record.',
+    agentAsk: 'Which of these numbers came from something I own, and which came from a platform that could take it away?',
     writesTo: 'numbers.md',
     done: (pack) => (pack?.numbers?.rows || []).length >= 2,
     doneLabel: 'Two dated results recorded',

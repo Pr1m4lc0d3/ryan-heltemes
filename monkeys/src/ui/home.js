@@ -258,6 +258,9 @@ function pageShell(title, bodyHtml, { pinned = false } = {}) {
 export function mountApp(root) {
   const state = {
     pack: null, view: 'home', loadError: '', skippedNote: '', checkDraft: '',
+    // The agent starts closed. It is optional and it cannot act without a key,
+    // so it does not get to own the screen until it is asked for.
+    agentOpen: false,
     // The drafting agent's own state. cfg is read from this browser once, on
     // boot; ask/busy/error live only as long as the page does.
     agent: { cfg: loadAgentConfig(), ask: '', busy: false, error: '' },
@@ -601,7 +604,12 @@ export function mountApp(root) {
     const uiBefore = captureUiState();
     state.guide.opening = openingLine(state.pack, evaluate(state.pack || {}));
     const cfg = state.agent.cfg;
-    root.innerHTML = `<div class="shell"><div class="shell-main">${view()}</div>`
+    // AGENT OPEN/CLOSED. It was a permanent 280px minimum rail — at an 800px
+    // window, 35% of the screen, holding a 175px input and a fixed 67px
+    // button, for a panel that can do nothing at all without a key. Closed it
+    // is a single line at the foot; open it takes the screen, which is the
+    // only honest shape for a conversation.
+    root.innerHTML = `<div class="shell${state.agentOpen ? ' shell-agent-open' : ''}"><div class="shell-main">${view()}</div>`
       + renderSidebarHTML({
         pack: state.pack,
         guide: state.guide,
@@ -612,6 +620,7 @@ export function mountApp(root) {
         modelsLoading: state.modelsLoading,
         modelsError: state.modelsError,
         agentConfigured: Boolean(cfg.baseUrl && cfg.apiKey && cfg.model),
+        agentOpen: state.agentOpen,
       })
       + '</div>';
     if (state.view === 'setup') {
@@ -841,6 +850,9 @@ export function mountApp(root) {
       // places.
       state.openPanel = el.dataset.panel || '';
       state.loadError = '';
+      render();
+    } else if (action === 'toggle-agent') {
+      state.agentOpen = !state.agentOpen;
       render();
     } else if (action === 'back') {
       state.view = 'home';

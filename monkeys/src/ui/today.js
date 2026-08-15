@@ -21,6 +21,7 @@ import { evaluate, STAGE_NAMES } from '../stages.js';
 import { renderNeedsPackHTML } from './loader.js';
 import { renderStepGroup } from './steps.js';
 import { makeGlossState, glossFor } from './glossary.js';
+import { phaseName, phaseWork, gateBlocker, gateFix } from './plain.js';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -105,31 +106,31 @@ const GATE_UNBLOCK = {
  *  stands between you and the next stage.
  */
 function renderStageBlock(evalResult) {
-  const name = STAGE_NAMES[evalResult.stage] || '';
   const last = STAGE_NAMES.length - 1;
   const nextClosed = evalResult.gates.find((g) => !g.open);
 
-  // The stage's own work, in the plain words stages.js already keeps. Falls
-  // back to the stage name rather than inventing a sentence.
-  const answer = (evalResult.openWork && evalResult.openWork[0]) || name;
-
+  // EVERY string here comes through plain.js. evalResult.openWork is the
+  // doctrine's own phrasing ("publish something substantial on land you own,
+  // then syndicate cuts of it") and is exactly what made this screen
+  // unreadable, so it is not used for display — the pack's own vocabulary
+  // stays in the pack.
   const gate = nextClosed
     ? `
       <section class="gate">
         <p class="gate-label">In the way</p>
-        <p class="gate-condition">${escapeHtml(GATE_PLAIN[nextClosed.stage] || nextClosed.unmet || '')}</p>
-        <p class="gate-note">${escapeHtml(nextClosed.unmet || '')}</p>
+        <p class="gate-condition">${escapeHtml(gateBlocker(nextClosed))}</p>
+        ${gateFix(nextClosed) ? `<p class="gate-note">Next: ${escapeHtml(gateFix(nextClosed))}</p>` : ''}
       </section>`
     : `
       <section class="gate">
-        <p class="gate-label">Nothing is blocking you</p>
-        <p class="gate-condition">Every gate is open. What is left is the work itself.</p>
+        <p class="gate-label">Nothing is in the way</p>
+        <p class="gate-condition">You are clear to do the work itself.</p>
       </section>`;
 
   return `
     <section class="today-stage">
-      <p class="landing-eyebrow">Stage ${evalResult.stage} of ${last} · ${escapeHtml(name)}</p>
-      <h2 class="landing-answer">${escapeHtml(answer)}</h2>
+      <p class="landing-eyebrow">Step ${evalResult.stage + 1} of ${last + 1} · ${escapeHtml(phaseName(evalResult.stage))}</p>
+      <h2 class="landing-answer">${escapeHtml(phaseWork(evalResult.stage))}</h2>
       ${gate}
     </section>`;
 }
@@ -152,7 +153,7 @@ function renderActionItem(entry) {
   return `
     <li class="action-item">
       <p class="action-text">${escapeHtml(entry.fields.action)}</p>
-      <p class="action-meta">skill: <strong>${escapeHtml(entry.fields.skill)}</strong> — done when: ${escapeHtml(entry.fields.doneWhen)}</p>
+      <p class="action-meta">Run <strong>${escapeHtml(entry.fields.skill)}</strong> in your AI agent · Finished when ${escapeHtml(entry.fields.doneWhen)}</p>
     </li>`;
 }
 

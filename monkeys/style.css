@@ -215,7 +215,7 @@ p { margin: 0 0 0.75rem; }
 
 /* gap and margin trimmed from 1rem/1.5rem on 2026-08-14, same measurement and
    same reason as .onboard-explainer below: the last 12px of the overflow. */
-.onboarding { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.75rem; }
+.onboarding { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.4rem; }
 .onboard-explainer { color: var(--muted); }
 /* MEASURED, 2026-08-14. The explainer that finally tells a new builder what a
    pack is put "chooser (no pack)" 29px over at 1100x640 (tests/noscroll.mjs),
@@ -1764,3 +1764,60 @@ h1 { font-size: 1.6rem; }
 .scroll-body-pinned > .pack-status { padding-top: 0.1rem; }
 .door-page:has(.scroll-body-pinned) .door-page-head h1 { display: none; }
 .door-page:has(.scroll-body-pinned) .door-page-head { padding-bottom: 0.2rem; }
+
+/* ── The agent: a strip, or the screen. Never a permanent rail. ────────────
+   It was flex: 0 0 clamp(280px, 24vw, 420px) — a MINIMUM of 280px at every
+   size, 35% of an 800px window, holding a 175px input and a fixed 67px button,
+   for a panel that can do nothing without a key. Reported as nearly impossible
+   to use, correctly.
+   Closed it is one line at the foot. Open it takes the screen, which is the
+   only honest shape for a conversation: the input gets the full column instead
+   of a sliver, and nothing else is competing for the space. */
+.agent-strip {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  background: var(--ink);
+  color: var(--bone);
+  padding: 0.45rem 1.25rem;
+  font: inherit;
+  font-size: var(--t-meta);
+  text-align: left;
+  cursor: pointer;
+}
+.agent-strip:hover, .agent-strip:focus-visible { background: var(--ink-lift); }
+.agent-strip-label {
+  flex: none;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--gold);
+}
+.agent-strip-teaser {
+  color: var(--muted-up);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Open: the whole surface. */
+.shell-agent-open .shell-main { display: none; }
+.shell-agent-open .guide-open {
+  flex: 1 1 auto;
+  border-left: 0;
+  padding: 1rem clamp(1rem, 6vw, 5rem);
+}
+.guide-open .guide-body,
+.guide-open .guide-ask { max-width: var(--measure); margin-left: auto; margin-right: auto; width: 100%; }
+.guide-open .guide-head { max-width: var(--measure); margin: 0 auto 0.5rem; width: 100%; gap: 1rem; }
+.guide-open .guide-ask > .setup-input { font-size: var(--t-body); padding: 0.7rem 0.9rem; }
+.guide-open .guide-ask > .btn { width: auto; padding: 0.7rem 1.5rem; }
+
+/* The shell stacks so the strip sits under the content rather than beside it. */
+.shell { flex-direction: column; }
+.shell-main { flex: 1 1 auto; min-height: 0; }

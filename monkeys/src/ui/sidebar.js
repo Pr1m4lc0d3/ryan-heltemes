@@ -201,9 +201,21 @@ export function renderSidebarHTML(state) {
     ? history.map(renderTurn).join('')
     : `<p class="guide-opening">${escapeHtml(g.opening || '')}</p>${noKeyNote}`) + thinking;
 
+  // CLOSED: one line at the foot of the screen, with the opening sentence as
+  // its label so the strip still says something true when it is shut.
+  if (!s.agentOpen) {
+    const teaser = (g.history.length ? g.history[g.history.length - 1].text : g.opening) || 'Ask about any of this';
+    return `
+      <button type="button" class="agent-strip" data-action="toggle-agent" aria-expanded="false">
+        <span class="agent-strip-label">Ask</span>
+        <span class="agent-strip-teaser">${escapeHtml(String(teaser).slice(0, 120))}</span>
+      </button>`;
+  }
+
   return `
-    <aside class="guide" aria-label="Campaign agent">
+    <aside class="guide guide-open" aria-label="Campaign agent">
       <header class="guide-head">
+        <button type="button" class="btn btn-back" data-action="toggle-agent" aria-expanded="true">&larr; Close</button>
         <h2>Agent</h2>
         ${s.agentConfigured ? '' : '<span class="guide-nokey" title="The console works without it. This panel is the only part that needs one.">optional</span>'}
         ${s.searchOn ? '<span class="guide-searching" title="Answers are searched against the live web">searching</span>' : ''}

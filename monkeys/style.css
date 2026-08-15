@@ -1743,3 +1743,24 @@ h1 { font-size: 1.6rem; }
 .today-view.landing { display: flex; flex-direction: column; min-height: 0; }
 .landing-fixed { flex: none; }
 .landing-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+/* The landing's chrome, demoted.
+   Moving the pack status here (so a returning reader still knows WHICH pack is
+   open) put four lines above the content, and the status was set bold and dark
+   — visually louder than the eyebrow under it, which is backwards. It is
+   provenance, not the answer. One quiet line, and the door title goes: on the
+   screen you land on, "What do I do today" restates the door metaphor the
+   landing exists to remove. */
+.scroll-body-pinned > .pack-status,
+.scroll-body-pinned > .persistence-note {
+  font-size: var(--t-micro);
+  font-weight: 400;
+  color: var(--muted);
+  margin: 0 0 0.2rem;
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+.scroll-body-pinned > .pack-status { padding-top: 0.1rem; }
+.door-page:has(.scroll-body-pinned) .door-page-head h1 { display: none; }
+.door-page:has(.scroll-body-pinned) .door-page-head { padding-bottom: 0.2rem; }

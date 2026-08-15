@@ -41,6 +41,31 @@ function escapeHtml(value) {
 const SKILL_NOTE =
   'raid-campaign is a skill you run in your own AI agent — it writes campaign.md; this console reads what it writes.';
 
+// PLAIN ENGLISH FOR EACH GATE, because the hero is the one place jargon costs
+// the most.
+//
+// stages.js writes `unmet` for an operator who knows the pack format, and it
+// is right to: raid-campaign's SKILL.md defines those strings and this console
+// must never paraphrase the authority. But rendered straight into the biggest
+// block on the page it read:
+//
+//   "campaign.md's delivery check has not been confirmed — ask the adopter
+//    directly whether a stranger can complete the action end to end"
+//
+// A file name and the word "adopter", to a person who has never opened the
+// doctrine. Same failure raid-dossier's translation rule exists to prevent,
+// repeated on the screen instead of in the document.
+//
+// So the hero says what it MEANS, and the exact string stays underneath it in
+// small type — the precise sentence is not lost, it just stops being the first
+// thing the eye lands on. Keyed by the gate that is closed.
+const GATE_PLAIN = {
+  1: 'You have nothing you can safely say in public yet.',
+  2: 'Every room you are in, you are a stranger in.',
+  3: 'Nobody has checked that a stranger can actually buy this.',
+  4: 'You have no recorded results yet, so there is nothing to judge.',
+};
+
 const GATE_UNBLOCK = {
   1: 'Add one sourced fact under truth.md’s ## Cleared section.',
   2: 'Get one bailey.md ## Active account to standing: warming or standing: established.',
@@ -91,8 +116,9 @@ function renderStageBlock(evalResult) {
   const gate = nextClosed
     ? `
       <section class="gate">
-        <p class="gate-label">Blocking stage ${nextClosed.stage} · ${escapeHtml(STAGE_NAMES[nextClosed.stage] || '')}</p>
-        <p class="gate-condition">${escapeHtml(nextClosed.unmet || '')}</p>
+        <p class="gate-label">In the way</p>
+        <p class="gate-condition">${escapeHtml(GATE_PLAIN[nextClosed.stage] || nextClosed.unmet || '')}</p>
+        <p class="gate-note">${escapeHtml(nextClosed.unmet || '')}</p>
       </section>`
     : `
       <section class="gate">

@@ -2409,3 +2409,52 @@ h1 { font-size: 1.6rem; }
 .step-elsewhere-note { margin-left: 0.5rem; color: var(--ink); font-weight: 600; }
 .step-research-text { position: absolute; left: -9999px; width: 1px; height: 1px; }
 @media (max-height: 44rem) { .step-elsewhere p { display: none; } }
+
+/* Step 8 carries five short fields now that the owned/rented column exists.
+   Two abreast on a desktop, and tighter still on a short window, because five
+   stacked rows put the screen 75px over. */
+@media (min-width: 62rem) {
+  .step-form[data-step-form="keep"] .sf-field { margin-bottom: 0.45rem; }
+}
+@media (max-height: 50rem) {
+  .step-form[data-step-form="keep"] .sf-input { padding: 0.35rem 0.6rem; }
+  .step-form[data-step-form="keep"] .sf-label { margin-bottom: 0.1rem; }
+  .step-form[data-step-form="keep"] .sf-field { margin-bottom: 0.35rem; }
+}
+
+/* Short window, sample loaded: the chrome row reached 104px because the sample
+   banner, the pack status and the persistence note all wrap. The banner stays,
+   because "this is not your data" is the one of the three that prevents a real
+   mistake. The persistence note goes, and the step's why-line folds, since the
+   instruction is what has to survive. */
+@media (max-height: 44rem) {
+  .step-chrome > .persist-note { display: none; }
+  .step-chrome { padding-top: 0.2rem; gap: 0 0.5rem; }
+  .step-why { display: none; }
+}
+
+/* Carried context is one line per item everywhere, not two.
+   Measured on step 8 at 1440x900: the block reached 118px and put the screen
+   48px over. It exists to remind you what you are building on, and one line
+   does that; the full entries are in the panel opposite under Recorded so far. */
+.step-carried li { -webkit-line-clamp: 1; }
+.step-brand { padding-top: 0.5rem; padding-bottom: 0.35rem; }
+.step-mark-img { width: 1.25rem; height: 1.25rem; }
+
+/* The last 9px on a short window, found only once the sweep walked every step
+   rather than whichever one the sample pack landed on. */
+@media (max-height: 44rem) {
+  .step-title { font-size: 1.45rem; margin-bottom: 0.4rem; }
+  .step-do-text { font-size: 1.05rem; }
+  .step-carried { margin-bottom: 0.4rem; }
+  .step-tip { display: none; }
+}
+
+@media (max-height: 44rem) {
+  .step-do { padding-left: 0.8rem; margin-bottom: 0.35rem; }
+  .step-do-label { margin-bottom: 0.2rem; }
+  .step-do-text { margin-bottom: 0.35rem; }
+  .step-agent { padding: 0.45rem 0.7rem; margin-bottom: 0.3rem; }
+  .step-eyebrow { margin-bottom: 0.15rem; }
+  .sf-head { margin-bottom: 0.45rem; }
+}

@@ -28,6 +28,18 @@
 // finished, and what is next.
 
 const has = (list) => Array.isArray(list) && list.length > 0;
+
+// WHICH STEPS ACTUALLY NEED THE LIVE WEB.
+//
+// Steps 1 to 4 ask the agent to go and find something that is not on this
+// machine: where a claim can be checked, buyers describing a problem in their
+// own words, how a rival makes money, which rooms those people are in. Offering
+// that to someone whose provider cannot search is the impossible ask this
+// console exists to remove — and only OpenRouter can search, with the toggle
+// off by default, so the offer was usually a promise nothing could keep.
+//
+// Steps 5 to 8 are about work the founder does and records; the agent helps
+// think, not fetch, so they read the same either way.
 const raws = (list) => (Array.isArray(list) ? list : []).map((r) => String(r?.raw ?? '')).filter(Boolean);
 
 /** What an earlier step produced that THIS step should be built on.
@@ -57,6 +69,7 @@ export function carriedInto(stepId, pack) {
 export const STEPS = [
   {
     id: 'prove',
+    needsWeb: true,
     form: {
       heading: 'Cleared',
       fields: [
@@ -78,6 +91,7 @@ export const STEPS = [
   },
   {
     id: 'hear',
+    needsWeb: true,
     form: {
       heading: 'Pains',
       fields: [
@@ -99,6 +113,7 @@ export const STEPS = [
   },
   {
     id: 'ground',
+    needsWeb: true,
     form: {
       heading: 'Our ground',
       fields: [
@@ -120,6 +135,7 @@ export const STEPS = [
   },
   {
     id: 'rent',
+    needsWeb: true,
     form: {
       heading: 'Active',
       fields: [

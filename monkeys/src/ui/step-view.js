@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto } from './steps-model.js';
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15c · rail';
+export const BUILD = '2026-08-15d · search-honest';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -134,13 +134,28 @@ export function renderStepHTML(pack, step, opts = {}) {
 
   // The agent line names what it would go and do for THIS step, so the offer
   // is concrete rather than an empty box asking what you want.
+  // WHAT THE AGENT CAN ACTUALLY DO HERE, said before it is offered.
+  //
+  // Steps 1 to 4 ask it to go and FIND something. Only OpenRouter can search
+  // the live web, and the toggle is off by default, so on any other provider
+  // this block was promising research nothing could perform. The offer now
+  // matches the configuration, and where it cannot be met it says the one
+  // thing that would fix it instead of failing later in conversation.
+  const web = opts.web || {};
+  const blockedReason = (step.needsWeb && !web.canSearch)
+    ? (web.providerCanSearch
+        ? 'Web search is switched off. Turn it on in the agent panel and it can go and find these.'
+        : 'This needs to search the live web, which only OpenRouter can do here. Change provider in the agent panel.')
+    : '';
+
   const agent = agentOpen ? '' : `
-    <button type="button" class="step-agent" data-action="toggle-agent">
+    <button type="button" class="step-agent${blockedReason ? ' is-limited' : ''}" data-action="toggle-agent">
       <span class="step-agent-head">
         <span class="step-agent-label">Ask the agent</span>
         <span class="step-agent-open">Open &rarr;</span>
       </span>
       <span class="step-agent-text">&ldquo;${escapeHtml(step.agentAsk)}&rdquo;</span>
+      ${blockedReason ? `<span class="step-agent-blocked">${escapeHtml(blockedReason)}</span>` : ''}
     </button>`;
 
   return `

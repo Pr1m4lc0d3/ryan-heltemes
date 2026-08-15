@@ -329,7 +329,15 @@ export function mountApp(root) {
     // Search is OFF by default and deliberately so: it costs extra on every
     // question, including on a free model, and a cost the founder did not
     // choose is worse than a capability they had to switch on.
-    searchOn: false,
+    // ON by default, where the provider can do it at all.
+    //
+    // It defaulted to false, so even after choosing the one provider that CAN
+    // search, the agent still would not — and nothing on the step said why.
+    // Four of the eight steps exist to go and find something, so a research
+    // tool whose research is off by default is a tool that does not work until
+    // you find a checkbox you were never told about. The cost note stays
+    // beside the toggle, which is the honest place for it.
+    searchOn: true,
     emptyLoadNote: '', packSource: '', savedAt: '', clearedNote: '',
     // The Sell-Kit drop. kitError is what went wrong in words a human can act
     // on; kitNote says which of Idea Forge Pro's three files we read it as, so
@@ -394,7 +402,14 @@ export function mountApp(root) {
           // blockified and the declaration is ignored. Wrapping them makes it
           // one row that can lay itself out however it likes.
           `<div class="step-chrome">${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}</div>`
-          + renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen, caps })
+          + renderStepScreenHTML(state.pack, step, {
+            agentOpen: state.agentOpen,
+            caps,
+            web: {
+              canSearch: state.searchOn && supportsSearch(state.providerId),
+              providerCanSearch: supportsSearch(state.providerId),
+            },
+          })
           + (state.pack ? '' : renderStartHereHTML(state)),
         { pinned: true, back: false });
       }
@@ -1100,7 +1115,10 @@ export function mountApp(root) {
     state.modelsError = '';
     // A provider that cannot search must not leave the toggle reading "on":
     // the label would be a claim the request cannot honour.
-    if (!supportsSearch(preset.id)) state.searchOn = false;
+    // Switching provider re-derives it: on where the new provider can search,
+    // off where it cannot, so the state can never claim a capability the
+    // current provider does not have.
+    state.searchOn = supportsSearch(preset.id);
     render();
   });
 

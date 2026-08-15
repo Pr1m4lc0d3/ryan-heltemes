@@ -2384,3 +2384,13 @@ h1 { font-size: 1.6rem; }
    number already say "here", and a tick crowded against the numeral read as a
    second digit. Finished-ness is carried by the bar being gold rather than
    grey, and by the step's own panel saying "Finished." */
+
+/* An offer the configuration cannot meet says so, on the offer. */
+.step-agent.is-limited { border-left: 3px solid var(--gold); }
+.step-agent-blocked {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--gold);
+  font-style: normal;
+  font-size: var(--t-micro);
+}

@@ -852,6 +852,54 @@ export function mountApp(root) {
     }
   }
 
+  /** Write one step's answers into the pack. The thing every screen before
+   *  this told you to do and gave you no way to do.
+   *
+   *  Refuses on an empty field rather than writing a half line: a malformed
+   *  entry is worse than a missing one, because pack.js drops it and the
+   *  reader is left believing they recorded something.
+   */
+  function saveStepEntry(stepId) {
+    const step = STEPS.find((x) => x.id === stepId);
+    const form = root.querySelector(`[data-step-form="${stepId}"]`);
+    if (!step || !step.form || !form) return;
+    const note = form.querySelector('[data-sf-note]');
+    const values = {};
+    for (const f of step.form.fields) {
+      const input = form.querySelector(`[data-field="${f.key}"]`);
+      values[f.key] = (input?.value || '').trim();
+    }
+    const missing = step.form.fields.filter((f) => !values[f.key]);
+    if (missing.length) {
+      if (note) {
+        note.textContent = `Fill in ${missing.map((f) => f.label.toLowerCase()).join(' and ')} first.`;
+        note.classList.remove('is-saved');
+      }
+      return;
+    }
+    if (!step.form.compose || !step.form.heading) {
+      if (note) {
+        note.textContent = 'This step is recorded by hand for now. Open the file and add it.';
+        note.classList.remove('is-saved');
+      }
+      return;
+    }
+    const files = { ...(state.pack ? state.pack.raw : {}) };
+    files[step.writesTo] = appendBulletToFile(files[step.writesTo] || '', step.form.heading, step.form.compose(values));
+    state.pack = parsePack(files);
+    state.packSource = state.packSource === 'sample' ? 'setup' : (state.packSource || 'setup');
+    // STAY ON THIS STEP. Saving marks it finished, so the "first unfinished
+    // step" rule would otherwise throw the reader forward the instant they
+    // recorded anything — they never see the entry land, and adding a SECOND
+    // fact means navigating back to a step the console says is done. Moving on
+    // is the reader's decision, not the pack's.
+    state.stepId = stepId;
+    persist();
+    render();
+    const after = root.querySelector(`[data-step-form="${stepId}"] [data-sf-note]`);
+    if (after) { after.textContent = 'Saved.'; after.classList.add('is-saved'); }
+  }
+
   root.addEventListener('click', (event) => {
     // Step strips first, and NOT via data-action: they are pure view state,
     // so routing them through the action switch would put a case in it that
@@ -916,6 +964,8 @@ export function mountApp(root) {
       state.openPanel = el.dataset.panel || '';
       state.loadError = '';
       render();
+    } else if (action === 'save-step') {
+      saveStepEntry(el.dataset.step);
     } else if (action === 'go-step') {
       state.stepId = el.dataset.step || null;
       state.view = 'step';

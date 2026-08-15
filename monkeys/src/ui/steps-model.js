@@ -32,6 +32,14 @@ const has = (list) => Array.isArray(list) && list.length > 0;
 export const STEPS = [
   {
     id: 'prove',
+    form: {
+      heading: 'Cleared',
+      fields: [
+      { key: 'claim', label: 'The fact', placeholder: 'Runs offline with no account' },
+      { key: 'source', label: 'Where it can be checked', placeholder: 'https://example.com/download' },
+      ],
+      compose: (v) => `${v.claim} — source: ${v.source}`,
+    },
     n: 1,
     title: 'Prove one thing',
     why: 'Until one fact about your product can be checked by a stranger, there is nothing you can safely say in public.',
@@ -45,6 +53,14 @@ export const STEPS = [
   },
   {
     id: 'hear',
+    form: {
+      heading: 'Pains',
+      fields: [
+      { key: 'pain', label: 'What they said, in their words', placeholder: 'I keep getting confident answers that turn out to be wrong' },
+      { key: 'where', label: 'Where you found it', placeholder: 'a forum thread, with the link' },
+      ],
+      compose: (v) => `${v.pain} — heard: ${v.where}`,
+    },
     n: 2,
     title: 'Hear the buyer',
     why: 'A problem you wrote is a problem you can already answer, which makes it useless for testing whether anyone else has it.',
@@ -58,6 +74,14 @@ export const STEPS = [
   },
   {
     id: 'ground',
+    form: {
+      heading: 'Our ground',
+      fields: [
+      { key: 'claim', label: 'What you can say', placeholder: 'Pay once, it is yours' },
+      { key: 'because', label: 'Why a rival cannot', placeholder: 'a subscription business would have to become a different company' },
+      ],
+      compose: (v) => `${v.claim} — because: ${v.because}`,
+    },
     n: 3,
     title: 'Find what only you can say',
     why: 'A competitor with more money can copy any feature. They cannot copy a claim their own business model forbids them to make.',
@@ -71,6 +95,14 @@ export const STEPS = [
   },
   {
     id: 'rent',
+    form: {
+      heading: 'Active',
+      fields: [
+      { key: 'channel', label: 'The place', placeholder: 'a forum where your buyers argue about this' },
+      { key: 'account', label: 'Your account there', placeholder: 'the handle you post under' },
+      ],
+      compose: (v) => `${v.channel} — account: ${v.account} — standing: cold — links allowed: no`,
+    },
     n: 4,
     title: 'List where you can speak',
     why: 'Every account you have is borrowed. Knowing which places are borrowed is what stops you building on ground that can be taken back.',
@@ -84,6 +116,14 @@ export const STEPS = [
   },
   {
     id: 'welcome',
+    form: {
+      heading: 'Active',
+      fields: [
+      { key: 'channel', label: 'The place you are now known', placeholder: 'the forum you have been answering in' },
+      { key: 'account', label: 'Your account there', placeholder: 'the handle you post under' },
+      ],
+      compose: (v) => `${v.channel} — account: ${v.account} — standing: warming — links allowed: no`,
+    },
     n: 5,
     title: 'Be worth listening to',
     why: 'Posting a link somewhere nobody knows you is how accounts get banned, and a ban is not something you recover from.',
@@ -97,6 +137,14 @@ export const STEPS = [
   },
   {
     id: 'make',
+    form: {
+      heading: 'Held',
+      fields: [
+      { key: 'asset', label: 'What you made and own', placeholder: 'the guide on your own site' },
+      { key: 'grows', label: 'What makes it grow', placeholder: 'every reader who links to it' },
+      ],
+      compose: (v) => `${v.asset} — control: full — grows by: ${v.grows}`,
+    },
     n: 6,
     title: 'Make one good thing',
     why: 'Everything else is rented. A thing on your own site is the only asset nobody can take back.',
@@ -110,6 +158,12 @@ export const STEPS = [
   },
   {
     id: 'send',
+    form: {
+      heading: null,
+      fields: [
+      { key: 'outcome', label: 'What happened when you bought it', placeholder: 'bought on a clean machine, licence arrived in four minutes' },
+      ],
+    },
     n: 7,
     title: 'Check it, then send people',
     why: 'Traffic down a path nobody has walked wastes the one first impression you get.',
@@ -123,6 +177,15 @@ export const STEPS = [
   },
   {
     id: 'keep',
+    form: {
+      heading: null,
+      fields: [
+      { key: 'date', label: 'Date', placeholder: '2026-09-01' },
+      { key: 'metric', label: 'What you counted', placeholder: 'signups from the guide' },
+      { key: 'value', label: 'How many', placeholder: '14' },
+      { key: 'source', label: 'Where the number came from', placeholder: 'site analytics' },
+      ],
+    },
     n: 8,
     title: 'Keep what worked',
     why: 'You cannot drop what failed until you have written down what happened, and memory is not a record.',

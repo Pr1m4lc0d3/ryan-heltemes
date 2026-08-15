@@ -60,6 +60,55 @@ export function renderProgressHTML(pack, activeId) {
   return `<nav class="step-rail" aria-label="Steps">${marks}</nav>`;
 }
 
+/** What has already been recorded for this step, read back from the pack.
+ *
+ *  Seeing your own answers is half of why a form feels like a tool rather than
+ *  a suggestion box: without it there is no evidence anything was saved.
+ */
+function recordedFor(pack, step) {
+  const at = {
+    prove: () => pack?.truth?.cleared,
+    hear: () => pack?.recon?.pains,
+    ground: () => pack?.asymmetry?.ourGround,
+    rent: () => pack?.bailey?.active,
+    welcome: () => pack?.bailey?.active,
+    make: () => pack?.motte?.held,
+    keep: () => pack?.numbers?.rows,
+  }[step.id];
+  const rows = (at && at()) || [];
+  return rows.map((r) => String(r?.raw ?? '')).filter(Boolean);
+}
+
+/** The form. THE thing that was missing.
+ *
+ *  Every screen before this told the reader to write something down and gave
+ *  them nowhere to write it. Four redesigns of a poster about entering a fact.
+ */
+export function renderStepFormHTML(pack, step) {
+  if (!step?.form) return '';
+  const fields = step.form.fields.map((f) => `
+    <label class="sf-field">
+      <span class="sf-label">${escapeHtml(f.label)}</span>
+      <input type="text" class="sf-input" data-field="${escapeHtml(f.key)}"
+        placeholder="${escapeHtml(f.placeholder)}" autocomplete="off">
+    </label>`).join('');
+
+  const recorded = recordedFor(pack, step);
+  const list = recorded.length
+    ? `<ul class="sf-recorded">${recorded.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`
+    : '<p class="sf-empty">Nothing recorded yet.</p>';
+
+  return `
+    <section class="step-form" data-step-form="${escapeHtml(step.id)}">
+      <h3 class="sf-head">Record it</h3>
+      ${fields}
+      <button type="button" class="btn sf-save" data-action="save-step" data-step="${escapeHtml(step.id)}">Save</button>
+      <p class="sf-note" data-sf-note></p>
+      <h3 class="sf-head sf-head-second">Recorded so far</h3>
+      ${list}
+    </section>`;
+}
+
 /** One step, whole. */
 export function renderStepHTML(pack, step, opts = {}) {
   if (!step) return '';
@@ -113,7 +162,10 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
         <p class="step-progress-line">${done} of ${STEPS.length} finished</p>
       </div>
       <div class="step-screen-body">
-        ${renderStepHTML(pack, step, opts)}
+        <div class="step-columns">
+          ${renderStepHTML(pack, step, opts)}
+          ${renderStepFormHTML(pack, step)}
+        </div>
         <p class="build-stamp">${escapeHtml(BUILD)}</p>
       </div>
     </div>`;

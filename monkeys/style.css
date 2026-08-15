@@ -2042,3 +2042,108 @@ h1 { font-size: 1.6rem; }
   margin: 0 auto 0.4rem;
   padding: 0.4rem var(--step);
 }
+
+/* ── TWO COLUMNS ON A PC, ONE ON A PHONE ──────────────────────────────────
+   Reported: "You seem to be building it to fit on a smart phone, but I am on
+   a PC. Can we not have it both ways?" We can. The 46rem measure is right for
+   a paragraph and wrong for a window: it left a 1440px screen mostly empty
+   while the work had nowhere to go. The instruction keeps its measure; the
+   form sits beside it and uses the room a desktop actually has. */
+.step-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: calc(var(--step) * 2);
+  align-items: start;
+  max-width: 74rem;
+  margin: 0 auto;
+}
+.step-columns > .step { max-width: none; margin: 0; }
+@media (max-width: 62rem) {
+  .step-columns { grid-template-columns: 1fr; gap: var(--step); max-width: var(--measure); }
+}
+
+/* The rail and chrome share the wider frame so nothing looks pasted on. */
+.step-brand, .step-rail, .step-progress-line, .build-stamp,
+.step-sample, .step-have-pack,
+.scroll-body-pinned > .pack-status,
+.scroll-body-pinned > .persistence-note,
+.scroll-body-pinned > .sample-banner { max-width: 74rem; }
+
+/* ── The form ─────────────────────────────────────────────────────────────── */
+.step-form {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: var(--step);
+  background: rgba(255, 255, 255, 0.45);
+  position: sticky;
+  top: 0;
+}
+.sf-head {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  margin: 0 0 0.7rem;
+}
+.sf-head-second { margin-top: var(--step); padding-top: var(--step); border-top: 1px solid var(--rule); }
+.sf-field { display: block; margin: 0 0 0.7rem; }
+.sf-label {
+  display: block;
+  font-size: var(--t-meta);
+  color: var(--muted);
+  margin: 0 0 0.25rem;
+}
+.sf-input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--t-body);
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--bone);
+  color: var(--ink);
+}
+.sf-input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--ink); }
+.sf-save {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  background: var(--ink);
+  color: var(--bone);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.sf-save:hover { background: var(--ink-lift); }
+.sf-note { font-size: var(--t-meta); margin: 0.5rem 0 0; min-height: 1.2em; color: var(--muted); }
+.sf-note.is-saved { color: var(--ink); font-weight: 600; }
+.sf-recorded { list-style: none; margin: 0; padding: 0; }
+.sf-recorded li {
+  font-size: var(--t-meta);
+  line-height: 1.5;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+}
+.sf-recorded li:last-child { border-bottom: 0; }
+.sf-empty { font-size: var(--t-meta); color: var(--muted); margin: 0; }
+
+/* Alignment, one frame for everything.
+   The chrome sat at the window's edge while the content started 54px in, and
+   the brand crowded the rail's first mark. One shared frame and one shared
+   padding, so nothing looks pasted on. */
+.step-brand, .step-rail, .step-progress-line, .build-stamp,
+.step-sample, .step-have-pack,
+.scroll-body-pinned > .pack-status,
+.scroll-body-pinned > .persistence-note,
+.scroll-body-pinned > .sample-banner {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+.scroll-body-pinned { padding-left: clamp(1rem, 4vw, 3rem); padding-right: clamp(1rem, 4vw, 3rem); }
+.step-columns { max-width: 74rem; }
+.step-brand { padding-bottom: 0.6rem; }
+.step-rail { padding-top: 0; }

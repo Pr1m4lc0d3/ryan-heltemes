@@ -233,7 +233,7 @@ export function renderCheckPlaceholderHTML() {
 // back button and heading are the only part that stays fixed (.door-page-head
 // — see the no-scroll shell in style.css); the body scrolls on its own
 // inside .scroll-body.
-function pageShell(title, bodyHtml, { pinned = false } = {}) {
+function pageShell(title, bodyHtml, { pinned = false, back = true } = {}) {
   // `pinned` turns .scroll-body into a flex column so a body can pin part of
   // itself and scroll the rest. Opt-in per door rather than global: every
   // other door wants the plain block behaviour, and height:100% inside a
@@ -242,8 +242,8 @@ function pageShell(title, bodyHtml, { pinned = false } = {}) {
   return `
     <div class="door-page">
       <div class="door-page-head">
-        <button type="button" class="btn btn-back" data-action="back">&larr; All doors</button>
-        <h1>${escapeHtml(title)}</h1>
+        ${back ? '<button type="button" class="btn btn-back" data-action="back">&larr; Back</button>' : ''}
+        ${title ? `<h1>${escapeHtml(title)}</h1>` : ''}
       </div>
       <div class="scroll-body${pinned ? ' scroll-body-pinned' : ''}">
         ${bodyHtml}
@@ -343,7 +343,7 @@ export function mountApp(root) {
         return pageShell('', state.pack
           ? `${renderPackStatus(state)}${renderPersistenceNote(state)}${renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen })}`
           : renderNeedsPackHTML('This screen', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state),
-        { pinned: Boolean(state.pack) });
+        { pinned: Boolean(state.pack), back: false });
       }
       case 'today':
         // The pack's identity travels with the landing screen. Loading now
@@ -628,7 +628,7 @@ export function mountApp(root) {
     // is a single line at the foot; open it takes the screen, which is the
     // only honest shape for a conversation.
     root.innerHTML = `<div class="shell${state.agentOpen ? ' shell-agent-open' : ''}"><div class="shell-main">${view()}</div>`
-      + renderSidebarHTML({
+      + ((state.view === 'step' && !state.agentOpen) ? '' : renderSidebarHTML({
         pack: state.pack,
         guide: state.guide,
         agentCfg: cfg,
@@ -639,7 +639,7 @@ export function mountApp(root) {
         modelsError: state.modelsError,
         agentConfigured: Boolean(cfg.baseUrl && cfg.apiKey && cfg.model),
         agentOpen: state.agentOpen,
-      })
+      }))
       + '</div>';
     if (state.view === 'setup') {
       const mount = root.querySelector('#setup-mount');

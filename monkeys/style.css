@@ -1850,16 +1850,19 @@ h1 { font-size: 1.6rem; }
   margin: 0 auto;
   padding: var(--step) 0 0.5rem;
 }
+/* EQUAL WIDTH, ALWAYS. The label used to sit inside the mark and expand on
+   the active one, which shoved every number out of line with its own bar.
+   The step's name is already the biggest thing on the screen below, so the
+   rail only has to answer "where am I and how far is left". Numbers do that;
+   the name is on the title, and hover or a screen reader gets the rest. */
 .step-mark {
   flex: 1 1 0;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  display: block;
   background: none;
   border: 0;
   border-top: 3px solid var(--rule);
-  padding: 0.45rem 0 0;
+  padding: 0.4rem 0 0;
   font: inherit;
   font-size: var(--t-micro);
   color: var(--muted);
@@ -1867,18 +1870,8 @@ h1 { font-size: 1.6rem; }
   text-align: left;
 }
 .step-mark-n { font-variant-numeric: tabular-nums; font-weight: 700; flex: none; }
-.step-mark-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 120ms ease;
-}
 .step-mark.is-done { border-top-color: var(--ink); color: var(--ink); }
 .step-mark.is-here { border-top-color: var(--gold); color: var(--ink); }
-.step-mark.is-here .step-mark-label,
-.step-mark:hover .step-mark-label,
-.step-mark:focus-visible .step-mark-label { opacity: 1; }
 .step-mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .step-progress-line {
   max-width: var(--measure);
@@ -1979,6 +1972,14 @@ h1 { font-size: 1.6rem; }
 .step-writes { font-size: var(--t-micro); color: var(--muted); margin: 0; }
 .step-writes code { font-size: inherit; }
 
-@media (max-width: 40rem) {
-  .step-mark-label { display: none; }
+
+/* The chrome above the step shares the step's measure and its left edge.
+   It was three alignments on one screen: a centred status line, a full-width
+   persistence note, and content starting 300px in. */
+.scroll-body-pinned > .pack-status,
+.scroll-body-pinned > .persistence-note {
+  max-width: var(--measure);
+  margin: 0 auto 0.15rem;
+  padding: 0 var(--step);
+  text-align: left;
 }

@@ -38,9 +38,9 @@ export function renderProgressHTML(pack, activeId) {
     return `
       <button type="button" class="step-mark ${state}" data-action="go-step" data-step="${s.id}"
         aria-current="${s.id === activeId ? 'step' : 'false'}"
+        aria-label="${escapeHtml(`Step ${s.n}, ${s.title}`)}"
         title="${escapeHtml(`${s.n}. ${s.title}`)}">
         <span class="step-mark-n">${s.n}</span>
-        <span class="step-mark-label">${escapeHtml(s.title)}</span>
       </button>`;
   }).join('');
   return `<nav class="step-rail" aria-label="Steps">${marks}</nav>`;

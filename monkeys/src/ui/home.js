@@ -58,9 +58,24 @@ function escapeHtml(value) {
   }[c]));
 }
 
+// WHICH DOORS ARE OFFERED depends on what the pack already contains.
+//
+// REPORTED, after loading a complete pack: "There are four different buttons
+// and none of them do anything I would expect." The chooser was a fixed list
+// that never once read the pack sitting next to it. With a finished pack the
+// FIRST card was "Start here", whose own body text offers to "interview you
+// until you have one fact you can prove" — against a register holding seven,
+// behind a button needing an API key that was not set. The one door that
+// answers the question a person actually arrives with, "what do I do today",
+// was third.
+//
+// A door that proposes work already finished is worse than a missing door: it
+// makes the reader doubt the tool knows anything about their situation, and
+// here the tool knew exactly — the sidebar beside it was correctly reporting
+// the open stage and the closed gate at the same moment.
 const DOORS = [
-  // Kickoff is the first door, not a tab buried inside the second one. It is
-  // where someone with nothing starts, so it is the first thing they see.
+  // Kickoff is where someone with NOTHING starts, so it leads while that is
+  // true and is dropped the moment it stops being true. See doorsFor().
   { id: 'kickoff', title: 'Start here', blurb: 'The agent interviews you' },
   // ⚠ The blurb names the Sell-Kit import ON PURPOSE. Once a pack exists the
   // home screen folds the onboarding routes away, so this door card is the
@@ -70,6 +85,29 @@ const DOORS = [
   { id: 'today', title: 'What do I do today', blurb: 'Stage, actions, blockers' },
   { id: 'check', title: 'Check before I publish', blurb: 'Lint a draft against truth.md' },
 ];
+
+/** The first fact is what kickoff exists to get. Once one exists, it is done. */
+export function hasFirstFact(pack) {
+  return Boolean(pack?.truth?.cleared?.length);
+}
+
+/** The doors worth offering for this pack. */
+export function doorsFor(pack) {
+  return hasFirstFact(pack) ? DOORS.filter((d) => d.id !== 'kickoff') : DOORS;
+}
+
+/** Where a person should LAND, rather than what they should choose from.
+ *
+ *  A chooser is the right screen when the console cannot know what you need.
+ *  Once a pack is loaded it does know: it has already computed the open stage
+ *  and the condition closing the next gate. Landing on the chooser then asks
+ *  the reader to guess which of four buttons leads to an answer the app is
+ *  already holding. Land on the answer; "← All doors" is in the page header of
+ *  every door, so nothing becomes unreachable.
+ */
+export function landingViewFor(pack) {
+  return pack ? 'today' : 'home';
+}
 
 // ---------------------------------------------------------------------------
 // The chooser — the opening screen. Pure function of the app state
@@ -89,7 +127,7 @@ const DOORS = [
 export function renderChooserHTML(state) {
   const s = state || {};
   const hasPack = !!s.pack;
-  const doorCards = DOORS.map((d) => `
+  const doorCards = doorsFor(s.pack).map((d) => `
     <button type="button" class="door-card" data-action="navigate" data-door="${d.id}">
       <span class="door-title">${icon(d.id)}${escapeHtml(d.title)}</span>
       <span class="door-blurb">${escapeHtml(d.blurb)}</span>
@@ -254,6 +292,8 @@ export function mountApp(root) {
     state.pack = parsePack(restored.files);
     state.packSource = 'restored';
     state.savedAt = formatSavedAt(restored.savedAt);
+    // Land on the answer, not the chooser. See landingViewFor().
+    state.view = landingViewFor(state.pack);
   }
 
   // Called after every change to state.pack. Best effort by definition: a
@@ -280,8 +320,15 @@ export function mountApp(root) {
     const caps = capabilities();
     switch (state.view) {
       case 'today':
+        // The pack's identity travels with the landing screen. Loading now
+        // lands here rather than on the chooser, and the chooser was the only
+        // place that said WHICH pack is open, how complete it is, when it was
+        // saved and how to clear it. Landing somewhere that does not say those
+        // things would trade one confusion for another. renderPackStatus emits
+        // nothing when there is nothing to report, so it costs no height on a
+        // door opened with no pack.
         return pageShell('What do I do today', state.pack
-          ? renderTodayHTML(state.pack)
+          ? `${renderPackStatus(state)}${renderPersistenceNote(state)}${renderTodayHTML(state.pack)}`
           : renderNeedsPackHTML('This door', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state));
       case 'kickoff':
         return pageShell('Start here', renderKickoffCallout(state.pack ? state.pack.raw : {}));
@@ -585,6 +632,8 @@ export function mountApp(root) {
     state.packSource = 'loaded';
     state.clearedNote = '';
     state.skippedNote = skippedMessage(skipped);
+    // The point of loading a pack is to find out what to do with it.
+    state.view = landingViewFor(state.pack);
     persist();
   }
 

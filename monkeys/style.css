@@ -1995,3 +1995,14 @@ h1 { font-size: 1.6rem; }
   padding: var(--step) var(--step) 0;
 }
 .step-have-pack .loader-bar { margin: 0; }
+
+/* The build stamp. Small, permanent, and the only reliable way to tell a
+   stale browser from a missing change: max-age=600 means a deploy is invisible
+   for up to ten minutes and the two cases look identical on screen. */
+.build-stamp {
+  max-width: var(--measure);
+  margin: var(--step) auto 0;
+  font-size: var(--t-micro);
+  color: var(--rule);
+  letter-spacing: 0.08em;
+}

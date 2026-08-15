@@ -1521,3 +1521,208 @@ h1 { font-size: 1.6rem; }
   color: var(--gold);
   opacity: 0.85;
 }
+
+/* ---- print ----------------------------------------------------------------
+
+   Added 2026-08-14. There was no @media print rule anywhere in this file, so
+   Ctrl+P produced the dark agent panel, the button rows, and a page clipped
+   at the first viewport — the no-scroll shell (html,body{height:100%;
+   overflow:hidden}) is exactly right on screen and exactly wrong on paper,
+   because it tells the printer the document is one screen tall.
+
+   The rule below undoes the shell for print only, drops every control that
+   cannot be pressed on paper, and puts ink-on-white back. The printable
+   STRATEGY document is `raid-dossier`'s output, not this page; this exists so
+   that printing what is on screen produces something legible rather than a
+   dark rectangle. */
+
+@media print {
+  /* Release the fixed-height shell so the content paginates instead of being
+     cut off at one screen. Every element in the scroll chain has to give. */
+  html, body, #app, .chooser, .door-page, .scroll-body {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Ink on paper. The screen palette is light text on dark in the sidebar and
+     costs a fortune in toner for no gain. */
+  body, .guide, .setup-panel, .today-section, .check-view {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Nothing that cannot be pressed. The agent panel is a conversation, the
+     loader is a file picker, and neither means anything on paper. */
+  .guide, .loader-bar, .doors-grid, .onboard-routes, .setup-steps,
+  .setup-tabs, .btn, button, .guide-ask, .sample-banner, .pack-toggle {
+    display: none !important;
+  }
+
+  /* A collapsed <details> prints as its summary alone, which silently drops
+     content the reader can see on screen by clicking. On paper there is no
+     clicking, so open everything. */
+  details { display: block !important; }
+  details > summary { display: none !important; }
+  .setup-step, .setup-panel { display: block !important; }
+
+  /* Keep a heading with the text under it, and never split a table row. */
+  h1, h2, h3 { break-after: avoid-page; }
+  tr, li { break-inside: avoid; }
+
+  /* Spell out any link that carries meaning: a printed href is unreachable
+     otherwise. Skipped for in-page anchors, which point at nothing on paper. */
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE LANDING, REDESIGNED — 2026-08-14
+
+   WHAT WAS WRONG, measured rather than felt:
+
+   1. TWENTY-SIX distinct font-sizes, twelve of them between 0.85 and 1.05rem.
+      That is not a scale, it is noise, and it meant nothing on the screen was
+      sized by importance. "Stage 2" and "Lint a draft against truth.md" had
+      the same visual weight.
+   2. The accent was spent entirely on chrome: focus rings, step-tab numbers,
+      icon hovers, the API-key bar. Never once on the thing actually blocking
+      the reader. A colour that marks everything marks nothing.
+   3. The content column ran ~120 characters per line. Comfortable reading is
+      65–75.
+   4. Four equal cards, so the eye had nowhere to land.
+
+   THE RULES THIS BLOCK ENFORCES:
+
+   - Six sizes, big jumps between them. If something needs a seventh, it is
+     probably not as important as it thinks.
+   - --gold means ONE thing here: this is what stands between you and the next
+     stage. It appears once per screen. Nowhere else.
+   - One column, 46rem, which is ~68 characters at the body size.
+   - The dark block is the only dark thing on a light page, and it is the
+     blocker. That is the taijitu doing work rather than decorating: the dark
+     half is what holds you.
+
+   No webfonts, deliberately — the console makes no network request of any
+   kind and that is a promise, not an oversight. Personality comes from scale,
+   weight, case and measure instead of from a purchased typeface.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --t-display: 2.75rem;   /* the one sentence that matters. Once per screen. */
+  --t-title: 1.375rem;
+  --t-body: 1.0625rem;
+  --t-meta: 0.8125rem;    /* uppercase, tracked — labels and conditions */
+  --t-micro: 0.75rem;
+
+  --measure: 46rem;       /* ~68ch at --t-body */
+  --step: 1.5rem;         /* the one vertical rhythm unit */
+}
+
+.landing {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: calc(var(--step) * 1.5) var(--step) var(--step);
+}
+
+/* ── Eyebrow: context, not the point ─────────────────────────────────────── */
+.landing-eyebrow {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin: 0 0 calc(var(--step) * 0.5);
+  font-weight: 600;
+}
+
+/* ── The answer, set large ───────────────────────────────────────────────── */
+.landing-answer {
+  font-size: var(--t-display);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  margin: 0 0 var(--step);
+  text-wrap: balance;
+}
+
+/* ── The blocker. The only dark block, the only gold, once. ──────────────── */
+.gate {
+  background: var(--ink);
+  color: var(--bone);
+  border-left: 4px solid var(--gold);
+  padding: calc(var(--step) * 0.9) var(--step);
+  margin: 0 0 calc(var(--step) * 1.5);
+  border-radius: 2px;
+}
+.gate-label {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.gate-condition {
+  font-size: var(--t-title);
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 500;
+  text-wrap: pretty;
+}
+.gate-note {
+  font-size: var(--t-meta);
+  color: var(--muted-up);
+  margin: 0.7rem 0 0;
+}
+
+/* ── Actions ─────────────────────────────────────────────────────────────── */
+.landing-section-head {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0 0 calc(var(--step) * 0.6);
+}
+.landing-actions { list-style: none; margin: 0 0 var(--step); padding: 0; }
+.landing-action {
+  padding: 0 0 calc(var(--step) * 0.7);
+  margin: 0 0 calc(var(--step) * 0.7);
+  border-bottom: 1px solid var(--rule);
+}
+.landing-action:last-child { border-bottom: 0; }
+.landing-action-what {
+  font-size: var(--t-body);
+  line-height: 1.5;
+  margin: 0 0 0.35rem;
+  font-weight: 500;
+}
+.landing-action-when {
+  font-size: var(--t-meta);
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+.landing-action-when b { font-weight: 600; color: var(--ink); }
+
+/* ── The quiet row: counts only, until you want them ─────────────────────── */
+.landing-tail { display: flex; gap: calc(var(--step) * 1.2); flex-wrap: wrap; }
+.landing-tail button {
+  background: none;
+  border: 0;
+  padding: 0.3rem 0;
+  font: inherit;
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.landing-tail button:hover,
+.landing-tail button:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.landing-tail .count { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; }
+
+@media (max-width: 34rem) {
+  :root { --t-display: 1.875rem; --t-title: 1.1875rem; }
+}

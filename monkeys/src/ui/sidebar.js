@@ -180,15 +180,32 @@ export function renderSidebarHTML(state) {
       + '</p></div>'
     : '';
 
+  // An unconfigured panel used to show only its opening line and a dead input,
+  // which read as a broken quarter of the screen. It is not broken, it is
+  // optional — and the console never said so, so a new builder reasonably
+  // concluded the AI was supposed to fill the forms in and had failed to.
+  // Say what it does, what it does not, and that nothing is blocked without it.
+  const noKeyNote = s.agentConfigured ? '' : `
+    <p class="guide-nokey-note">
+      This panel is the only part of the console that needs an API key, and it is your own key going
+      to your own provider. Everything else works without it: the guided forms, the stage read, and
+      the claim check are computation over your own files.
+    </p>
+    <p class="guide-nokey-note">
+      It cannot fill the forms in for you. It answers questions about what to do next. To have an
+      agent research and write the pack, install the RAID and FORTRESS skills in your own coding
+      agent and run their kickoff.
+    </p>`;
+
   const body = (history.length
     ? history.map(renderTurn).join('')
-    : `<p class="guide-opening">${escapeHtml(g.opening || '')}</p>`) + thinking;
+    : `<p class="guide-opening">${escapeHtml(g.opening || '')}</p>${noKeyNote}`) + thinking;
 
   return `
     <aside class="guide" aria-label="Campaign agent">
       <header class="guide-head">
         <h2>Agent</h2>
-        ${s.agentConfigured ? '' : '<span class="guide-nokey">no API key</span>'}
+        ${s.agentConfigured ? '' : '<span class="guide-nokey" title="The console works without it. This panel is the only part that needs one.">optional</span>'}
         ${s.searchOn ? '<span class="guide-searching" title="Answers are searched against the live web">searching</span>' : ''}
       </header>
 

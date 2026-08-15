@@ -24,7 +24,7 @@
 
 import { parsePack, serialise } from '../pack.js';
 import {
-  capabilities, packFromFileList, openDirectory, readPackFromDirectory,
+  capabilities, packFromFileList, openDirectory, readPackFromDirectory, PACK_FILES,
 } from '../fs.js';
 import {
   storageAvailable, savePack, loadSavedPack, clearSavedPack, formatSavedAt,
@@ -101,7 +101,11 @@ export function renderChooserHTML(state) {
         <img class="mark" src="assets/mark-combined.png" alt="The Maverick's Monkeys mark">
         <div>
           <h1>Monkey Console</h1>
-          <p class="tagline">A reader for your <code>.monkeys/</code> pack — nine markdown files of what you can prove.</p>
+          <!-- Derived, never a literal. This line said "nine" from before voice.md
+               joined the format until 2026-08-14, shipping a wrong count in the
+               product whose whole thesis is not shipping wrong numbers.
+               tests/run.mjs learned this lesson for the suite; the prose kept the bug. -->
+          <p class="tagline">A reader for your <code>.monkeys/</code> pack — ${PACK_FILES.length} markdown files of what you can prove.</p>
         </div>
       </header>
 
@@ -118,16 +122,24 @@ export function renderChooserHTML(state) {
               ${renderLoaderControls(s.caps)}
               ${renderPersistenceNote(s)}
             </details>`
-          : `<section class="loader-bar">
-              ${renderPackStatus(s)}
-              ${renderLoaderControls(s.caps)}
-              ${s.persistenceOff ? renderPersistenceNote(s) : ''}
-            </section>`}
+          : ''}
         ${renderSampleBannerHTML(s.packSource)}
 
         ${hasPack
           ? `${renderPackToggleHTML(s)}<nav class="doors-grid">${doorCards}</nav>`
-          : renderOnboardingHTML(s)}
+          // ORDER, and why it is this way round. The loader used to sit above
+          // this block: the first thing a new visitor met was "point at your
+          // .monkeys/ folder" for a folder they did not have and had not yet
+          // been told about. Everyone arriving without a pack needs the
+          // explanation and the three routes; only a returning visitor with
+          // files on disk needs the picker, so it now sits under them as a
+          // quiet line rather than the headline action.
+          : `${renderOnboardingHTML(s)}
+            <section class="loader-bar loader-bar-returning">
+              ${renderPackStatus(s)}
+              ${renderLoaderControls(s.caps)}
+              ${s.persistenceOff ? renderPersistenceNote(s) : ''}
+            </section>`}
       </div>
     </div>`;
 }

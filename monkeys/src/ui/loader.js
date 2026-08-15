@@ -126,9 +126,36 @@ export function renderPersistenceNote(state) {
 // here is PURE HTML — home.js decides WHEN to show them.
 // ---------------------------------------------------------------------------
 
+// WHAT THIS FIXES. This function was named "explainer" and its own call site
+// comment claimed the empty state ran "what it is, how to get one, how to look
+// around" — but it rendered a heading and nothing else. Nowhere on the opening
+// screen said what a pack was, what it was for, or what a first session should
+// achieve. Reported as: "There is nothing for a new builder to understand how
+// this tool even works."
+//
+// Kept to four short lines on purpose. The full model lives in
+// GETTING-STARTED.md; this is the part a reader needs before they can press a
+// button, and the hub must not scroll (see the no-scroll shell in style.css).
+//
+// The one-line goal is not encouragement, it is the literal stage-1 gate from
+// RAID/skills/raid-campaign/SKILL.md §3: stage 1 opens when truth.md has at
+// least one entry under ## Cleared. A new builder reading "ten files" assumes
+// ten files of work. It is one line.
 export function renderPackExplainerHTML() {
   return `
-    <h2 class="onboard-heading">No pack yet? Three ways to get one.</h2>`;
+    <section class="onboard-explainer">
+      <h2 class="onboard-heading">What is a pack?</h2>
+      <p>
+        ${PACK_FILES.length} markdown files in a <code>.monkeys/</code> folder: what you can prove,
+        what you own, where you can speak. An agent reads them instead of guessing.
+      </p>
+      <p class="onboard-first-goal">
+        <strong>You do not fill in all ${PACK_FILES.length}.</strong> One sourced line in
+        <code>truth.md</code> opens the next stage.
+        <a href="GETTING-STARTED.md" target="_blank" rel="noopener">How it works</a>
+      </p>
+      <h2 class="onboard-heading">Three ways to get one</h2>
+    </section>`;
 }
 
 // Each route: a 2-4 word heading, one short line, one button. No paragraph,

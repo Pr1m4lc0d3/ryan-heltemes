@@ -29,6 +29,28 @@ export function stepGroupOf(key) {
   return String(key ?? '').split(':')[0];
 }
 
+// WHICH STEP IS OPEN, remembered per group.
+//
+// THE BUG THIS FIXES. renderStepGroup used to hardcode the first step as the
+// active one (`i === 0`). setup.js's paint() rebuilds container.innerHTML on
+// every successful save, so the moment you added an entry in step 2 the strip
+// repainted and threw you back to step 1 — finish a step, get sent to the
+// start, forever. activateStep moved the class on the live DOM, but a repaint
+// discarded that and the renderer put it back on index 0.
+//
+// The file tab next to it never had this problem because setup.js keeps
+// `activePanel` and passes it back into the renderer. The step had no such
+// variable anywhere, so there was nothing to pass. Rather than thread one
+// through five call sites in three files, the memory lives here, beside the
+// two functions that read and write it — the same reason drawing and
+// switching were merged into this file in the first place.
+const openStep = new Map();
+
+// Exported for tests and for a caller that needs to reset between packs.
+export function resetOpenSteps() {
+  openStep.clear();
+}
+
 // renderStepGroup(idPrefix, steps) -> the strip plus one panel per step,
 // exactly one shown. `steps` is [[key, label, bodyHtml], ...].
 //
@@ -41,13 +63,21 @@ export function stepGroupOf(key) {
 // strip whose steps are not in the icon vocabulary simply renders without
 // them rather than needing a second function.
 export function renderStepGroup(idPrefix, steps) {
-  const strip = steps.map(([key, label], i) => `
-    <button type="button" class="setup-step-tab${i === 0 ? ' is-active' : ''}" data-setup-step="${idPrefix}:${key}">
+  // The remembered step wins, but only if it still exists in this strip: a
+  // different pack can render a group with different steps, and a stale key
+  // would leave every panel hidden. Falling back to the first step means the
+  // worst case is the old behaviour, never a blank panel.
+  const remembered = openStep.get(idPrefix);
+  const activeKey = steps.some(([key]) => key === remembered) ? remembered : steps[0]?.[0];
+  const isOn = (key) => (key === activeKey ? ' is-active' : '');
+
+  const strip = steps.map(([key, label]) => `
+    <button type="button" class="setup-step-tab${isOn(key)}" data-setup-step="${idPrefix}:${key}">
       <span class="setup-step-n" aria-hidden="true"></span>${icon(key)}${escapeHtml(label)}
     </button>`).join('');
 
-  const panels = steps.map(([key, , body], i) => `
-    <div class="setup-step${i === 0 ? ' is-active' : ''}" data-setup-step-panel="${idPrefix}:${key}">
+  const panels = steps.map(([key, , body]) => `
+    <div class="setup-step${isOn(key)}" data-setup-step-panel="${idPrefix}:${key}">
       ${body}
     </div>`).join('');
 
@@ -59,6 +89,9 @@ export function renderStepGroup(idPrefix, steps) {
 // and mountSetup call this rather than each keeping a copy.
 export function activateStep(root, key) {
   const group = stepGroupOf(key);
+  // Record it before touching the DOM, so the next repaint re-opens this step
+  // instead of resetting to the first one.
+  openStep.set(group, String(key ?? '').slice(group.length + 1));
   root.querySelectorAll('[data-setup-step-panel]').forEach((el) => {
     if (stepGroupOf(el.dataset.setupStepPanel) !== group) return;
     el.classList.toggle('is-active', el.dataset.setupStepPanel === key);

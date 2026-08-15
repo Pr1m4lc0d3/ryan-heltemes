@@ -1821,3 +1821,164 @@ h1 { font-size: 1.6rem; }
 /* The shell stacks so the strip sits under the content rather than beside it. */
 .shell { flex-direction: column; }
 .shell-main { flex: 1 1 auto; min-height: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE STEP SCREEN — one thing to do, and nothing competing with it.
+
+   Replaces four cards onto ten files. The rail across the top is numbered
+   because this genuinely is a sequence and the order carries information the
+   reader needs: you cannot be recognised somewhere before you have somewhere
+   to be recognised. Numbering parallel choices would be decoration. Numbering
+   these is the content.
+
+   Uses the tokens set with the landing redesign: six sizes, --gold meaning one
+   thing only, 46rem measure.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.step-screen { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+.step-screen-head { flex: none; padding: 0 var(--step); }
+.step-screen-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--step) var(--step); }
+
+/* ── The rail ─────────────────────────────────────────────────────────────
+   Eight marks on one line. The label is hidden until a mark is the current
+   one or is hovered, so eight titles do not compete with the step's own. */
+.step-rail {
+  display: flex;
+  align-items: stretch;
+  gap: 0.3rem;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--step) 0 0.5rem;
+}
+.step-mark {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 0;
+  border-top: 3px solid var(--rule);
+  padding: 0.45rem 0 0;
+  font: inherit;
+  font-size: var(--t-micro);
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+}
+.step-mark-n { font-variant-numeric: tabular-nums; font-weight: 700; flex: none; }
+.step-mark-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.step-mark.is-done { border-top-color: var(--ink); color: var(--ink); }
+.step-mark.is-here { border-top-color: var(--gold); color: var(--ink); }
+.step-mark.is-here .step-mark-label,
+.step-mark:hover .step-mark-label,
+.step-mark:focus-visible .step-mark-label { opacity: 1; }
+.step-mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.step-progress-line {
+  max-width: var(--measure);
+  margin: 0 auto;
+  font-size: var(--t-micro);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ── The step ─────────────────────────────────────────────────────────────── */
+.step { max-width: var(--measure); margin: 0 auto; padding-top: calc(var(--step) * 0.8); }
+.step-eyebrow {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+}
+.step-title {
+  font-size: var(--t-display);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  text-wrap: balance;
+}
+.step-why {
+  font-size: var(--t-body);
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0 0 var(--step);
+  max-width: 34rem;
+}
+
+/* The instruction. The one bordered thing on the screen, because it is the
+   one thing the reader has to act on. */
+.step-do {
+  border-left: 3px solid var(--ink);
+  padding: 0 0 0 var(--step);
+  margin: 0 0 var(--step);
+}
+.step-do-label {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+.step-do-text { font-size: var(--t-title); line-height: 1.4; margin: 0 0 0.6rem; font-weight: 500; text-wrap: pretty; }
+.step-example { font-size: var(--t-meta); color: var(--muted); margin: 0; line-height: 1.5; }
+.step-example span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--ink);
+  margin-right: 0.4rem;
+}
+
+/* ── The agent, offering something specific ──────────────────────────────── */
+.step-agent {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  width: 100%;
+  border: 0;
+  background: var(--ink);
+  color: var(--bone);
+  padding: 0.7rem 0.9rem;
+  margin: 0 0 var(--step);
+  border-radius: 2px;
+  font: inherit;
+  font-size: var(--t-meta);
+  text-align: left;
+  cursor: pointer;
+}
+.step-agent:hover, .step-agent:focus-visible { background: var(--ink-lift); }
+.step-agent-label {
+  flex: none;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--gold);
+}
+.step-agent-text { color: var(--bone); min-width: 0; }
+
+/* ── Tail ─────────────────────────────────────────────────────────────────── */
+.step-tip { font-size: var(--t-meta); color: var(--muted); margin: 0 0 0.8rem; line-height: 1.55; }
+.step-status {
+  font-size: var(--t-meta);
+  margin: 0 0 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--rule);
+  font-weight: 600;
+}
+.step-status.is-done { color: var(--ink); }
+.step-writes { font-size: var(--t-micro); color: var(--muted); margin: 0; }
+.step-writes code { font-size: inherit; }
+
+@media (max-width: 40rem) {
+  .step-mark-label { display: none; }
+}

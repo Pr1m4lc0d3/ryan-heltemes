@@ -46,6 +46,8 @@ import { mountSetup, renderKickoffCallout, appendBulletToFile } from './setup.js
 import { planImport, applyImport, toKitMarkdown } from '../sellkit.js';
 import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
+import { currentStep, STEPS } from './steps-model.js';
+import { renderStepScreenHTML } from './step-view.js';
 
 // Re-exported unchanged: the loader markup moved to ./loader.js so today.js
 // and check.js can render it without importing this file (which imports
@@ -106,7 +108,7 @@ export function doorsFor(pack) {
  *  every door, so nothing becomes unreachable.
  */
 export function landingViewFor(pack) {
-  return pack ? 'today' : 'home';
+  return pack ? 'step' : 'home';
 }
 
 // ---------------------------------------------------------------------------
@@ -261,6 +263,9 @@ export function mountApp(root) {
     // The agent starts closed. It is optional and it cannot act without a key,
     // so it does not get to own the screen until it is asked for.
     agentOpen: false,
+    // Which step the reader has clicked to. null means "whichever is next",
+    // recomputed from the pack every render.
+    stepId: null,
     // The drafting agent's own state. cfg is read from this browser once, on
     // boot; ask/busy/error live only as long as the page does.
     agent: { cfg: loadAgentConfig(), ask: '', busy: false, error: '' },
@@ -327,6 +332,19 @@ export function mountApp(root) {
   function view() {
     const caps = capabilities();
     switch (state.view) {
+      case 'step': {
+        // The console's real screen: the first unfinished step, alone. Which
+        // step is NOT stored — it is computed from the pack every render, so
+        // it cannot disagree with the files, and editing a file elsewhere
+        // moves you without anything needing to be told.
+        const step = state.stepId
+          ? (STEPS.find((x) => x.id === state.stepId) || currentStep(state.pack))
+          : currentStep(state.pack);
+        return pageShell('', state.pack
+          ? `${renderPackStatus(state)}${renderPersistenceNote(state)}${renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen })}`
+          : renderNeedsPackHTML('This screen', TODAY_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state),
+        { pinned: Boolean(state.pack) });
+      }
       case 'today':
         // The pack's identity travels with the landing screen. Loading now
         // lands here rather than on the chooser, and the chooser was the only
@@ -850,6 +868,10 @@ export function mountApp(root) {
       // places.
       state.openPanel = el.dataset.panel || '';
       state.loadError = '';
+      render();
+    } else if (action === 'go-step') {
+      state.stepId = el.dataset.step || null;
+      state.view = 'step';
       render();
     } else if (action === 'toggle-agent') {
       state.agentOpen = !state.agentOpen;

@@ -134,12 +134,25 @@ export function renderChooserHTML(state) {
           // explanation and the three routes; only a returning visitor with
           // files on disk needs the picker, so it now sits under them as a
           // quiet line rather than the headline action.
+          // MEASURED, not reasoned about. Adding the explainer pushed this
+          // screen 27px over at 1400x700 and 113px over at 1100x640
+          // (tests/noscroll.mjs, 2026-08-14). Folding the loader behind its own
+          // summary reclaims 89px of the 111 — the same treatment, and the same
+          // reason, as the pack-loaded branch above: "how to load a pack" is not
+          // the primary action for someone who does not have one yet.
           : `${renderOnboardingHTML(s)}
-            <section class="loader-bar loader-bar-returning">
-              ${renderPackStatus(s)}
+            ${/* OUTSIDE the fold, deliberately. renderPackStatus emits nothing
+                  when there is no pack and no error, so it costs no height in
+                  the normal empty state — but a load error or an empty-folder
+                  note must never be hidden behind a collapsed summary the user
+                  has no reason to open. Folding it was a regression this
+                  suite caught. */''}
+            ${renderPackStatus(s)}
+            <details class="loader-bar loader-bar-folded">
+              <summary>Already have a <code>.monkeys/</code> folder?<span class="loader-more">Load it</span></summary>
               ${renderLoaderControls(s.caps)}
               ${s.persistenceOff ? renderPersistenceNote(s) : ''}
-            </section>`}
+            </details>`}
       </div>
     </div>`;
 }

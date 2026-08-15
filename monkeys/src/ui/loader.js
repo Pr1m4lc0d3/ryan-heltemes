@@ -154,7 +154,6 @@ export function renderPackExplainerHTML() {
         <code>truth.md</code> opens the next stage.
         <a href="GETTING-STARTED.md" target="_blank" rel="noopener">How it works</a>
       </p>
-      <h2 class="onboard-heading">Three ways to get one</h2>
     </section>`;
 }
 

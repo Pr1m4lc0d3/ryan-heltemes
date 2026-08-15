@@ -213,8 +213,18 @@ p { margin: 0 0 0.75rem; }
 
 /* ---- first-run onboarding (no pack loaded) ---- */
 
-.onboarding { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+/* gap and margin trimmed from 1rem/1.5rem on 2026-08-14, same measurement and
+   same reason as .onboard-explainer below: the last 12px of the overflow. */
+.onboarding { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.75rem; }
 .onboard-explainer { color: var(--muted); }
+/* MEASURED, 2026-08-14. The explainer that finally tells a new builder what a
+   pack is put "chooser (no pack)" 29px over at 1100x640 (tests/noscroll.mjs),
+   and every word in it is load-bearing — what a pack is, and that ONE sourced
+   line in truth.md opens the next stage. So the default heading and paragraph
+   margins give instead of the copy. Re-run the sweep before loosening these. */
+.onboard-explainer .onboard-heading { margin: 0 0 0.35rem; }
+.onboard-explainer p { margin: 0 0 0.5rem; }
+.onboard-explainer p:last-child { margin-bottom: 0; }
 .onboard-routes {
   border: 1px solid var(--rule);
   border-radius: 0.75rem;

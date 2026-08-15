@@ -2394,3 +2394,18 @@ h1 { font-size: 1.6rem; }
   font-style: normal;
   font-size: var(--t-micro);
 }
+
+/* A way through, not just a wall.
+   Borrowed from Idea Forge Pro, which hit the same CORS limit and answered it
+   with a prompt you can run somewhere that CAN reach the web, instead of
+   telling you no and stopping. */
+.step-elsewhere {
+  margin: 0 0 calc(var(--step) * 0.6);
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+.step-elsewhere p { margin: 0 0 0.4rem; }
+.step-elsewhere .btn { font-size: var(--t-meta); padding: 0.4rem 0.8rem; }
+.step-elsewhere-note { margin-left: 0.5rem; color: var(--ink); font-weight: 600; }
+.step-research-text { position: absolute; left: -9999px; width: 1px; height: 1px; }
+@media (max-height: 44rem) { .step-elsewhere p { display: none; } }

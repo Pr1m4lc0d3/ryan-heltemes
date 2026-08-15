@@ -257,6 +257,40 @@ export function currentStep(pack) {
   return states.find((s) => !s.isDone) || states[states.length - 1];
 }
 
+/** A prompt the founder can paste into any tool that CAN reach the web.
+ *
+ *  Borrowed from Idea Forge Pro, which hit this same wall and answered it
+ *  properly: a browser cannot fetch DuckDuckGo or a rival's pricing page,
+ *  because those hosts send no CORS headers to it, so on any provider without
+ *  server-side search the console genuinely cannot go and look. Saying so and
+ *  stopping is honest but useless. IFP says so and hands over a prompt to run
+ *  somewhere that can, which keeps the step completable on every provider.
+ *
+ *  It carries what is already recorded, so the research is about THIS product
+ *  rather than a generic question, and it asks for links because a finding
+ *  without a source cannot clear anything.
+ */
+export function researchPrompt(step, pack) {
+  if (!step?.needsWeb) return '';
+  const carried = carriedInto(step.id, pack);
+  const known = (carried?.items || []).slice(0, 3);
+  return [
+    `I am working on marketing a product and I need you to search the web and come back with sources.`,
+    '',
+    `WHAT I NEED: ${step.agentAsk}`,
+    '',
+    known.length ? `WHAT I ALREADY KNOW (${carried.label.toLowerCase()}):
+${known.map((k) => `- ${k}`).join(String.fromCharCode(10))}` : '',
+    known.length ? '' : '',
+    `RULES:`,
+    `- Every finding must come with the URL it came from. A statement with no link is useless to me.`,
+    `- Quote people in their own words. Do not tidy their phrasing into marketing language.`,
+    `- If you cannot find something, say so. Do not fill the gap.`,
+    '',
+    `Give me the findings as a short list I can paste back, each one line plus its link.`,
+  ].filter((l) => l !== null).join(String.fromCharCode(10));
+}
+
 /** How many are finished, for the progress line. */
 export function doneCount(pack) {
   return stepStates(pack).filter((s) => s.isDone).length;

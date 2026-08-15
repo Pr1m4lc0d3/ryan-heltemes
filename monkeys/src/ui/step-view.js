@@ -17,7 +17,7 @@
 // asked for, because it was a permanent 280px minimum holding a 175px input
 // for a panel that can do nothing without a key.
 
-import { STEPS, stepStates, carriedInto } from './steps-model.js';
+import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js';
 
 // THE BUILD STAMP, and why a static tool needs one.
 //
@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto } from './steps-model.js';
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15d · search-honest';
+export const BUILD = '2026-08-15e · a-way-through';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -156,7 +156,14 @@ export function renderStepHTML(pack, step, opts = {}) {
       </span>
       <span class="step-agent-text">&ldquo;${escapeHtml(step.agentAsk)}&rdquo;</span>
       ${blockedReason ? `<span class="step-agent-blocked">${escapeHtml(blockedReason)}</span>` : ''}
-    </button>`;
+    </button>
+    ${blockedReason ? `
+      <div class="step-elsewhere">
+        <p>Or do it somewhere that can reach the web. This prompt carries what you have already recorded.</p>
+        <button type="button" class="btn btn-secondary" data-action="copy-research" data-step="${escapeHtml(step.id)}">Copy a research prompt</button>
+        <span class="step-elsewhere-note" data-copy-note></span>
+        <textarea class="step-research-text" readonly aria-hidden="true" tabindex="-1">${escapeHtml(researchPrompt(step, pack))}</textarea>
+      </div>` : ''}`;
 
   return `
     <article class="step">

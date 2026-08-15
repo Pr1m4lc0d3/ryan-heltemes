@@ -994,6 +994,15 @@ export function mountApp(root) {
       state.openPanel = el.dataset.panel || '';
       state.loadError = '';
       render();
+    } else if (action === 'copy-research') {
+      const box = root.querySelector('.step-research-text');
+      const note = root.querySelector('[data-copy-note]');
+      if (box) {
+        box.select();
+        navigator.clipboard?.writeText(box.value)
+          .then(() => { if (note) note.textContent = 'Copied.'; })
+          .catch(() => { if (note) note.textContent = 'Select the text and copy it.'; });
+      }
     } else if (action === 'save-step') {
       saveStepEntry(el.dataset.step);
     } else if (action === 'go-step') {

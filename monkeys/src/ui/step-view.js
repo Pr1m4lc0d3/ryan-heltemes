@@ -100,10 +100,15 @@ export function renderStepFormHTML(pack, step) {
 
   return `
     <section class="step-form" data-step-form="${escapeHtml(step.id)}">
-      <h3 class="sf-head">Record it</h3>
+      <h3 class="sf-head">Record it <span class="sf-file">${escapeHtml(step.writesTo)}</span></h3>
       ${fields}
       <button type="button" class="btn sf-save" data-action="save-step" data-step="${escapeHtml(step.id)}">Save</button>
       <p class="sf-note" data-sf-note></p>
+      <p class="sf-status${(pack && step.done(pack)) ? ' is-done' : ''}">${
+        (pack && step.done(pack))
+          ? `Finished. ${escapeHtml(step.doneLabel)}.`
+          : `Finished when: ${escapeHtml(step.doneLabel.toLowerCase())}.`
+      }</p>
       <h3 class="sf-head sf-head-second">Recorded so far</h3>
       ${list}
     </section>`;
@@ -115,16 +120,20 @@ export function renderStepHTML(pack, step, opts = {}) {
   const isDone = Boolean(pack && step.done(pack));
   const agentOpen = Boolean(opts.agentOpen);
 
-  const status = isDone
-    ? `<p class="step-status is-done">Finished. ${escapeHtml(step.doneLabel)}.</p>`
-    : `<p class="step-status">You are here. Finished when: ${escapeHtml(step.doneLabel.toLowerCase())}.</p>`;
+  // The status moved INTO the form panel. It is a statement about recording,
+  // it sat under the prose repeating what the panel already showed, and the
+  // pair cost enough height to push every one of the eight steps into a
+  // scrollbar.
 
   // The agent line names what it would go and do for THIS step, so the offer
   // is concrete rather than an empty box asking what you want.
   const agent = agentOpen ? '' : `
     <button type="button" class="step-agent" data-action="toggle-agent">
-      <span class="step-agent-label">Ask</span>
-      <span class="step-agent-text">${escapeHtml(step.agentAsk)}</span>
+      <span class="step-agent-head">
+        <span class="step-agent-label">Ask the agent</span>
+        <span class="step-agent-open">Open &rarr;</span>
+      </span>
+      <span class="step-agent-text">&ldquo;${escapeHtml(step.agentAsk)}&rdquo;</span>
     </button>`;
 
   return `
@@ -141,10 +150,10 @@ export function renderStepHTML(pack, step, opts = {}) {
 
       ${agent}
 
-      <p class="step-tip">${escapeHtml(step.tip)}</p>
-      ${status}
-
-      <p class="step-writes">Recorded in <code>${escapeHtml(step.writesTo)}</code></p>
+      <details class="step-tip">
+        <summary>One thing people get wrong here</summary>
+        <p>${escapeHtml(step.tip)}</p>
+      </details>
     </article>`;
 }
 

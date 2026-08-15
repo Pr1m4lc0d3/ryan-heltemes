@@ -1835,7 +1835,7 @@ h1 { font-size: 1.6rem; }
    thing only, 46rem measure.
    ═════════════════════════════════════════════════════════════════════════ */
 
-.step-screen { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+.step-screen { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
 .step-screen-head { flex: none; padding: 0 var(--step); }
 .step-screen-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--step) var(--step); }
 
@@ -2147,3 +2147,130 @@ h1 { font-size: 1.6rem; }
 .step-columns { max-width: 74rem; }
 .step-brand { padding-bottom: 0.6rem; }
 .step-rail { padding-top: 0; }
+
+/* The Ask block reads as a door, not a sentence.
+   It was a gold label beside a line of text, which reads as a statement rather
+   than a control: nothing said an agent was behind it or that clicking opened
+   anything. Now it names the thing and says where it goes, with the offer as a
+   quoted example of what you could ask. */
+.step-agent { display: block; padding: 0.75rem 0.9rem; }
+.step-agent-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+.step-agent-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--gold);
+}
+.step-agent-open { color: var(--muted-up); font-size: var(--t-micro); }
+.step-agent-text { display: block; color: var(--bone); font-style: italic; opacity: 0.92; }
+
+/* The file the step writes, small, beside the panel head. */
+.sf-file {
+  float: right;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--muted);
+}
+.sf-status { font-size: var(--t-meta); color: var(--muted); margin: 0.5rem 0 0; }
+.sf-status.is-done { color: var(--ink); font-weight: 600; }
+
+/* The build stamp leaves the flow: it is provenance, not content, and a whole
+   row of height for it was part of what pushed the step into a scrollbar. */
+.build-stamp { position: absolute; right: 1rem; bottom: 0.4rem; margin: 0; }
+.step-screen { position: relative; }
+
+/* Tighter verticals now that the panel carries the recording talk. */
+.step-why { margin-bottom: calc(var(--step) * 0.75); }
+.step-do { margin-bottom: calc(var(--step) * 0.75); }
+.step-agent { margin-bottom: calc(var(--step) * 0.6); }
+.step-tip { margin-bottom: 0; }
+
+/* The tip collapses. It is advice rather than instruction, and a full
+   paragraph of it on every step was part of what pushed all eight into a
+   scrollbar. One line closed, the whole thing on demand. */
+.step-tip { font-size: var(--t-meta); color: var(--muted); }
+.step-tip > summary { cursor: pointer; list-style: none; }
+.step-tip > summary::-webkit-details-marker { display: none; }
+.step-tip > summary::before { content: '▸ '; }
+.step-tip[open] > summary::before { content: '▾ '; }
+.step-tip > p { margin: 0.4rem 0 0; line-height: 1.55; }
+
+/* Chrome on ONE line. The status and the persistence note were two full rows
+   above the content saying related things. Side by side they cost one. */
+.scroll-body-pinned > .pack-status,
+.scroll-body-pinned > .persist-note {
+  display: inline;
+  font-size: var(--t-micro);
+  color: var(--muted);
+}
+.scroll-body-pinned > .persist-note { margin-left: 0.4rem; }
+.scroll-body-pinned > .pack-status::after { content: ''; }
+
+/* Step 8 records four short things; on a desktop they fit two abreast. */
+@media (min-width: 62rem) {
+  .step-form[data-step-form="keep"] { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.7rem; }
+  .step-form[data-step-form="keep"] > .sf-head,
+  .step-form[data-step-form="keep"] > .sf-save,
+  .step-form[data-step-form="keep"] > .sf-note,
+  .step-form[data-step-form="keep"] > .sf-status,
+  .step-form[data-step-form="keep"] > .sf-recorded,
+  .step-form[data-step-form="keep"] > .sf-empty { grid-column: 1 / -1; }
+}
+
+/* THE STEP SCREEN MUST FILL ITS CONTAINER.
+   Measured: .scroll-body-pinned was 886px tall and .step-screen sized itself
+   to its content at 667, so the body inside it got 550px for 576px of
+   content — a scrollbar with 219px of the window sitting unused below it. The
+   flex rule existed for the old landing view and was never written for this
+   one. */
+.scroll-body-pinned > .step-screen { flex: 1 1 auto; min-height: 0; }
+
+/* The chrome merge used the wrong class: the note is .persist-note, so the
+   rule above matched nothing and it kept a full row to itself. */
+.scroll-body-pinned > .persist-note {
+  display: inline;
+  font-size: var(--t-micro);
+  color: var(--muted);
+  margin-left: 0.4rem;
+}
+
+/* The chrome: one flex child, one line, wrapping if it must. */
+.step-chrome {
+  flex: none;
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.6rem;
+  font-size: var(--t-micro);
+  color: var(--muted);
+  padding-top: 0.4rem;
+}
+.step-chrome > * { margin: 0; font-size: inherit; color: inherit; }
+.step-chrome .sample-banner { border: 0; padding: 0; background: none; }
+
+/* Short windows. At 1100x640 the two columns still sit side by side (the
+   breakpoint is width, not height) and the step ran 41-53px over. Height is
+   the scarce axis there, so the parts that are spacing rather than content
+   give first. */
+@media (max-height: 44rem) {
+  .step-brand { display: none; }
+  .step-title { font-size: 1.6rem; }
+  .step-why { margin-bottom: 0.5rem; }
+  .step-do { margin-bottom: 0.5rem; }
+  .step-agent { margin-bottom: 0.4rem; padding: 0.55rem 0.8rem; }
+  .step-form { padding: 0.8rem; }
+  .sf-field { margin-bottom: 0.5rem; }
+  .sf-head-second { margin-top: 0.7rem; padding-top: 0.7rem; }
+  .step-rail { padding-bottom: 0.3rem; }
+}

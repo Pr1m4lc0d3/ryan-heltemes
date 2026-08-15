@@ -329,10 +329,19 @@ ${q}`,
 // The opening line, before anything is asked. Computed, never generated: an
 // opening the model writes is an opening that can be wrong about the stage,
 // and this is the first thing the founder reads.
-export function openingLine(pack, evalResult) {
-  if (!pack) return 'Load a pack, or open "Set up my ground" and I will walk you through building one.';
+export function openingLine(pack, evalResult, step) {
+  // ABOUT THE STEP YOU ARE ON, in the words the screen uses.
+  //
+  // This said 'Load a pack, or open "Set up my ground"' with no pack, naming a
+  // door that no longer exists, and otherwise recited a stage number and the
+  // raw gate string. Opening the agent from step 2 and being told to load a
+  // pack is how a helper proves it is not paying attention.
+  if (step) {
+    return `You are on step ${step.n} of 8: ${step.title.toLowerCase()}. ${step.todo} Ask me anything about it, or say "${step.agentAsk}"`;
+  }
   const ev = evalResult || {};
   const closed = (ev.gates || []).find((g) => !g.open);
-  if (!closed) return `Stage ${ev.stage ?? 0}. Every gate is open. Ask me what to do next.`;
-  return `Stage ${ev.stage ?? 0}. Next gate is closed: ${closed.unmet} Ask me how to open it.`;
+  if (!pack) return 'You are on step 1: write down one true thing about your product, and where someone could check it. Ask me to go and find where a claim can be checked.';
+  if (!closed) return 'Everything is unblocked. Ask me what to do next.';
+  return `Ask me how to get past what is blocking you: ${closed.unmet}`;
 }

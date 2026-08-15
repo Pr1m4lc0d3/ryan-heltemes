@@ -387,7 +387,13 @@ export function mountApp(root) {
           // The sample banner travels too. It only ever rendered in the
           // chooser, so loading the example on the step screen showed
           // somebody else's product with nothing saying it was not theirs.
-          `${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}`
+          // ONE flex child, not three. These were three siblings of
+          // .step-screen inside a flex column, so they each took a full row:
+          // 143px of chrome above a step that was overflowing by 26. Styling
+          // them `display: inline` did nothing, because a flex item is
+          // blockified and the declaration is ignored. Wrapping them makes it
+          // one row that can lay itself out however it likes.
+          `<div class="step-chrome">${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}</div>`
           + renderStepScreenHTML(state.pack, step, { agentOpen: state.agentOpen, caps })
           + (state.pack ? '' : renderStartHereHTML(state)),
         { pinned: true, back: false });
@@ -667,7 +673,11 @@ export function mountApp(root) {
     // the agent's whole job is knowing what to do next, which is a question
     // you have from inside a door as often as from the hub.
     const uiBefore = captureUiState();
-    state.guide.opening = openingLine(state.pack, evaluate(state.pack || {}));
+    // The agent's opening follows the step the reader is looking at.
+    const openStep = state.view === 'step'
+      ? (state.stepId ? (STEPS.find((x) => x.id === state.stepId) || currentStep(state.pack)) : currentStep(state.pack))
+      : null;
+    state.guide.opening = openingLine(state.pack, evaluate(state.pack || {}), openStep);
     const cfg = state.agent.cfg;
     // AGENT OPEN/CLOSED. It was a permanent 280px minimum rail — at an 800px
     // window, 35% of the screen, holding a 175px input and a fixed 67px

@@ -547,7 +547,12 @@ export function mountApp(root) {
     // for: it interviews them until there is one.
     if (!state.pack && !state.guide.mode) state.guide.mode = 'kickoff';
     const canSearch = state.searchOn && supportsSearch(state.providerId);
-    const prompt = buildGuidePrompt(state.pack, evaluate(state.pack || {}), state.guide.history, q, state.guide.mode, canSearch);
+    // The step travels with the question. The agent had the pack and no idea
+    // what the founder was trying to do with it.
+    const askingStep = state.stepId
+      ? (STEPS.find((x) => x.id === state.stepId) || currentStep(state.pack))
+      : currentStep(state.pack);
+    const prompt = buildGuidePrompt(state.pack, evaluate(state.pack || {}), state.guide.history, q, state.guide.mode, canSearch, askingStep);
     if (prompt.blocked) { state.guide.error = prompt.blocked; render(); return; }
     state.guide.history.push({ role: 'user', text: q });
     state.guide.question = '';

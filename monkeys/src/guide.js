@@ -257,7 +257,7 @@ function entryLines(entries, limit = 25) {
 // the last few turns: a sidebar conversation that grows without bound turns
 // every question into a more expensive one, and the pack is the real
 // context here rather than the chat.
-export function buildGuidePrompt(pack, evalResult, history, question, mode, canSearch) {
+export function buildGuidePrompt(pack, evalResult, history, question, mode, canSearch, step) {
   const q = String(question || '').trim();
   // Kickoff runs with no pack, by definition: it exists to produce one.
   const kickoff = mode === 'kickoff';
@@ -272,7 +272,10 @@ export function buildGuidePrompt(pack, evalResult, history, question, mode, canS
     return {
       system,
       user: `There is no pack yet. You are starting from nothing.
-
+${step ? `
+THE STEP THEY ARE ON — this is the job, and your answer serves it:
+Step ${step.n} of 8: ${step.title}. ${step.todo}
+` : ''}
 ${recent0 ? `THE CONVERSATION SO FAR:
 ${recent0}
 
@@ -299,6 +302,15 @@ ${q}`,
     .join('\n\n');
 
   const user = [
+    // THE STEP GOES FIRST, because it is the job. Without it the model got a
+    // pack full of facts and no idea what the founder was trying to do with
+    // them, which is why it answered a question about step 2 by talking about
+    // loading a pack. Reported as "the agent says it cannot see step one".
+    step ? `THE STEP THEY ARE ON — this is the job, and every answer serves it:
+Step ${step.n} of 8: ${step.title}. ${step.todo}
+What finishes it: ${step.doneLabel}.
+${step.n > 1 ? 'Earlier steps are already recorded below. USE THEM: a search you run must be built from what they have already written down, not from a generic question.' : ''}` : '',
+    '',
     `WHERE THIS CAMPAIGN STANDS — computed from their files, not your judgement:`,
     `Stage ${ev.stage ?? 0} of 4.`,
     firstClosed

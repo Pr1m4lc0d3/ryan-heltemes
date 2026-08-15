@@ -28,6 +28,31 @@
 // finished, and what is next.
 
 const has = (list) => Array.isArray(list) && list.length > 0;
+const raws = (list) => (Array.isArray(list) ? list : []).map((r) => String(r?.raw ?? '')).filter(Boolean);
+
+/** What an earlier step produced that THIS step should be built on.
+ *
+ *  Reported: arriving at step 2 with nothing carried over from step 1, and an
+ *  agent that could not tell you were on step 2 at all. Each step now says
+ *  what it is standing on, so the screen and the agent agree about the job.
+ *
+ *  Returns {label, items} or null when there is nothing earlier to show. Never
+ *  invents a connection: if the earlier step is empty, this says so and the
+ *  step tells you to go back rather than pretending it can proceed.
+ */
+export function carriedInto(stepId, pack) {
+  const from = {
+    hear: ['What you can already prove', () => raws(pack?.truth?.cleared)],
+    ground: ['What your buyer actually said', () => raws(pack?.recon?.pains)],
+    rent: ['Who you are looking for', () => raws(pack?.recon?.pains)],
+    welcome: ['Where you said you can speak', () => raws(pack?.bailey?.active)],
+    make: ['Everything you may say, and nothing else', () => raws(pack?.truth?.cleared)],
+    send: ['What you made', () => raws(pack?.motte?.held)],
+    keep: ['What you own, so you can tell it from rented attention', () => raws(pack?.motte?.held)],
+  }[stepId];
+  if (!from) return null;
+  return { label: from[0], items: from[1]() };
+}
 
 export const STEPS = [
   {

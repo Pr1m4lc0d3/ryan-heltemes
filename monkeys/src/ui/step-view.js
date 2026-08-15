@@ -17,7 +17,7 @@
 // asked for, because it was a permanent 280px minimum holding a 175px input
 // for a panel that can do nothing without a key.
 
-import { STEPS, stepStates } from './steps-model.js';
+import { STEPS, stepStates, carriedInto } from './steps-model.js';
 
 // THE BUILD STAMP, and why a static tool needs one.
 //
@@ -31,7 +31,7 @@ import { STEPS, stepStates } from './steps-model.js';
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15 · step-console';
+export const BUILD = '2026-08-15b · carries-forward';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -141,6 +141,27 @@ export function renderStepHTML(pack, step, opts = {}) {
       <p class="step-eyebrow">Step ${step.n} of ${STEPS.length}</p>
       <h2 class="step-title">${escapeHtml(step.title)}</h2>
       <p class="step-why">${escapeHtml(step.why)}</p>
+
+      ${(() => {
+        const carried = carriedInto(step.id, pack);
+        if (!carried) return '';
+        if (!carried.items.length) {
+          return `<div class="step-carried is-missing">
+            <p class="step-carried-label">${escapeHtml(carried.label)}</p>
+            <p class="step-carried-empty">Nothing yet. Go back and finish the earlier step first, or this one has nothing to work from.</p>
+          </div>`;
+        }
+        // TWO, and the rest counted. This is context for the instruction
+        // below it, not a list to read: four full entries from a real pack put
+        // the step 96px past its viewport.
+        const shown = carried.items.slice(0, 2);
+        const more = carried.items.length - shown.length;
+        return `<div class="step-carried">
+          <p class="step-carried-label">${escapeHtml(carried.label)}</p>
+          <ul>${shown.map((i) => `<li>${escapeHtml(i)}</li>`).join('')}</ul>
+          ${more > 0 ? `<p class="step-carried-more">and ${more} more</p>` : ''}
+        </div>`;
+      })()}
 
       <div class="step-do">
         <p class="step-do-label">Do this</p>

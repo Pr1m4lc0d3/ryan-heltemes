@@ -2274,3 +2274,51 @@ h1 { font-size: 1.6rem; }
   .sf-head-second { margin-top: 0.7rem; padding-top: 0.7rem; }
   .step-rail { padding-bottom: 0.3rem; }
 }
+
+/* WHAT CARRIED FORWARD. Arriving at step 2 with no sign of step 1 made every
+   step read as a fresh start, and left the reader to remember what they were
+   supposed to build on. Shown before the instruction, because it is the
+   material the instruction operates on. */
+.step-carried {
+  border-left: 3px solid var(--rule);
+  padding-left: var(--step);
+  margin: 0 0 calc(var(--step) * 0.75);
+}
+.step-carried-label {
+  font-size: var(--t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+}
+.step-carried ul { list-style: none; margin: 0; padding: 0; }
+.step-carried li { font-size: var(--t-meta); line-height: 1.5; color: var(--ink); }
+.step-carried-empty { font-size: var(--t-meta); color: var(--danger); margin: 0; }
+.step-carried.is-missing { border-left-color: var(--danger); }
+
+/* Carried entries are context, so they are clamped to two lines each and the
+   remainder is counted rather than listed. */
+.step-carried li {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 0.15rem;
+}
+.step-carried-more { font-size: var(--t-micro); color: var(--muted); margin: 0.2rem 0 0; }
+@media (max-height: 44rem) {
+  .step-carried { margin-bottom: 0.5rem; }
+  .step-carried li { -webkit-line-clamp: 1; }
+}
+
+/* At 1100x640 a loaded sample pack still ran 57px over: the sample banner adds
+   a row of chrome the empty state does not have, and the carried block adds
+   another. On a short window the carried context folds to its label and count,
+   since the instruction below it is the part that has to be readable. */
+@media (max-height: 44rem) {
+  .step-carried ul { display: none; }
+  .step-carried-more { display: none; }
+  .step-carried-label::after { content: ' · recorded'; font-weight: 400; letter-spacing: 0; text-transform: none; }
+  .step-example { display: none; }
+}

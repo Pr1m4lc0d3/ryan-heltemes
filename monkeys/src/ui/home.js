@@ -42,7 +42,7 @@ import { buildDraftPrompt, callProvider, loadAgentConfig, saveAgentConfig, listM
 import { buildGuidePrompt, openingLine } from '../guide.js';
 import { renderSidebarHTML, tickElapsed } from './sidebar.js';
 import { evaluate } from '../stages.js';
-import { mountSetup, renderKickoffCallout, appendBulletToFile } from './setup.js';
+import { mountSetup, renderKickoffCallout, appendBulletToFile, setPreambleLine } from './setup.js';
 import { planImport, applyImport, toKitMarkdown } from '../sellkit.js';
 import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
@@ -907,15 +907,26 @@ export function mountApp(root) {
       }
       return;
     }
-    if (!step.form.compose || !step.form.heading) {
+    const files = { ...(state.pack ? state.pack.raw : {}) };
+
+    // The delivery check is a preamble LINE, not a bullet under a heading, so
+    // it needs its own writer. Without one this step dead-ended on "recorded
+    // by hand for now" while its own done-check watched that very line.
+    if (step.id === 'send') {
+      files['campaign.md'] = setPreambleLine(
+        files['campaign.md'] || '',
+        /^\*\*Delivery check:\*\*/i,
+        `**Delivery check:** confirmed ${new Date().toISOString().slice(0, 10)} - ${values.outcome}`,
+      );
+    } else if (!step.form.compose || !step.form.heading) {
       if (note) {
         note.textContent = 'This step is recorded by hand for now. Open the file and add it.';
         note.classList.remove('is-saved');
       }
       return;
+    } else {
+      files[step.writesTo] = appendBulletToFile(files[step.writesTo] || '', step.form.heading, step.form.compose(values));
     }
-    const files = { ...(state.pack ? state.pack.raw : {}) };
-    files[step.writesTo] = appendBulletToFile(files[step.writesTo] || '', step.form.heading, step.form.compose(values));
     state.pack = parsePack(files);
     state.packSource = state.packSource === 'sample' ? 'setup' : (state.packSource || 'setup');
     // STAY ON THIS STEP. Saving marks it finished, so the "first unfinished

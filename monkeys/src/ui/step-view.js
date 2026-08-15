@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15g · no-impossible-asks';
+export const BUILD = '2026-08-15h · step7-shows-its-work';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -82,6 +82,17 @@ function recordedFor(pack, step) {
     make: () => pack?.motte?.held,
     keep: () => pack?.numbers?.rows,
   }[step.id];
+
+  // The delivery check is ONE line in campaign.md's preamble, not a list, so
+  // it had no reader here at all. The step's done-check read it and reported
+  // "Finished" while the panel below said "Nothing recorded yet" — finished
+  // according to what, with nothing to show for it. A step that claims to be
+  // done has to be able to show the thing that finished it.
+  if (step.id === 'send') {
+    const check = String(pack?.campaign?.deliveryCheck || '').trim();
+    return check ? [check] : [];
+  }
+
   const rows = (at && at()) || [];
   return rows.map((r) => String(r?.raw ?? '')).filter(Boolean);
 }

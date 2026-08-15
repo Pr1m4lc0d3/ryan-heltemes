@@ -210,7 +210,7 @@ export const STEPS = [
     why: 'Traffic down a path nobody has walked wastes the one first impression you get. Checking it once is enough; it does not have to be checked again, and it does not have to cost you money.',
     todo: 'Confirm that a stranger can get from your page to a working product, and write down what happened. Then share what you made where it genuinely belongs.',
     example: 'Real order on 2026-07-17, #4285181: checkout, payment and the emails all worked.',
-    tip: 'It does not have to cost you anything. A 100% discount code, your store’s test mode, or a friend buying it all prove the same thing, and a sale you already made months ago counts — write that down rather than paying again.',
+    tip: 'It does not have to cost you anything: a 100% discount code, your store’s test mode, or a friend buying it all prove the same thing. An older check counts only for the parts that have not changed since. If the product, the download link or the site has moved, re-walk those legs, because they are the ones most likely to be broken and the ones a stale check quietly vouches for.',
     agentAsk: 'Walk me through what a stranger would experience buying this, step by step, so I can check each one.',
     writesTo: 'campaign.md',
     done: (pack) => /^confirmed/i.test(String(pack?.campaign?.deliveryCheck || '').trim()),

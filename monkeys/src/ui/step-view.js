@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15i · step8-makes-sense';
+export const BUILD = '2026-08-15j · eight-of-eight';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -94,7 +94,19 @@ function recordedFor(pack, step) {
   }
 
   const rows = (at && at()) || [];
-  return rows.map((r) => String(r?.raw ?? '')).filter(Boolean);
+  return rows
+    .map((r) => String(r?.raw ?? ''))
+    .filter(Boolean)
+    // A table row is stored as raw markdown, pipes and all. Reading your own
+    // entry back as "| 2026-08-15 | downloads | motte | 10 |" is reading the
+    // file format rather than the answer, so the pipes become separators and
+    // the doctrine word becomes English.
+    .map((raw) => (raw.trim().startsWith('|')
+      ? raw.trim().replace(/^\||\|$/g, '').split('|')
+        .map((c) => c.trim())
+        .map((c) => (c === 'motte' ? 'owned' : c === 'bailey' ? 'rented' : c))
+        .filter(Boolean).join('  ·  ')
+      : raw));
 }
 
 /** The form. THE thing that was missing.

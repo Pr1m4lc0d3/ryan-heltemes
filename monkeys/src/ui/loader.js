@@ -39,6 +39,37 @@ export function emptyLoadMessage() {
 // file it wanted. The hint line says, once, what to point each control at;
 // the fuller explanation lives in each button's title tooltip instead of on
 // screen, since a tooltip costs nothing to a reader who never hovers it.
+// THE STEP SCREEN'S OWN LOADER, and why it is a separate, permanent control.
+//
+// The step screen only ever rendered a loader through renderStartHereHTML,
+// which is gated on `state.pack ? '' : ...`. So the moment a pack existed —
+// including one restored from this browser's localStorage on boot — every way
+// of loading a pack disappeared from the only screen the console opens on.
+// The console reads the browser's copy, the skills read the folder on disk,
+// and there was no control anywhere that re-read one into the other. Reported
+// as "I reloaded and did not see gate 8 filled out": the files on disk had the
+// rows, the browser had a months-old copy, and nothing on screen could close
+// the gap.
+//
+// Inline and always present, rather than folded behind a <details>: this sits
+// in .step-chrome, which is a fixed flex row above a step that already fits
+// its viewport by a small margin, so a disclosure that expands in place would
+// push the step into a scrollbar exactly when it is used.
+export function renderStepLoaderHTML(caps, hasPack) {
+  const safeCaps = caps || capabilities();
+  const folderBtn = safeCaps.directoryAccess
+    ? '<button type="button" class="btn btn-link" data-action="open-folder" title="Point this at your .monkeys/ folder. On Chromium this stays connected, so Save writes back to the same folder.">folder</button>'
+    : '';
+  const sep = folderBtn ? '<span class="step-load-sep">or</span>' : '';
+  return `
+    <span class="step-load">
+      <span class="step-load-label">${hasPack ? 'Re-read from disk:' : 'Have a <code>.monkeys/</code> folder?'}</span>
+      ${folderBtn}${sep}
+      <button type="button" class="btn btn-link" data-action="choose-files" title="Select the .md files inside a .monkeys/ folder">files</button>
+      <input type="file" id="file-input" data-action="file-input" multiple accept=".md" hidden>
+    </span>`;
+}
+
 export function renderLoaderControls(caps) {
   const safeCaps = caps || capabilities();
   const folderBtn = safeCaps.directoryAccess

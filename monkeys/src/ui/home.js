@@ -30,7 +30,7 @@ import {
   storageAvailable, savePack, loadSavedPack, clearSavedPack, formatSavedAt,
 } from '../storage.js';
 import {
-  renderLoaderControls, renderPackStatus, renderPersistenceNote,
+  renderLoaderControls, renderStepLoaderHTML, renderPackStatus, renderPersistenceNote,
   renderNeedsPackHTML, emptyLoadMessage, renderOnboardingHTML, renderPackToggleHTML,
   renderSampleBannerHTML,
 } from './loader.js';
@@ -129,19 +129,18 @@ export function landingViewFor() {
  *  was a file picker for people who had files already. That third case is real
  *  and rare, so it gets a line rather than a third of the screen.
  */
-function renderStartHereHTML(state) {
+export function renderStartHereHTML(state) {
   return `
     <div class="step-have-pack">
       <p class="step-sample">
         <button type="button" class="btn btn-link" data-action="load-sample">See a finished example</button>
         for a made-up product, so you can look around before starting.
       </p>
-      <details class="loader-bar loader-bar-folded">
-        <summary>Already have a <code>.monkeys/</code> folder?<span class="loader-more">Load it</span></summary>
-        ${renderLoaderControls(state.caps || capabilities())}
-      </details>
     </div>`;
 }
+// The loader that used to live here moved into .step-chrome, where it renders
+// with OR without a pack. Here it was inside `state.pack ? '' : ...`, so it was
+// the one control that vanished the moment there was something to reload.
 
 // ---------------------------------------------------------------------------
 // The chooser — the opening screen. Pure function of the app state
@@ -401,7 +400,7 @@ export function mountApp(root) {
           // them `display: inline` did nothing, because a flex item is
           // blockified and the declaration is ignored. Wrapping them makes it
           // one row that can lay itself out however it likes.
-          `<div class="step-chrome">${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}</div>`
+          `<div class="step-chrome">${renderSampleBannerHTML(state.packSource)}${renderPackStatus(state)}${renderStepLoaderHTML(caps, Boolean(state.pack))}${(state.pack || state.persistenceOff) ? renderPersistenceNote(state) : ''}</div>`
           + renderStepScreenHTML(state.pack, step, {
             agentOpen: state.agentOpen,
             caps,

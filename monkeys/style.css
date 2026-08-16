@@ -2259,6 +2259,13 @@ h1 { font-size: 1.6rem; }
 .step-chrome > * { margin: 0; font-size: inherit; color: inherit; }
 .step-chrome .sample-banner { border: 0; padding: 0; background: none; }
 
+/* The re-read control. Inline, one line, no expansion — see
+   renderStepLoaderHTML for why it is not a disclosure. */
+.step-load { display: inline-flex; align-items: baseline; gap: 0.3rem; }
+.step-load-label { color: var(--muted); }
+.step-load-sep { color: var(--muted); opacity: 0.7; }
+.step-load .btn-link { font-size: inherit; padding: 0; }
+
 /* Short windows. At 1100x640 the two columns still sit side by side (the
    breakpoint is width, not height) and the step ran 41-53px over. Height is
    the scarce axis there, so the parts that are spacing rather than content

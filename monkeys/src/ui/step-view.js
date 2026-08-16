@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15l · the plan is reachable';
+export const BUILD = '2026-08-15m · the campaign sheet';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -258,8 +258,8 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
         ${renderProgressHTML(pack, step && step.id)}
         <p class="step-progress-line">
           <span>${done} of ${STEPS.length} finished</span>
-          <button type="button" class="btn btn-link" data-action="navigate" data-door="today"
-            title="Stage, the named actions, what is blocked, and what is waiting on you">See the plan</button>
+          <button type="button" class="btn btn-link" data-action="navigate" data-door="campaign"
+            title="The whole campaign on one printable sheet: what to do in what order, which rooms, what you may say">The campaign</button>
           <button type="button" class="btn btn-link" data-action="navigate" data-door="check"
             title="Paste a draft and lint every claim in it against truth.md">Check a draft</button>
         </p>

@@ -48,6 +48,7 @@ import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
 import { currentStep, STEPS } from './steps-model.js';
 import { renderStepScreenHTML } from './step-view.js';
+import { renderCampaignSheetHTML } from './campaign.js';
 
 // Re-exported unchanged: the loader markup moved to ./loader.js so today.js
 // and check.js can render it without importing this file (which imports
@@ -59,6 +60,17 @@ function escapeHtml(value) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 }
+
+// Today, as an ISO date, for the printed sheet's header and for ageing the
+// delivery check. Local rather than UTC: the founder printing it at 9pm on the
+// 15th is on the 15th, and a sheet dated tomorrow reads as wrong.
+function todayISO() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+const CAMPAIGN_NEEDS_PACK_REASON = 'the campaign is derived from your pack, never from a template. With no pack there is nothing to derive it from, and a plan that reads the same for everybody would mean nothing was read.';
 
 // WHICH DOORS ARE OFFERED depends on what the pack already contains.
 //
@@ -412,6 +424,20 @@ export function mountApp(root) {
           + (state.pack ? '' : renderStartHereHTML(state)),
         { pinned: true, back: false });
       }
+      // THE OUTPUT. Ten files in, a plan on paper out. This case is what the
+      // pack was always for, and its absence is what made the console read as
+      // a file viewer with a progress bar bolted to it.
+      case 'campaign':
+        return pageShell('', state.pack
+          ? `<div class="cs-page">
+               <div class="cs-toolbar no-print">
+                 <button type="button" class="btn" data-action="print-campaign">Print this</button>
+                 <button type="button" class="btn btn-link" data-action="navigate" data-door="today">Where am I right now</button>
+               </div>
+               ${renderCampaignSheetHTML(state.pack, { today: todayISO() })}
+             </div>`
+          : renderNeedsPackHTML('The campaign', CAMPAIGN_NEEDS_PACK_REASON, caps, state.emptyLoadNote, state),
+        { pinned: Boolean(state.pack) });
       case 'today':
         // The pack's identity travels with the landing screen. Loading now
         // lands here rather than on the chooser, and the chooser was the only
@@ -1028,6 +1054,10 @@ ${step.form.compose(values)}
       state.stepId = el.dataset.step || null;
       state.view = 'step';
       render();
+    } else if (action === 'print-campaign') {
+      // The browser's own print dialog. No PDF library, no server: the sheet
+      // is already HTML and @media print already sizes it for paper.
+      window.print();
     } else if (action === 'toggle-agent') {
       state.agentOpen = !state.agentOpen;
       render();

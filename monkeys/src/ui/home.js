@@ -442,11 +442,10 @@ export function mountApp(root) {
         return pageShell('', state.pack
           ? `<div class="cs-page">
                <div class="cs-toolbar no-print">
-                 <button type="button" class="btn" data-action="open-campaign">Open it as a page</button>
-                 <button type="button" class="btn btn-secondary" data-action="print-campaign">Print this</button>
-                 <button type="button" class="btn btn-link" data-action="save-campaign">or save it to disk</button>
-                 <button type="button" class="btn btn-link" data-action="navigate" data-door="today">Where am I right now</button>
+                 <button type="button" class="btn" data-action="print-campaign">Print my campaign</button>
+                 <button type="button" class="btn btn-secondary" data-action="save-campaign">Save it as a file</button>
                  <span class="cs-save-note" data-save-note></span>
+                 <button type="button" class="btn btn-link" data-action="navigate" data-door="today">Where am I right now</button>
                </div>
                ${renderCampaignSheetHTML(state.pack, { today: todayISO() })}
              </div>`
@@ -1068,27 +1067,15 @@ ${step.form.compose(values)}
       state.stepId = el.dataset.step || null;
       state.view = 'step';
       render();
-    } else if (action === 'open-campaign') {
-      // OPEN IT, do not make them go and find it.
-      //
-      // "Save as a file" wrote a document into a downloads folder and left the
-      // reader to locate it and double-click it. It is an HTML file and this is
-      // a browser: the whole errand was invented. A blob URL in a new tab puts
-      // the finished sheet on screen in one click, and from there the browser's
-      // own Ctrl+P and Ctrl+S are the print and the save, with nothing to hunt
-      // for. window.open is permitted here because this runs inside a click.
-      //
-      // The URL is deliberately NOT revoked: revoking it closes the tab's own
-      // source out from under it, and a page that goes blank on reload is worse
-      // than a blob that lives until the tab does.
-      const url = URL.createObjectURL(new Blob([campaignDocument(state.pack, { today: todayISO() })], { type: 'text/html' }));
-      const tab = window.open(url, '_blank');
-      const note = root.querySelector('[data-save-note]');
-      if (note) {
-        note.textContent = tab
-          ? 'Opened in a new tab. Ctrl+P to print it, Ctrl+S to keep it.'
-          : 'Your browser blocked the new tab. Allow pop-ups for this site, or use "or save it to disk".';
-      }
+    // 'open-campaign' is GONE, and it was mine to remove.
+    //
+    // It opened the same sheet in a second tab, one turn after the sheet was
+    // already rendering on this screen. Asked, fairly: "None of those buttons
+    // are obvious. How do you expect a new user to pick this up?" A control
+    // whose effect is "show you the thing you are looking at" cannot be
+    // labelled into obviousness, because there is no plain sentence describing
+    // what it does that a reader would want. Two controls remain and each one
+    // names a thing a person wants: print it, or keep the file.
     } else if (action === 'save-campaign') {
       // A FILE, not a print dialog. Rendering the sheet on screen and offering
       // the browser's printer is not the same as producing something a founder

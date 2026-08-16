@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15o · open it as a page';
+export const BUILD = '2026-08-15p · plain labels';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -123,9 +123,18 @@ export function renderStepFormHTML(pack, step) {
         placeholder="${escapeHtml(f.placeholder)}" autocomplete="off">
     </label>`).join('');
 
+  // THREE, and the rest counted. This printed every entry ever recorded, so a
+  // step's own panel grew without limit as the step was used: on step 2 of the
+  // sample pack it reached 124px and put the screen 6px past its viewport,
+  // which is the form's Save button going under the fold on the step where
+  // most entries get made. The panel is proof that saving worked, not an
+  // archive — the archive is the file, named directly above it.
   const recorded = recordedFor(pack, step);
+  const shownRecorded = recorded.slice(-3);
+  const moreRecorded = recorded.length - shownRecorded.length;
   const list = recorded.length
-    ? `<ul class="sf-recorded">${recorded.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`
+    ? `<ul class="sf-recorded">${shownRecorded.map((r) => `<li title="${escapeHtml(r)}">${escapeHtml(r)}</li>`).join('')}</ul>`
+      + (moreRecorded > 0 ? `<p class="sf-more">and ${moreRecorded} more in ${escapeHtml(step.writesTo)}</p>` : '')
     : '<p class="sf-empty">Nothing recorded yet.</p>';
 
   return `
@@ -257,11 +266,15 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
         </div>
         ${renderProgressHTML(pack, step && step.id)}
         <p class="step-progress-line">
-          <span>${done} of ${STEPS.length} finished</span>
-          <button type="button" class="btn btn-link" data-action="navigate" data-door="campaign"
-            title="The whole campaign on one printable sheet: what to do in what order, which rooms, what you may say">The campaign</button>
-          <button type="button" class="btn btn-link" data-action="navigate" data-door="check"
-            title="Paste a draft and lint every claim in it against truth.md">Check a draft</button>
+          <span class="step-purpose">${
+            done === 0
+              ? `These ${STEPS.length} steps build your marketing campaign.`
+              : (done < STEPS.length
+                  ? `${done} of ${STEPS.length} steps done. Your campaign is being written as you go.`
+                  : `All ${STEPS.length} steps done. Your campaign is ready.`)
+          }</span>
+          <button type="button" class="btn btn-goto" data-action="navigate" data-door="campaign">See my campaign</button>
+          <button type="button" class="btn btn-link" data-action="navigate" data-door="check">Check something I wrote</button>
         </p>
       </div>
       <div class="step-screen-body">

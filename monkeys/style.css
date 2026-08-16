@@ -1878,8 +1878,11 @@ h1 { font-size: 1.6rem; }
   margin: 0 auto;
   font-size: var(--t-micro);
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  /* NOT uppercase. This line used to be the words "8 of 8 finished", where
+     small-caps read as a label. It now carries a sentence telling a first-time
+     reader what the eight steps are FOR, and a sentence in tracked-out capitals
+     is the slowest thing on a screen to read. */
+  letter-spacing: 0.02em;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -2495,3 +2498,43 @@ h1 { font-size: 1.6rem; }
 /* The saved-file confirmation. Without it, a download that lands in a folder
    the browser never opens reads as a button that did nothing. */
 .cs-save-note { font-size: 0.85rem; color: var(--muted); }
+
+/* The way to the campaign. A REAL button, not an underlined word in a status
+   line: the sheet is what the eight steps are for, and it was reachable only
+   through the least prominent thing on the screen. */
+.btn-goto {
+  font-size: 0.85rem; padding: 0.15rem 0.75rem; min-height: 0; border-width: 2px;
+  letter-spacing: 0.04em; text-transform: none; font-weight: 700; line-height: 1.45;
+}
+/* The rail is the tight one: a button here is taller than the micro text it
+   sits beside, and the eight steps clear their viewport by single-digit pixels.
+   Measured, not guessed — tests/noscroll.mjs put five steps 2 to 22px over
+   before these numbers came down. */
+.step-progress-line { gap: 0 0.9rem; }
+.step-purpose { text-transform: none; letter-spacing: 0.02em; }
+
+/* Short windows: the purpose sentence and the button share a row. When they
+   cannot, the sentence wraps and step 'hear' (the longest carried block in the
+   pack) goes 11px over. Shrinking the type keeps them on one line rather than
+   hiding the sentence — a new reader on a small screen is exactly the reader
+   who needs it, so it is the last thing that should go. */
+@media (max-height: 44rem) {
+  .step-progress-line { font-size: 0.66rem; gap: 0 0.7rem; }
+  .btn-goto { font-size: 0.72rem; padding: 0.1rem 0.6rem; }
+  /* Step 'hear' carries the longest block of any step: two full recon entries,
+     each a quoted sentence plus a URL. It is the step that decides this
+     breakpoint, and it was the last 6px. */
+  .step-carried { margin-bottom: 0.3rem; }
+  .step-carried li { line-height: 1.3; }
+}
+.sf-more { margin: 0.25rem 0 0; font-size: var(--t-micro); color: var(--muted); }
+
+/* Two lines each, with the whole entry on hover.
+   A recon pain is a quoted sentence plus a URL, so one entry wrapped to four
+   lines and two of them ran the right column 486px inside a 494px body. The
+   panel's job is to prove the save landed; the entry itself lives in the file
+   named at the top of the panel, which is where the full text belongs. */
+.sf-recorded li {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}

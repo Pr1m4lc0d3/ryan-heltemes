@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15k · re-read from disk';
+export const BUILD = '2026-08-15l · the plan is reachable';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -230,7 +230,22 @@ export function renderStepHTML(pack, step, opts = {}) {
     </article>`;
 }
 
-/** The whole screen: where you are, the step, and the way onward. */
+/** The whole screen: where you are, the step, and the way onward.
+ *
+ *  THE TWO ROUTES OFF THIS SCREEN, and why they had to be added.
+ *
+ *  Asked, correctly: "what good is this data split out across the gates? what
+ *  is actionable?" Nothing, from here. The gates are a completeness check on
+ *  facts, and the two screens that turn those facts into work — 'today' (stage,
+ *  named actions, blockers, what is waiting on a human) and 'check' (lint a
+ *  draft against truth.md) — were built, tested, and UNREACHABLE. Making the
+ *  step screen the permanent landing with back:false left the console a
+ *  one-room app whose output rooms had no door.
+ *
+ *  They ride the progress line rather than arriving as new buttons: that line
+ *  already says how far along you are, and "what do I do with this" is the
+ *  question it provokes.
+ */
 export function renderStepScreenHTML(pack, step, opts = {}) {
   const done = stepStates(pack).filter((s) => s.isDone).length;
   return `
@@ -241,7 +256,13 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
           <span class="step-brand-name">Monkey Console</span>
         </div>
         ${renderProgressHTML(pack, step && step.id)}
-        <p class="step-progress-line">${done} of ${STEPS.length} finished</p>
+        <p class="step-progress-line">
+          <span>${done} of ${STEPS.length} finished</span>
+          <button type="button" class="btn btn-link" data-action="navigate" data-door="today"
+            title="Stage, the named actions, what is blocked, and what is waiting on you">See the plan</button>
+          <button type="button" class="btn btn-link" data-action="navigate" data-door="check"
+            title="Paste a draft and lint every claim in it against truth.md">Check a draft</button>
+        </p>
       </div>
       <div class="step-screen-body">
         <div class="step-columns">

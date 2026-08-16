@@ -1880,6 +1880,25 @@ h1 { font-size: 1.6rem; }
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.1rem 1rem;
+}
+/* The two routes off this screen. Same size and casing as the count they sit
+   beside, so the line reads as one statement rather than a count with a
+   toolbar bolted to it. */
+.step-progress-line .btn-link {
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 0;
+  /* .btn-link resets padding and border but NOT .btn's min-height: 3rem, so
+     two links in a micro-text line pushed every step 11px past its viewport.
+     Scoped rather than fixed on .btn-link itself: that class is used at full
+     button size elsewhere and this is the one place it must not be. */
+  min-height: 0;
 }
 
 /* ── The step ─────────────────────────────────────────────────────────────── */

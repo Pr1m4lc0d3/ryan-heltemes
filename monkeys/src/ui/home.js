@@ -1032,7 +1032,11 @@ ${step.form.compose(values)}
       state.agentOpen = !state.agentOpen;
       render();
     } else if (action === 'back') {
-      state.view = 'home';
+      // BACK TO THE STEPS, not to the chooser. 'home' is the pre-redesign
+      // four-card menu; landingViewFor never returns it and nothing else
+      // routes to it, so sending Back there would drop the reader in a screen
+      // the console no longer opens on and no longer explains itself through.
+      state.view = 'step';
       state.loadError = '';
       state.clearedNote = '';
       render();

@@ -48,7 +48,8 @@ import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
 import { currentStep, STEPS } from './steps-model.js';
 import { renderStepScreenHTML } from './step-view.js';
-import { renderCampaignSheetHTML } from './campaign.js';
+import { renderCampaignSheetHTML, campaignDocument, campaignFilename } from './campaign.js';
+import { SHEET_CSS } from './campaign-css.js';
 
 // Re-exported unchanged: the loader markup moved to ./loader.js so today.js
 // and check.js can render it without importing this file (which imports
@@ -301,6 +302,16 @@ function pageShell(title, bodyHtml, { pinned = false, back = true } = {}) {
 // ---------------------------------------------------------------------------
 
 export function mountApp(root) {
+  // THE SHEET'S STYLESHEET, injected once. It lives in campaign-css.js as a
+  // string because the saved file has to carry it inline, and a second copy in
+  // style.css would drift from that one the first time either was edited alone.
+  if (typeof document !== 'undefined' && !document.getElementById('campaign-sheet-css')) {
+    const tag = document.createElement('style');
+    tag.id = 'campaign-sheet-css';
+    tag.textContent = SHEET_CSS;
+    document.head.appendChild(tag);
+  }
+
   const state = {
     // view is SEEDED from landingViewFor, not hardcoded.
     //
@@ -431,8 +442,10 @@ export function mountApp(root) {
         return pageShell('', state.pack
           ? `<div class="cs-page">
                <div class="cs-toolbar no-print">
-                 <button type="button" class="btn" data-action="print-campaign">Print this</button>
+                 <button type="button" class="btn" data-action="save-campaign">Save as a file</button>
+                 <button type="button" class="btn btn-secondary" data-action="print-campaign">Print this</button>
                  <button type="button" class="btn btn-link" data-action="navigate" data-door="today">Where am I right now</button>
+                 <span class="cs-save-note" data-save-note></span>
                </div>
                ${renderCampaignSheetHTML(state.pack, { today: todayISO() })}
              </div>`
@@ -1054,6 +1067,24 @@ ${step.form.compose(values)}
       state.stepId = el.dataset.step || null;
       state.view = 'step';
       render();
+    } else if (action === 'save-campaign') {
+      // A FILE, not a print dialog. Rendering the sheet on screen and offering
+      // the browser's printer is not the same as producing something a founder
+      // can keep, email, or set beside last month's. Self-contained HTML rather
+      // than PDF: no library ships, it opens anywhere, and the browser's own
+      // print-to-PDF is one keystroke away from the saved file too.
+      const doc = campaignDocument(state.pack, { today: todayISO() });
+      const blob = new Blob([doc], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = campaignFilename(todayISO());
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      const note = root.querySelector('[data-save-note]');
+      if (note) note.textContent = `Saved as ${campaignFilename(todayISO())}`;
     } else if (action === 'print-campaign') {
       // The browser's own print dialog. No PDF library, no server: the sheet
       // is already HTML and @media print already sizes it for paper.

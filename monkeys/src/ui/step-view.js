@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15m · the campaign sheet';
+export const BUILD = '2026-08-15n · save the campaign';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({

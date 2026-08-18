@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-15p · plain labels';
+export const BUILD = '2026-08-17s · scout step';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -153,6 +153,54 @@ export function renderStepFormHTML(pack, step) {
     </section>`;
 }
 
+/** The copyable question sheet: the rules, then the six questions numbered. */
+function scoutSheetText(step) {
+  const lines = [
+    'Rules for the model:',
+    '- Answer one question per message. Wait for the answer, then send the next.',
+    '- Give quotes and links first, before any summary.',
+    '- If you cannot find something, say so. Do not fill the gap.',
+    '',
+    'Replace <topic> with your subject, in the words the market itself uses.',
+    '',
+  ];
+  (step.questions || []).forEach((q, i) => {
+    lines.push(`Q${i + 1} — ${q.tag}`, q.q, '');
+  });
+  return lines.join(String.fromCharCode(10));
+}
+
+/** SCOUT's panel: the six questions to take to Grok, and a box for the answers.
+ *
+ *  Step 1 is not a field form — it does not compose one line. It hands over a
+ *  fixed sheet, sends you to the one place that can read what buyers are saying
+ *  right now, and takes the raw answers back. The grading is a separate skill in
+ *  Claude Code; this only has to collect the dump and prove it is present. */
+export function renderStepPasteHTML(pack, step) {
+  const saved = String(pack?.research || '').trim();
+  const questions = (step.questions || []).map((q) => `
+    <li><span class="scout-q-tag">${escapeHtml(q.tag)}</span><span class="scout-q-text">${escapeHtml(q.q)}</span></li>`).join('');
+  const status = saved
+    ? `<p class="sf-status is-done">Finished. ${escapeHtml(step.doneLabel)}.</p>
+       <p class="scout-handoff">Now run the <b>scout</b> skill in Claude Code. It grades this into recon.md and lexicon.md, which fills the next steps.</p>`
+    : `<p class="sf-status">Finished when: ${escapeHtml(step.doneLabel.toLowerCase())}.</p>`;
+  return `
+    <section class="step-form step-scout" data-step-form="${escapeHtml(step.id)}">
+      <h3 class="sf-head">The six questions <span class="sf-file">ask Grok, on X</span></h3>
+      <ol class="scout-qs">${questions}</ol>
+      <p class="scout-rule">Replace <code>&lt;topic&gt;</code> with your subject, in the words the market uses. Ask one at a time; paste each answer below before you send the next.</p>
+      <button type="button" class="btn btn-secondary" data-action="copy-research" data-step="${escapeHtml(step.id)}">Copy the questions</button>
+      <span class="step-elsewhere-note" data-copy-note></span>
+      <textarea class="step-research-text" data-scout-sheet readonly aria-hidden="true" tabindex="-1">${escapeHtml(scoutSheetText(step))}</textarea>
+
+      <h3 class="sf-head sf-head-second">Paste Grok&rsquo;s answers <span class="sf-file">${escapeHtml(step.writesTo)}</span></h3>
+      <textarea class="sf-input scout-paste" data-field="dump" rows="8" placeholder="Paste each answer here, one under the next.">${escapeHtml(saved)}</textarea>
+      <button type="button" class="btn sf-save" data-action="save-step" data-step="${escapeHtml(step.id)}">Save</button>
+      <p class="sf-note" data-sf-note></p>
+      ${status}
+    </section>`;
+}
+
 /** One step, whole. */
 export function renderStepHTML(pack, step, opts = {}) {
   if (!step) return '';
@@ -180,7 +228,7 @@ export function renderStepHTML(pack, step, opts = {}) {
         : 'This needs to search the live web, which only OpenRouter can do here. Change provider in the agent panel.')
     : '';
 
-  const agent = agentOpen ? '' : `
+  const agent = (step.paste || agentOpen) ? '' : `
     <button type="button" class="step-agent${blockedReason ? ' is-limited' : ''}" data-action="toggle-agent">
       <span class="step-agent-head">
         <span class="step-agent-label">Ask the agent</span>
@@ -280,7 +328,7 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
       <div class="step-screen-body">
         <div class="step-columns">
           ${renderStepHTML(pack, step, opts)}
-          ${renderStepFormHTML(pack, step)}
+          ${step && step.paste ? renderStepPasteHTML(pack, step) : renderStepFormHTML(pack, step)}
         </div>
         <p class="build-stamp">${escapeHtml(BUILD)}</p>
       </div>

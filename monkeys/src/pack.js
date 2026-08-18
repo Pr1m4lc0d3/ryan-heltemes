@@ -513,6 +513,11 @@ export function parsePack(files) {
     // rather than risk a misparse dropping the one thing standing between a
     // draft and an invented house style.
     voice: need('voice.md'),
+    // research-dump.md is the raw Grok answers the SCOUT step pastes in. Cached
+    // raw (never parsed here): the scout-intake skill grades it into recon.md
+    // and lexicon.md in Claude Code, and step 1's done-check only needs to know
+    // the dump is present. need() records and caches it so a download keeps it.
+    research: need('research-dump.md'),
     // sell-kit.md is CACHED but not parsed here, for exactly voice.md's
     // reason above and one more: sellkit.js is the only reader of a kit, and
     // a second parser in this file disagreed with it for months. The one that

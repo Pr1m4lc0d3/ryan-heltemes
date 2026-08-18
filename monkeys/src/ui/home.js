@@ -930,7 +930,33 @@ export function mountApp(root) {
   function saveStepEntry(stepId) {
     const step = STEPS.find((x) => x.id === stepId);
     const form = root.querySelector(`[data-step-form="${stepId}"]`);
-    if (!step || !step.form || !form) return;
+    if (!step || !form) return;
+
+    // The paste step is the one step that takes a wall of text instead of
+    // composing a line, so it REPLACES its whole file rather than appending a
+    // bullet. Re-pasting an updated dump overwrites the old one, which is what
+    // you want — the file is the raw research, not a growing log.
+    if (step.paste) {
+      const pnote = form.querySelector('[data-sf-note]');
+      const box = form.querySelector('[data-field="dump"]');
+      const dump = (box?.value || '').trim();
+      if (!dump) {
+        if (pnote) { pnote.textContent = 'Paste Grok’s answers first.'; pnote.classList.remove('is-saved'); }
+        return;
+      }
+      const pfiles = { ...(state.pack ? state.pack.raw : {}) };
+      pfiles[step.writesTo] = `${dump}\n`;
+      state.pack = parsePack(pfiles);
+      state.packSource = state.packSource === 'sample' ? 'setup' : (state.packSource || 'setup');
+      state.stepId = stepId;
+      persist();
+      render();
+      const pafter = root.querySelector(`[data-step-form="${stepId}"] [data-sf-note]`);
+      if (pafter) { pafter.textContent = 'Saved.'; pafter.classList.add('is-saved'); }
+      return;
+    }
+
+    if (!step.form) return;
     const note = form.querySelector('[data-sf-note]');
     const values = {};
     for (const f of step.form.fields) {

@@ -68,6 +68,7 @@ export const PACK_FILES = Object.freeze([
   'motte.md',
   'bailey.md',
   'recon.md',
+  'research-dump.md',
   'asymmetry.md',
   'voice.md',
   'campaign.md',

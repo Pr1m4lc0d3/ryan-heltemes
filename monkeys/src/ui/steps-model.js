@@ -66,7 +66,39 @@ export function carriedInto(stepId, pack) {
   return { label: from[0], items: from[1]() };
 }
 
+// THE SIX QUESTIONS, and why they are a fixed sheet rather than free text.
+//
+// They came out of a real research run and each one earns its place: rounds
+// that ask what a market wants return nothing about why it refuses, so the
+// objection is its own question and comes first. Every question asks for raw
+// quotes and links BEFORE any summary, because a model asked to summarise first
+// then hunts for quotes that fit the conclusion it already wrote. Replace
+// <topic> with the subject, in the words the market itself uses.
+export const SCOUT_QUESTIONS = [
+  { tag: 'Objections', q: 'When it comes to <topic>, what words do the critics and sceptics use? Who argues it is a waste of money, theatre, or needless complexity, and what exactly do they say? Give me their direct quotes and links first, before any summary.' },
+  { tag: 'Price', q: 'When it comes to <topic>, what do people say about cost? What are they paying now, what do they say is too expensive, and what is worth paying for? Direct quotes with prices and links first, before any summary.' },
+  { tag: 'Communities', q: 'When it comes to <topic>, what are the named communities where these people actually gather? Specific forums, servers and newsletters by name, and for each one its rules on self-promotion and what it takes to be accepted as a new member.' },
+  { tag: 'The literal ask', q: 'When it comes to <topic>, what exactly do people type when they are looking for a solution? The verbatim sentences and questions people post asking for a recommendation, with links, before any summary.' },
+  { tag: 'Repellent language', q: 'When it comes to <topic>, what marketing language does this community mock or dismiss? What phrasing makes them distrust a product instantly? Direct quotes and links first, before any summary.' },
+  { tag: 'Self-description', q: 'When it comes to <topic>, how do these people describe themselves and their own role, in their own words? The direct quotes where they say what they are and what they do, with links, before any summary.' },
+];
+
 export const STEPS = [
+  {
+    id: 'find',
+    paste: true,
+    n: 1,
+    title: 'Find the truth',
+    why: 'Everything after this is built on what real buyers actually said. Guess it and you have built a campaign for a market that is not there.',
+    todo: 'Take the six questions below to Grok, on X. Grok can read what people are posting on X right now — their real words, their real objections, the prices they complain about. Ask one question at a time, then paste every answer back into the box.',
+    example: 'Ask Grok question one, paste its reply. Then question two. Six questions, six pastes, into the box on the right.',
+    tip: 'Grok, because it is wired into X and pulls live posts and quotes a general chatbot cannot reach — as close to hearing your buyers as you get without being in the thread. Ask one question per message: a merged answer cannot be split back apart.',
+    agentAsk: '',
+    writesTo: 'research-dump.md',
+    questions: SCOUT_QUESTIONS,
+    done: (pack) => Boolean(String(pack?.research || '').trim()),
+    doneLabel: 'Grok’s research pasted in',
+  },
   {
     id: 'prove',
     needsWeb: true,
@@ -249,6 +281,11 @@ export const STEPS = [
     doneLabel: 'Two dated results recorded',
   },
 ];
+
+// Numbers follow position. SCOUT went in at the front, so rather than renumber
+// every step by hand (and re-break it on the next insertion), n is derived from
+// the order here — the one place the order is defined.
+STEPS.forEach((s, i) => { s.n = i + 1; });
 
 /** Which steps are finished, in order. Reads the pack, never a stored flag. */
 export function stepStates(pack) {

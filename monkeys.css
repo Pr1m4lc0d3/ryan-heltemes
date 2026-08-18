@@ -84,6 +84,16 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   letter-spacing: var(--track-display);
   margin: var(--space-1) 0 var(--space-2);
 }
+/* The hook, in gold, straight under the name — the one line that says what all
+   three do in order: find, take, hold. */
+.mm-hook {
+  font-family: var(--font-display-thin);
+  font-weight: var(--weight-black);
+  font-size: var(--step-1);
+  letter-spacing: var(--track-display);
+  color: var(--mm-gold);
+  margin: 0 0 var(--space-2);
+}
 .mm-sub { max-width: var(--measure); font-size: var(--step-1); }
 
 /* ---- The three tools --------------------------------------------------- */
@@ -104,11 +114,13 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
 }
 @media (min-width: 54rem) {
   .mm-tools { grid-template-columns: repeat(2, 1fr); }
-  .mm-tools > :last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 @media (min-width: 80rem) {
+  /* The three packs read as the compass in one row. The console is not a
+     pack — it is where all three are operated from — so it drops below and
+     spans the full width. */
   .mm-tools { grid-template-columns: repeat(3, 1fr); }
-  .mm-tools > :last-child:nth-child(odd) { grid-column: auto; }
+  .mm-tools > .mm-tool--hinge { grid-column: 1 / -1; }
 }
 
 .mm-tool {
@@ -139,6 +151,17 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   border-color: var(--mm-gold);
 }
 .mm-tool--hinge .mm-tool-what { color: var(--mm-muted); }
+/* SCOUT is the needle — neither half, the third that reads the ground first.
+   Ink ground so its gold needle carries, the way the SCOUT card reads dark
+   with a gold name everywhere else it appears. */
+.mm-tool--needle {
+  background: var(--mm-ink-lift);
+  color: var(--mm-bone);
+  border-color: var(--mm-rule-dark);
+}
+.mm-tool--needle .mm-tool-what { color: var(--mm-muted-up); }
+.mm-tool--needle .mm-tool-role { color: var(--mm-gold); }
+.mm-tool--needle .mm-ico { background-color: var(--mm-gold); }
 
 /* One mark per card, stating the card's job before the heading does.
    Chosen for what each tool IS, not for decoration: a lever for RAID, which
@@ -158,6 +181,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   mask-size: contain;
 }
 .mm-tool--yin .mm-ico { background-color: var(--mm-gold); }
+.mm-ico--needle { -webkit-mask-image: url("assets/icons/mm-needle.png"); mask-image: url("assets/icons/mm-needle.png"); }
 .mm-ico--lever { -webkit-mask-image: url("assets/icons/mm-lever.png"); mask-image: url("assets/icons/mm-lever.png"); }
 .mm-ico--claim-broken { -webkit-mask-image: url("assets/icons/mm-claim-broken.png"); mask-image: url("assets/icons/mm-claim-broken.png"); }
 .mm-ico--sign-pen { -webkit-mask-image: url("assets/icons/mm-sign-pen.png"); mask-image: url("assets/icons/mm-sign-pen.png"); }

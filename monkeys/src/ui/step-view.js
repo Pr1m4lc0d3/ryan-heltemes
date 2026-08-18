@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-17s · scout step';
+export const BUILD = '2026-08-18t · topic + 8 questions';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -153,19 +153,20 @@ export function renderStepFormHTML(pack, step) {
     </section>`;
 }
 
-/** The copyable question sheet: the rules, then the six questions numbered. */
-function scoutSheetText(step) {
+/** The copyable question sheet: the rules, then the questions numbered, with
+ *  <topic> filled in from the subject field (or left as <topic> if it's blank
+ *  so the sheet still reads as a template). */
+function scoutSheetText(step, topic) {
+  const t = topic || '<topic>';
   const lines = [
     'Rules for the model:',
     '- Answer one question per message. Wait for the answer, then send the next.',
     '- Give quotes and links first, before any summary.',
     '- If you cannot find something, say so. Do not fill the gap.',
     '',
-    'Replace <topic> with your subject, in the words the market itself uses.',
-    '',
   ];
   (step.questions || []).forEach((q, i) => {
-    lines.push(`Q${i + 1} — ${q.tag}`, q.q, '');
+    lines.push(`Q${i + 1} — ${q.tag}`, q.q.split('<topic>').join(t), '');
   });
   return lines.join(String.fromCharCode(10));
 }
@@ -179,19 +180,23 @@ function scoutSheetText(step) {
 export function renderStepPasteHTML(pack, step) {
   const saved = String(pack?.research || '').trim();
   const questions = (step.questions || []).map((q) => `
-    <li><span class="scout-q-tag">${escapeHtml(q.tag)}</span><span class="scout-q-text">${escapeHtml(q.q)}</span></li>`).join('');
+    <li><span class="scout-q-tag">${escapeHtml(q.tag)}</span><span class="scout-q-text" data-q="${escapeHtml(q.q)}">${escapeHtml(q.q)}</span></li>`).join('');
   const status = saved
     ? `<p class="sf-status is-done">Finished. ${escapeHtml(step.doneLabel)}.</p>
        <p class="scout-handoff">Now run the <b>scout</b> skill in Claude Code. It grades this into recon.md and lexicon.md, which fills the next steps.</p>`
     : `<p class="sf-status">Finished when: ${escapeHtml(step.doneLabel.toLowerCase())}.</p>`;
+  const base = scoutSheetText(step, '');
   return `
     <section class="step-form step-scout" data-step-form="${escapeHtml(step.id)}">
-      <h3 class="sf-head">The six questions <span class="sf-file">ask Grok, on X</span></h3>
+      <label class="scout-topic-field">
+        <span class="sf-label">Your subject <span class="scout-topic-hint">fills into every question</span></span>
+        <input type="text" class="sf-input scout-topic" data-scout-topic placeholder="e.g. AI councils, camp stoves, budgeting apps" autocomplete="off">
+      </label>
+      <h3 class="sf-head">The eight questions <span class="sf-file">ask Grok, on X</span></h3>
       <ol class="scout-qs">${questions}</ol>
-      <p class="scout-rule">Replace <code>&lt;topic&gt;</code> with your subject, in the words the market uses. Ask one at a time; paste each answer below before you send the next.</p>
       <button type="button" class="btn btn-secondary" data-action="copy-research" data-step="${escapeHtml(step.id)}">Copy the questions</button>
       <span class="step-elsewhere-note" data-copy-note></span>
-      <textarea class="step-research-text" data-scout-sheet readonly aria-hidden="true" tabindex="-1">${escapeHtml(scoutSheetText(step))}</textarea>
+      <textarea class="step-research-text" data-scout-sheet data-sheet="${escapeHtml(base)}" readonly aria-hidden="true" tabindex="-1">${escapeHtml(base)}</textarea>
 
       <h3 class="sf-head sf-head-second">Paste Grok&rsquo;s answers <span class="sf-file">${escapeHtml(step.writesTo)}</span></h3>
       <textarea class="sf-input scout-paste" data-field="dump" rows="8" placeholder="Paste each answer here, one under the next.">${escapeHtml(saved)}</textarea>

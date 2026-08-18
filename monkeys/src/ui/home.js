@@ -1014,6 +1014,22 @@ ${step.form.compose(values)}
     if (after) { after.textContent = 'Saved.'; after.classList.add('is-saved'); }
   }
 
+  // SCOUT's subject field fills <topic> into every question live, so the copied
+  // sheet comes out ready to paste. Pure DOM update, no re-render: the topic is
+  // transient (not a pack file), and re-rendering on every keystroke would move
+  // the caret. Reads the pristine templates off data-q / data-sheet each time,
+  // so it substitutes from the original, never from an already-substituted copy.
+  root.addEventListener('input', (event) => {
+    const el = event.target;
+    if (!el || !el.matches || !el.matches('[data-scout-topic]')) return;
+    const topic = el.value.trim() || '<topic>';
+    root.querySelectorAll('.scout-q-text[data-q]').forEach((span) => {
+      span.textContent = span.dataset.q.split('<topic>').join(topic);
+    });
+    const sheet = root.querySelector('[data-scout-sheet][data-sheet]');
+    if (sheet) sheet.value = sheet.dataset.sheet.split('<topic>').join(topic);
+  });
+
   root.addEventListener('click', (event) => {
     // Step strips first, and NOT via data-action: they are pure view state,
     // so routing them through the action switch would put a case in it that

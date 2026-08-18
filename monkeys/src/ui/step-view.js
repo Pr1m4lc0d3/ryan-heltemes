@@ -17,7 +17,7 @@
 // asked for, because it was a permanent 280px minimum holding a 175px input
 // for a panel that can do nothing without a key.
 
-import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js';
+import { STEPS, stepStates, carriedInto, researchPrompt, scoutProgress } from './steps-model.js';
 
 // THE BUILD STAMP, and why a static tool needs one.
 //
@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt } from './steps-model.js
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-18t · topic + 8 questions';
+export const BUILD = '2026-08-18w · scout wizard';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -153,56 +153,57 @@ export function renderStepFormHTML(pack, step) {
     </section>`;
 }
 
-/** The copyable question sheet: the rules, then the questions numbered, with
- *  <topic> filled in from the subject field (or left as <topic> if it's blank
- *  so the sheet still reads as a template). */
-function scoutSheetText(step, topic) {
+/** SCOUT's panel is a wizard: one question at a time, its own answer box, and a
+ *  nav bar. Not a field form, and not eight questions behind a scroll bar — it
+ *  walks the reader through the eight one at a time, gates Next on the open
+ *  answer being filled, and lets Back revisit. Answers accumulate into
+ *  research-dump.md; the scout-intake skill grades that in Claude Code. qIndex
+ *  is the shown question (held in state); it defaults to the first unanswered. */
+export function renderScoutWizardHTML(pack, step, qIndex) {
+  const questions = step.questions || [];
+  const total = questions.length;
+  const { topic, answers, answered, answeredCount } = scoutProgress(pack);
+  let i = Number.isInteger(qIndex) ? qIndex : answered.findIndex((a) => !a);
+  if (i < 0) i = total - 1;
+  i = Math.max(0, Math.min(total - 1, i));
+  const q = questions[i];
   const t = topic || '<topic>';
-  const lines = [
-    'Rules for the model:',
-    '- Answer one question per message. Wait for the answer, then send the next.',
-    '- Give quotes and links first, before any summary.',
-    '- If you cannot find something, say so. Do not fill the gap.',
-    '',
-  ];
-  (step.questions || []).forEach((q, i) => {
-    lines.push(`Q${i + 1} — ${q.tag}`, q.q.split('<topic>').join(t), '');
-  });
-  return lines.join(String.fromCharCode(10));
-}
+  const qText = q.q.split('<topic>').join(t);
+  const answer = String(answers[q.tag] || '');
+  const isLast = i === total - 1;
+  const allDone = answeredCount >= total;
 
-/** SCOUT's panel: the six questions to take to Grok, and a box for the answers.
- *
- *  Step 1 is not a field form — it does not compose one line. It hands over a
- *  fixed sheet, sends you to the one place that can read what buyers are saying
- *  right now, and takes the raw answers back. The grading is a separate skill in
- *  Claude Code; this only has to collect the dump and prove it is present. */
-export function renderStepPasteHTML(pack, step) {
-  const saved = String(pack?.research || '').trim();
-  const questions = (step.questions || []).map((q) => `
-    <li><span class="scout-q-tag">${escapeHtml(q.tag)}</span><span class="scout-q-text" data-q="${escapeHtml(q.q)}">${escapeHtml(q.q)}</span></li>`).join('');
-  const status = saved
-    ? `<p class="sf-status is-done">Finished. ${escapeHtml(step.doneLabel)}.</p>
-       <p class="scout-handoff">Now run the <b>scout</b> skill in Claude Code. It grades this into recon.md and lexicon.md, which fills the next steps.</p>`
-    : `<p class="sf-status">Finished when: ${escapeHtml(step.doneLabel.toLowerCase())}.</p>`;
-  const base = scoutSheetText(step, '');
+  const dots = questions.map((qq, j) =>
+    `<span class="scout-dot${answered[j] ? ' is-done' : ''}${j === i ? ' is-here' : ''}" title="${escapeHtml(`${j + 1}. ${qq.tag}`)}"></span>`).join('');
+
   return `
     <section class="step-form step-scout" data-step-form="${escapeHtml(step.id)}">
       <label class="scout-topic-field">
-        <span class="sf-label">Your subject <span class="scout-topic-hint">fills into every question</span></span>
-        <input type="text" class="sf-input scout-topic" data-scout-topic placeholder="e.g. AI councils, camp stoves, budgeting apps" autocomplete="off">
+        <span class="sf-label">Your subject</span>
+        <input type="text" class="sf-input scout-topic" data-scout-topic value="${escapeHtml(topic)}" placeholder="e.g. AI councils, camp stoves, budgeting apps" autocomplete="off">
       </label>
-      <h3 class="sf-head">The eight questions <span class="sf-file">ask Grok, on X</span></h3>
-      <ol class="scout-qs">${questions}</ol>
-      <button type="button" class="btn btn-secondary" data-action="copy-research" data-step="${escapeHtml(step.id)}">Copy the questions</button>
-      <span class="step-elsewhere-note" data-copy-note></span>
-      <textarea class="step-research-text" data-scout-sheet data-sheet="${escapeHtml(base)}" readonly aria-hidden="true" tabindex="-1">${escapeHtml(base)}</textarea>
 
-      <h3 class="sf-head sf-head-second">Paste Grok&rsquo;s answers <span class="sf-file">${escapeHtml(step.writesTo)}</span></h3>
-      <textarea class="sf-input scout-paste" data-field="dump" rows="8" placeholder="Paste each answer here, one under the next.">${escapeHtml(saved)}</textarea>
-      <button type="button" class="btn sf-save" data-action="save-step" data-step="${escapeHtml(step.id)}">Save</button>
+      <p class="scout-wiz-count">Question ${i + 1} of ${total}<span class="scout-wiz-tag">${escapeHtml(q.tag)}</span></p>
+      <p class="scout-wiz-q" data-q="${escapeHtml(q.q)}">${escapeHtml(qText)}</p>
+
+      <button type="button" class="btn btn-secondary scout-copy-one" data-action="copy-research" data-step="${escapeHtml(step.id)}">Copy this question &mdash; ask Grok, on X</button>
+      <span class="step-elsewhere-note" data-copy-note></span>
+      <textarea class="step-research-text" data-scout-one readonly aria-hidden="true" tabindex="-1">${escapeHtml(qText)}</textarea>
+
+      <label class="scout-answer-field">
+        <span class="sf-label">Paste Grok&rsquo;s answer <span class="sf-file">${escapeHtml(step.writesTo)}</span></span>
+        <textarea class="sf-input scout-answer" data-scout-answer rows="5" placeholder="Paste Grok&rsquo;s reply, then press ${isLast ? 'Finish' : 'Next'}.">${escapeHtml(answer)}</textarea>
+      </label>
+
       <p class="sf-note" data-sf-note></p>
-      ${status}
+
+      <nav class="scout-nav">
+        <button type="button" class="btn btn-secondary scout-back" data-action="scout-nav" data-dir="back" data-step="${escapeHtml(step.id)}"${i === 0 ? ' disabled' : ''}>&larr; Back</button>
+        <span class="scout-dots" aria-hidden="true">${dots}</span>
+        <button type="button" class="btn scout-next" data-action="scout-nav" data-dir="next" data-step="${escapeHtml(step.id)}"${answer.trim() ? '' : ' disabled'}>${isLast ? 'Finish' : 'Next'} &rarr;</button>
+      </nav>
+
+      ${allDone ? `<p class="scout-handoff">All ${total} answered. Now run the <b>scout</b> skill in Claude Code &mdash; it grades this into recon.md and lexicon.md, which fills the next steps.</p>` : ''}
     </section>`;
 }
 
@@ -333,7 +334,7 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
       <div class="step-screen-body">
         <div class="step-columns">
           ${renderStepHTML(pack, step, opts)}
-          ${step && step.paste ? renderStepPasteHTML(pack, step) : renderStepFormHTML(pack, step)}
+          ${step && step.paste ? renderScoutWizardHTML(pack, step, opts.scoutQ) : renderStepFormHTML(pack, step)}
         </div>
         <p class="build-stamp">${escapeHtml(BUILD)}</p>
       </div>

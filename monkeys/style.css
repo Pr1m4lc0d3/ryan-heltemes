@@ -2438,29 +2438,28 @@ h1 { font-size: 1.6rem; }
 .step-elsewhere-note { margin-left: 0.5rem; color: var(--ink); font-weight: 600; }
 .step-research-text { position: absolute; left: -9999px; width: 1px; height: 1px; }
 
-/* SCOUT (step 1) is a different shape from the field forms: a fixed question
-   sheet and a paste box, not inputs that compose a line. It borrows the .sf-*
-   panel and button, and adds only what those do not cover. */
-/* The six are long, and the panel must not push the paste box under the fold —
-   the whole console holds a no-scroll rule. So the questions scroll inside their
-   own bounded box and the copy button, paste box and Save stay visible below. */
-.scout-qs { list-style: none; margin: 0.4rem 0 0; padding: 0 0.4rem 0 0; display: grid; gap: 0.45rem; max-height: 5rem; overflow-y: auto; }
-/* Step 1 is the tallest panel in the console, so it earns tighter section gaps
-   than the field forms use — otherwise the paste box lands under the fold. */
-.step-scout .sf-head-second { margin-top: 0.7rem; padding-top: 0.7rem; }
-.step-scout .scout-rule { margin: 0.5rem 0; }
-.scout-qs li { display: grid; grid-template-columns: max-content 1fr; gap: 0.7rem; align-items: baseline; }
-.scout-q-tag { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-deep); white-space: nowrap; }
-.scout-q-text { color: var(--muted); font-size: 0.95rem; line-height: 1.4; }
-.scout-rule { color: var(--muted); font-size: 0.9rem; margin: 0.7rem 0; }
-.scout-rule code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.scout-paste { min-height: 4.5rem; resize: vertical; font-family: inherit; line-height: 1.45; }
-.scout-handoff { margin-top: 0.55rem; color: var(--muted); font-size: 0.92rem; border-left: 3px solid var(--gold); padding-left: 0.7rem; }
-.scout-handoff b { color: var(--ink); }
-.scout-topic-field { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.5rem; }
+/* SCOUT (step 1) is a wizard, not a field form: one question at a time, its own
+   answer box, and a nav bar. It borrows the .sf-* input and buttons and adds
+   only the wizard chrome. One question at a time fits with no scroll bar. */
+.scout-topic-field { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.7rem; }
 .scout-topic-field .sf-label { white-space: nowrap; flex: none; }
 .scout-topic { flex: 1; min-width: 0; }
-.scout-topic-hint { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.scout-wiz-count { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; }
+.scout-wiz-tag { color: var(--gold-deep); }
+.scout-wiz-q { font-size: 1.05rem; line-height: 1.4; margin: 0 0 0.7rem; color: var(--ink); }
+.scout-answer-field { display: grid; gap: 0.3rem; margin-top: 0.6rem; }
+.scout-answer { min-height: 5rem; resize: vertical; font-family: inherit; line-height: 1.45; }
+
+.scout-nav { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; margin-top: 0.7rem; }
+.scout-dots { display: flex; gap: 0.35rem; flex: 1; justify-content: center; }
+.scout-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; border: 1px solid var(--rule-dark); background: transparent; }
+.scout-dot.is-done { background: var(--gold); border-color: var(--gold); }
+.scout-dot.is-here { outline: 2px solid var(--ink); outline-offset: 1px; }
+.scout-next[disabled], .scout-back[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+.scout-handoff { margin-top: 0.7rem; color: var(--muted); font-size: 0.92rem; border-left: 3px solid var(--gold); padding-left: 0.7rem; }
+.scout-handoff b { color: var(--ink); }
 @media (max-height: 44rem) { .step-elsewhere p { display: none; } }
 
 /* Step 8 carries five short fields now that the owned/rented column exists.

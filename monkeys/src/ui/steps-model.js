@@ -99,8 +99,8 @@ export const STEPS = [
     agentAsk: '',
     writesTo: 'research-dump.md',
     questions: SCOUT_QUESTIONS,
-    done: (pack) => Boolean(String(pack?.research || '').trim()),
-    doneLabel: 'Grok’s research pasted in',
+    done: (pack) => scoutProgress(pack).answeredCount >= SCOUT_QUESTIONS.length,
+    doneLabel: 'all eight questions answered',
   },
   {
     id: 'prove',
@@ -344,4 +344,48 @@ ${known.map((k) => `- ${k}`).join(String.fromCharCode(10))}` : '',
 /** How many are finished, for the progress line. */
 export function doneCount(pack) {
   return stepStates(pack).filter((s) => s.isDone).length;
+}
+
+const NL = String.fromCharCode(10);
+
+/** research-dump.md is a subject line then one `## Tag` section per answered
+ *  question. This shape round-trips (the wizard resumes exactly where it was)
+ *  and reads cleanly for the scout-intake skill that grades it in Claude Code. */
+export function assembleScoutDump(topic, answers) {
+  const out = [`# Subject: ${(topic || '').trim()}`.trim(), ''];
+  SCOUT_QUESTIONS.forEach((q) => {
+    const a = String(answers[q.tag] || '').trim();
+    if (a) out.push(`## ${q.tag}`, a, '');
+  });
+  return out.join(NL).trim() + NL;
+}
+
+/** The inverse of assembleScoutDump: pull the subject and each answer back out
+ *  of the saved file so the wizard can prefill and count progress. */
+export function parseScoutDump(text) {
+  const src = String(text || '');
+  const subject = src.match(/^#\s*Subject:\s*(.*)$/m);
+  const topic = subject ? subject[1].trim() : '';
+  const answers = {};
+  src.split(/^##\s+/m).slice(1).forEach((part) => {
+    const nl = part.indexOf(NL);
+    const tag = (nl === -1 ? part : part.slice(0, nl)).trim();
+    const body = (nl === -1 ? '' : part.slice(nl + 1)).trim();
+    if (tag) answers[tag] = body;
+  });
+  return { topic, answers };
+}
+
+/** Where the reader is in the eight: the subject, the per-question answers, how
+ *  many are done, and the first one still open (so a fresh visit resumes there). */
+export function scoutProgress(pack) {
+  const { topic, answers } = parseScoutDump(pack?.research || '');
+  const answered = SCOUT_QUESTIONS.map((q) => Boolean(String(answers[q.tag] || '').trim()));
+  const first = answered.findIndex((a) => !a);
+  return {
+    topic, answers, answered,
+    answeredCount: answered.filter(Boolean).length,
+    total: SCOUT_QUESTIONS.length,
+    firstUnanswered: first === -1 ? SCOUT_QUESTIONS.length - 1 : first,
+  };
 }

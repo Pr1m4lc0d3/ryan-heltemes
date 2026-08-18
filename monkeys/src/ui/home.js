@@ -46,7 +46,7 @@ import { mountSetup, renderKickoffCallout, appendBulletToFile, setPreambleLine }
 import { planImport, applyImport, toKitMarkdown } from '../sellkit.js';
 import { readKitFile } from '../kitfile.js';
 import { SAMPLE_PACK_FILES } from './sample-pack.js';
-import { currentStep, STEPS } from './steps-model.js';
+import { currentStep, STEPS, scoutProgress, assembleScoutDump } from './steps-model.js';
 import { renderStepScreenHTML } from './step-view.js';
 import { renderCampaignSheetHTML, campaignDocument, campaignFilename } from './campaign.js';
 import { SHEET_CSS } from './campaign-css.js';
@@ -328,6 +328,10 @@ export function mountApp(root) {
     // Which step the reader has clicked to. null means "whichever is next",
     // recomputed from the pack every render.
     stepId: null,
+    // SCOUT's wizard: which of the eight questions is showing. null means "the
+    // first unanswered", recomputed from the pack. Set only by Back/Next, reset
+    // to null when the reader leaves step 1 so a return resumes at the open one.
+    scoutQ: null,
     // The drafting agent's own state. cfg is read from this browser once, on
     // boot; ask/busy/error live only as long as the page does.
     agent: { cfg: loadAgentConfig(), ask: '', busy: false, error: '' },
@@ -427,6 +431,7 @@ export function mountApp(root) {
           + renderStepScreenHTML(state.pack, step, {
             agentOpen: state.agentOpen,
             caps,
+            scoutQ: state.scoutQ,
             web: {
               canSearch: state.searchOn && supportsSearch(state.providerId),
               providerCanSearch: supportsSearch(state.providerId),
@@ -930,33 +935,7 @@ export function mountApp(root) {
   function saveStepEntry(stepId) {
     const step = STEPS.find((x) => x.id === stepId);
     const form = root.querySelector(`[data-step-form="${stepId}"]`);
-    if (!step || !form) return;
-
-    // The paste step is the one step that takes a wall of text instead of
-    // composing a line, so it REPLACES its whole file rather than appending a
-    // bullet. Re-pasting an updated dump overwrites the old one, which is what
-    // you want — the file is the raw research, not a growing log.
-    if (step.paste) {
-      const pnote = form.querySelector('[data-sf-note]');
-      const box = form.querySelector('[data-field="dump"]');
-      const dump = (box?.value || '').trim();
-      if (!dump) {
-        if (pnote) { pnote.textContent = 'Paste Grok’s answers first.'; pnote.classList.remove('is-saved'); }
-        return;
-      }
-      const pfiles = { ...(state.pack ? state.pack.raw : {}) };
-      pfiles[step.writesTo] = `${dump}\n`;
-      state.pack = parsePack(pfiles);
-      state.packSource = state.packSource === 'sample' ? 'setup' : (state.packSource || 'setup');
-      state.stepId = stepId;
-      persist();
-      render();
-      const pafter = root.querySelector(`[data-step-form="${stepId}"] [data-sf-note]`);
-      if (pafter) { pafter.textContent = 'Saved.'; pafter.classList.add('is-saved'); }
-      return;
-    }
-
-    if (!step.form) return;
+    if (!step || !step.form || !form) return;
     const note = form.querySelector('[data-sf-note]');
     const values = {};
     for (const f of step.form.fields) {
@@ -1014,20 +993,63 @@ ${step.form.compose(values)}
     if (after) { after.textContent = 'Saved.'; after.classList.add('is-saved'); }
   }
 
-  // SCOUT's subject field fills <topic> into every question live, so the copied
-  // sheet comes out ready to paste. Pure DOM update, no re-render: the topic is
-  // transient (not a pack file), and re-rendering on every keystroke would move
-  // the caret. Reads the pristine templates off data-q / data-sheet each time,
-  // so it substitutes from the original, never from an already-substituted copy.
+  // SCOUT's wizard: save the answer showing now (and the subject) into
+  // research-dump.md, then move one question. Next is gated on an answer being
+  // present; Back saves whatever is typed without erasing an existing answer and
+  // can always move. The dump is the store, so progress survives a reload.
+  function scoutNav(stepId, dir) {
+    const step = STEPS.find((x) => x.id === stepId);
+    const form = root.querySelector(`[data-step-form="${stepId}"]`);
+    if (!step || !form) return;
+    const questions = step.questions || [];
+    const total = questions.length;
+    const prog = scoutProgress(state.pack);
+    let i = Number.isInteger(state.scoutQ) ? state.scoutQ : prog.firstUnanswered;
+    i = Math.max(0, Math.min(total - 1, i));
+    const answer = (form.querySelector('[data-scout-answer]')?.value || '').trim();
+    const topic = (form.querySelector('[data-scout-topic]')?.value || '').trim();
+
+    if (dir === 'next' && !answer) {
+      const note = form.querySelector('[data-sf-note]');
+      if (note) note.textContent = 'Paste the answer to this question before moving on.';
+      return;
+    }
+
+    const answers = { ...prog.answers };
+    if (answer) answers[questions[i].tag] = answer;
+    const files = { ...(state.pack ? state.pack.raw : {}) };
+    files[step.writesTo] = assembleScoutDump(topic || prog.topic, answers);
+    state.pack = parsePack(files);
+    state.packSource = state.packSource === 'sample' ? 'setup' : (state.packSource || 'setup');
+    state.stepId = stepId;
+    state.scoutQ = dir === 'next' ? Math.min(total - 1, i + 1) : Math.max(0, i - 1);
+    persist();
+    render();
+  }
+
+  // The subject fills into the question showing now, and into the copy source
+  // that "Copy this question" reads; the answer box gates Next. Pure DOM update,
+  // no re-render, so the caret does not jump on every keystroke.
   root.addEventListener('input', (event) => {
     const el = event.target;
-    if (!el || !el.matches || !el.matches('[data-scout-topic]')) return;
-    const topic = el.value.trim() || '<topic>';
-    root.querySelectorAll('.scout-q-text[data-q]').forEach((span) => {
-      span.textContent = span.dataset.q.split('<topic>').join(topic);
-    });
-    const sheet = root.querySelector('[data-scout-sheet][data-sheet]');
-    if (sheet) sheet.value = sheet.dataset.sheet.split('<topic>').join(topic);
+    if (!el || !el.matches) return;
+    // The subject fills into the question showing now, and into the copy source
+    // that "Copy this question" reads. Pure DOM update, no re-render.
+    if (el.matches('[data-scout-topic]')) {
+      const topic = el.value.trim() || '<topic>';
+      const shown = root.querySelector('.scout-wiz-q[data-q]');
+      if (shown) {
+        shown.textContent = shown.dataset.q.split('<topic>').join(topic);
+        const one = root.querySelector('[data-scout-one]');
+        if (one) one.value = shown.textContent;
+      }
+      return;
+    }
+    // No answer, no forward: the answer box enables Next as soon as it has text.
+    if (el.matches('[data-scout-answer]')) {
+      const next = root.querySelector('.scout-next');
+      if (next) next.disabled = !el.value.trim();
+    }
   });
 
   root.addEventListener('click', (event) => {
@@ -1105,8 +1127,13 @@ ${step.form.compose(values)}
       }
     } else if (action === 'save-step') {
       saveStepEntry(el.dataset.step);
+    } else if (action === 'scout-nav') {
+      scoutNav(el.dataset.step, el.dataset.dir);
     } else if (action === 'go-step') {
       state.stepId = el.dataset.step || null;
+      // Reset the wizard cursor: a return to step 1 resumes at the first open
+      // question, not wherever it was last left.
+      state.scoutQ = null;
       state.view = 'step';
       render();
     // 'open-campaign' is GONE, and it was mine to remove.

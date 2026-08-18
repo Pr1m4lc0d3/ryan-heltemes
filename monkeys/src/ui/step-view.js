@@ -31,7 +31,7 @@ import { STEPS, stepStates, carriedInto, researchPrompt, scoutProgress } from '.
 // So the screen says which build it is. Bump this when you deploy. If the
 // stamp is old, the browser is stale and a hard reload fixes it; if the stamp
 // is current and the change is missing, the change is genuinely missing.
-export const BUILD = '2026-08-18w · scout wizard';
+export const BUILD = '2026-08-18x · generic examples';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -180,7 +180,7 @@ export function renderScoutWizardHTML(pack, step, qIndex) {
     <section class="step-form step-scout" data-step-form="${escapeHtml(step.id)}">
       <label class="scout-topic-field">
         <span class="sf-label">Your subject</span>
-        <input type="text" class="sf-input scout-topic" data-scout-topic value="${escapeHtml(topic)}" placeholder="e.g. AI councils, camp stoves, budgeting apps" autocomplete="off">
+        <input type="text" class="sf-input scout-topic" data-scout-topic value="${escapeHtml(topic)}" placeholder="e.g. running shoes, houseplants, invoicing software" autocomplete="off">
       </label>
 
       <p class="scout-wiz-count">Question ${i + 1} of ${total}<span class="scout-wiz-tag">${escapeHtml(q.tag)}</span></p>

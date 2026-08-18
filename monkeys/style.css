@@ -48,7 +48,7 @@ html, body {
   background: var(--bone);
   color: var(--ink);
   font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -617,7 +617,7 @@ p { margin: 0 0 0.75rem; }
   .chooser-header, .door-page-head { padding: 1.5rem 1rem 0; }
   .scroll-body { padding: 1rem 1rem 2rem; }
   .chooser-header { flex-wrap: wrap; }
-  html, body { font-size: 17px; }
+  html, body { font-size: 15px; }
 }
 
 /* ── Height-keyed responsive tiers ───────────────────────────────────────
@@ -957,7 +957,7 @@ h1 { font-size: 1.6rem; }
    is spacing and type scale — no content is hidden and no layout changes,
    so a short window shows the same screen, closer together. */
 @media (max-height: 820px) {
-  html, body { font-size: 16px; }
+  html, body { font-size: 14px; }
   .door-page-head { padding: 0.35rem 1.25rem 0.2rem; }
   .door-page-head h2 { font-size: 1.1rem; }
   .scroll-body { padding: 0.5rem 1.25rem 0.6rem; }

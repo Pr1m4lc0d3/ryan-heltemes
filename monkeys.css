@@ -60,13 +60,13 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   bottom: var(--space-4);
   width: var(--work-thumb);
   height: var(--work-thumb);
-  background: url("assets/works/monkeys-peel.png") left bottom / contain no-repeat;
+  background: url("assets/works/monkeys-peel.webp") left bottom / contain no-repeat;
 }
 
 .mm-mark {
   width: var(--shelf-tile);
   height: var(--shelf-tile);
-  background: url("assets/works/monkeys-mark.png") center / contain no-repeat;
+  background: url("assets/works/monkeys-mark.webp") center / contain no-repeat;
 }
 
 .mm-say { color: var(--mm-bone); }
@@ -181,7 +181,7 @@ body.mm { background: var(--mm-bone); color: var(--mm-ink); }
   mask-size: contain;
 }
 .mm-tool--yin .mm-ico { background-color: var(--mm-gold); }
-.mm-ico--needle { -webkit-mask-image: url("assets/icons/mm-needle.png"); mask-image: url("assets/icons/mm-needle.png"); }
+.mm-ico--needle { -webkit-mask-image: url("assets/icons/mm-needle.webp"); mask-image: url("assets/icons/mm-needle.webp"); }
 .mm-ico--lever { -webkit-mask-image: url("assets/icons/mm-lever.png"); mask-image: url("assets/icons/mm-lever.png"); }
 .mm-ico--claim-broken { -webkit-mask-image: url("assets/icons/mm-claim-broken.png"); mask-image: url("assets/icons/mm-claim-broken.png"); }
 .mm-ico--sign-pen { -webkit-mask-image: url("assets/icons/mm-sign-pen.png"); mask-image: url("assets/icons/mm-sign-pen.png"); }

@@ -1,0 +1,5 @@
+# https://ryan-heltemes.com
+User-agent: *
+Allow: /
+
+Sitemap: https://ryan-heltemes.com/sitemap.xml

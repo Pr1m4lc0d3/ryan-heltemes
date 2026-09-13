@@ -24,6 +24,8 @@
   --ink-soft:     #5c6260;   /* utility data, captions, secondary */
   --accent:       #2f5d50;   /* deep verdigris — material codes and rules ONLY */
   --accent-lift:  #3d7565;   /* accent on hover */
+  --alert:        #9a2b1e;   /* form errors ONLY. The one warm colour allowed on a
+                                cool page, and only where something failed. */
 
   /* --- Mavericks Monkeys ------------------------------------------------
      ONE sub-page carries a second palette on purpose: mavericks-monkeys.html.

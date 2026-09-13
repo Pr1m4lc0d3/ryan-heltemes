@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not built — Ryan Heltemes</title>
+<meta name="description" content="That page isn't on ryan-heltemes.com.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://ryan-heltemes.com/404.html">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/tokens.css">
+<script src="/analytics.js" defer></script>
+<style>
+  body{background:var(--ground);color:var(--ink);font-family:var(--font-body)}
+  .col{max-width:var(--measure);margin:0 auto;padding:var(--space-4) var(--space-3) var(--space-6)}
+  .col.mid{text-align:center;padding-top:var(--space-5)}
+  .col .back{font-size:var(--step--1);text-decoration:none;letter-spacing:var(--track-util);color:var(--accent)}
+  .col h1{font-size:var(--step-3);margin:var(--space-3) 0 var(--space-2);line-height:var(--leading-tight);color:var(--ink)}
+  .col h2{font-size:var(--step-1);margin:var(--space-4) 0 var(--space-1);color:var(--ink)}
+  .col p{margin:0 0 var(--space-2);line-height:var(--leading-body);color:var(--ink-soft)}
+  .col .lede{font-size:var(--step-1);color:var(--ink)}
+  .col a{color:var(--accent)}
+  .col code{background:var(--ground-deep);border:var(--rule) solid var(--ground-edge);
+            border-radius:var(--radius);padding:0 var(--space-1);font-family:var(--font-util)}
+  .col hr{border:0;border-top:var(--rule) solid var(--ground-edge);margin:var(--space-4) 0 var(--space-3)}
+  .col .fine{font-size:var(--step--1);color:var(--ink-soft)}
+  .col .seal{font-size:var(--step--1);letter-spacing:var(--track-util);text-transform:uppercase;
+             margin:0 0 var(--space-2);color:var(--accent)}
+</style>
+</head>
+<body>
+<main class="col mid">
+  <p class="seal">404</p>
+  <h1>Not built</h1>
+  <p>Plenty of things are. That one isn't, or it moved.</p>
+  <p><a href="/">Back to the index of works.</a></p>
+</main>
+<script>
+  /* analytics.js is deferred, so gtag does not exist yet while this parses.
+     Deferred scripts finish before DOMContentLoaded, which is why the event waits. */
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'page_not_found', { page_path: location.pathname, referrer: document.referrer });
+    }
+  });
+</script>
+</body>
+</html>

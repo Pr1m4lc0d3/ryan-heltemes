@@ -182,7 +182,7 @@ export function renderChooserHTML(state) {
   return `
     <div class="chooser">
       <header class="chooser-header">
-        <img class="mark" src="assets/mark-combined.png" alt="The Maverick's Monkeys mark">
+        <img class="mark" src="assets/mark-combined.webp" alt="The Maverick's Monkeys mark">
         <div>
           <h1>Monkey Console</h1>
           <!-- Derived, never a literal. This line said "nine" from before voice.md

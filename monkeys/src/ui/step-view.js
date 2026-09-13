@@ -315,7 +315,7 @@ export function renderStepScreenHTML(pack, step, opts = {}) {
     <div class="step-screen">
       <div class="step-screen-head">
         <div class="step-brand">
-          <img class="step-mark-img" src="assets/mark-combined.png" alt="">
+          <img class="step-mark-img" src="assets/mark-combined.webp" alt="">
           <span class="step-brand-name">Monkey Console</span>
         </div>
         ${renderProgressHTML(pack, step && step.id)}
